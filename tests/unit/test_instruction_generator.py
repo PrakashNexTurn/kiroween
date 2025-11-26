@@ -74,8 +74,9 @@ class TestInstructionGenerator:
         assert ".kiro/specs/todo-app/" in instruction
         assert "tasks.md" in instruction
         assert "design.md" in instruction
-        assert "checkbox format" in instruction or "checkbox tasks" in instruction
+        assert "- [ ]" in instruction  # Checkbox format
         assert "Implementation Plan" in instruction
+        assert "blank lines between main tasks" in instruction
         assert "Do not modify requirements.md or design.md" in instruction
 
     def test_generate_spec_instruction_invalid_type(self):
