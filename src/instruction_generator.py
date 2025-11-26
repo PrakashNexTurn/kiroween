@@ -40,36 +40,36 @@ class InstructionGenerator:
 
         if spec_type == "requirements":
             instruction += (
-                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/\n\n"
-                f"Generate the requirements.md file following the Kiro spec format:\n"
-                f"- Use EARS (Easy Approach to Requirements Syntax) patterns\n"
-                f"- Include Introduction, Glossary, and numbered Requirements sections\n"
-                f"- Each requirement should have a user story and 2-5 acceptance criteria\n"
-                f"- Follow INCOSE quality rules (active voice, no vague terms, measurable criteria)\n\n"
-                f"Feature description: {description}\n\n"
+                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/. "
+                f"Generate the requirements.md file following the Kiro spec format: "
+                f"Use EARS (Easy Approach to Requirements Syntax) patterns, "
+                f"include Introduction, Glossary, and numbered Requirements sections, "
+                f"each requirement should have a user story and 2-5 acceptance criteria, "
+                f"follow INCOSE quality rules (active voice, no vague terms, measurable criteria). "
+                f"Feature description: {description}. "
                 f"Create ONLY the requirements.md file. Do not create design.md or tasks.md yet."
             )
         elif spec_type == "design":
             instruction += (
-                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/\n\n"
-                f"The requirements.md file already exists. Now generate the design.md file following the Kiro spec format:\n"
-                f"- Include sections: Overview, Architecture, Components and Interfaces, Data Models, "
-                f"Correctness Properties, Error Handling, Testing Strategy\n"
-                f"- Use the prework tool to analyze acceptance criteria before writing Correctness Properties\n"
-                f"- Each correctness property should reference specific requirements\n"
-                f"- Include both unit testing and property-based testing approaches\n\n"
+                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/. "
+                f"The requirements.md file already exists. Now generate the design.md file following the Kiro spec format: "
+                f"Include sections: Overview, Architecture, Components and Interfaces, Data Models, "
+                f"Correctness Properties, Error Handling, Testing Strategy. "
+                f"Use the prework tool to analyze acceptance criteria before writing Correctness Properties. "
+                f"Each correctness property should reference specific requirements. "
+                f"Include both unit testing and property-based testing approaches. "
                 f"Create ONLY the design.md file based on requirements.md. Do not modify requirements.md or create tasks.md yet."
             )
         elif spec_type == "tasks":
             instruction += (
-                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/\n\n"
-                f"The requirements.md and design.md files already exist. Now generate the tasks.md file following the Kiro spec format:\n"
-                f"- Create numbered checkbox tasks (e.g., - [ ] 1. Task name)\n"
-                f"- Use decimal notation for sub-tasks (e.g., - [ ] 1.1, - [ ] 1.2)\n"
-                f"- Each task should reference specific requirements (e.g., _Requirements: 1.1, 2.3_)\n"
-                f"- Mark optional test-related sub-tasks with '*' suffix (e.g., - [ ]* 2.1 Write unit tests)\n"
-                f"- Include checkpoint tasks: 'Ensure all tests pass, ask the user if questions arise.'\n"
-                f"- Each property-based test should be its own sub-task with property number and requirement reference\n\n"
+                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/. "
+                f"The requirements.md and design.md files already exist. Now generate the tasks.md file following the Kiro spec format: "
+                f"Create numbered checkbox tasks (e.g., - [ ] 1. Task name), "
+                f"use decimal notation for sub-tasks (e.g., - [ ] 1.1, - [ ] 1.2), "
+                f"each task should reference specific requirements (e.g., _Requirements: 1.1, 2.3_), "
+                f"mark optional test-related sub-tasks with '*' suffix (e.g., - [ ]* 2.1 Write unit tests), "
+                f"include checkpoint tasks: 'Ensure all tests pass, ask the user if questions arise.', "
+                f"each property-based test should be its own sub-task with property number and requirement reference. "
                 f"Create ONLY the tasks.md file based on design.md. Do not modify requirements.md or design.md."
             )
 
@@ -154,8 +154,8 @@ class InstructionGenerator:
         """
         instruction = "/tools trust-all\n"
         instruction += (
-            f"The following tests are failing in .kiro/specs/{project_id}/:\n"
-            f"{failure_details}\n"
+            f"The following tests are failing in .kiro/specs/{project_id}/: "
+            f"{failure_details}. "
             f"Please analyze and fix these issues."
         )
 
