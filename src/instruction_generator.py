@@ -63,13 +63,17 @@ class InstructionGenerator:
         elif spec_type == "tasks":
             instruction += (
                 f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/. "
-                f"The requirements.md and design.md files already exist. Now generate the tasks.md file following the Kiro spec format: "
-                f"Create numbered checkbox tasks (e.g., - [ ] 1. Task name), "
-                f"use decimal notation for sub-tasks (e.g., - [ ] 1.1, - [ ] 1.2), "
-                f"each task should reference specific requirements (e.g., _Requirements: 1.1, 2.3_), "
-                f"mark optional test-related sub-tasks with '*' suffix (e.g., - [ ]* 2.1 Write unit tests), "
-                f"include checkpoint tasks: 'Ensure all tests pass, ask the user if questions arise.', "
-                f"each property-based test should be its own sub-task with property number and requirement reference. "
+                f"The requirements.md and design.md files already exist. Now generate the tasks.md file following the exact Kiro spec format. "
+                f"IMPORTANT FORMAT RULES: "
+                f"Start with title '# Implementation Plan' (not '# Tasks'), "
+                f"use numbered checkbox format '- [ ] 1. Task name' for main tasks, "
+                f"add blank lines between main tasks for readability, "
+                f"use decimal notation '- [ ] 1.1 Sub-task' for sub-tasks (indented with 2 spaces), "
+                f"add task details as indented sub-bullets (2 spaces, no checkbox), "
+                f"add requirements reference as indented sub-bullet '  - _Requirements: 1.1, 2.3_', "
+                f"mark optional test sub-tasks with '- [ ]* X.Y Task name' format, "
+                f"property-based test sub-tasks should include '  - **Property N: Name**' and '  - **Validates: Requirements X.Y**', "
+                f"include checkpoint tasks as '- [ ] N. Checkpoint - Ensure all tests pass' with sub-bullet '  - Ensure all tests pass, ask the user if questions arise.'. "
                 f"Create ONLY the tasks.md file based on design.md. Do not modify requirements.md or design.md."
             )
 
