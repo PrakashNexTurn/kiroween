@@ -74,6 +74,8 @@ class InstructionGenerator:
                 f"7) Optional test sub-tasks use '- [ ]* X.Y Task name' format, "
                 f"8) Property-based test sub-tasks include '  - **Property N: Name**' and '  - **Validates: Requirements X.Y**', "
                 f"9) Checkpoint tasks use '- [ ] N. Checkpoint - Ensure all tests pass' with sub-bullet '  - Ensure all tests pass, ask the user if questions arise.'. "
+                f"IMPORTANT: The FIRST task (task 1) MUST be about creating/deciding on the project folder structure. "
+                f"This task should include sub-tasks for: creating the directory structure, setting up configuration files, and establishing the basic project skeleton. "
                 f"The blank lines between main tasks are ESSENTIAL for readability. "
                 f"Create ONLY the tasks.md file based on design.md. Do not modify requirements.md or design.md."
             )
