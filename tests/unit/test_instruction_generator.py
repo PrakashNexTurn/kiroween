@@ -28,8 +28,9 @@ class TestInstructionGenerator:
         # Verify instruction contains project details
         assert project_id in instruction
         assert description in instruction
-        assert ".kiro/specs/test-project/requirements.md" in instruction
-        assert "ONLY the requirements.md" in instruction
+        assert ".kiro/specs/test-project/" in instruction
+        assert "requirements.md" in instruction
+        assert "EARS" in instruction
         assert "Do not create design.md or tasks.md" in instruction
 
     def test_generate_spec_instruction_design(self):
@@ -48,11 +49,11 @@ class TestInstructionGenerator:
 
         # Verify instruction contains project details
         assert project_id in instruction
-        assert ".kiro/specs/my-app/design.md" in instruction
-        assert "ONLY the design.md" in instruction
-        assert "Do not create or modify tasks.md" in instruction
-        assert "design" in instruction.lower()
+        assert ".kiro/specs/my-app/" in instruction
+        assert "design.md" in instruction
         assert "requirements.md" in instruction
+        assert "Correctness Properties" in instruction
+        assert "Do not modify requirements.md or create tasks.md" in instruction
 
     def test_generate_spec_instruction_tasks(self):
         """Test generating tasks spec instruction."""
@@ -70,10 +71,11 @@ class TestInstructionGenerator:
 
         # Verify instruction contains project details
         assert project_id in instruction
-        assert ".kiro/specs/todo-app/tasks.md" in instruction
-        assert "ONLY the tasks.md" in instruction
-        assert "Do not create or modify requirements.md or design.md" in instruction
+        assert ".kiro/specs/todo-app/" in instruction
+        assert "tasks.md" in instruction
         assert "design.md" in instruction
+        assert "checkbox tasks" in instruction
+        assert "Do not modify requirements.md or design.md" in instruction
 
     def test_generate_spec_instruction_invalid_type(self):
         """Test that invalid spec_type raises ValueError."""
