@@ -108,7 +108,9 @@ class TestInstructionGenerator:
         assert project_id in instruction
         assert task_number in instruction
         assert ".kiro/specs/my-project/tasks.md" in instruction
-        assert "Execute task" in instruction
+        assert "implementing task" in instruction or "Execute task" in instruction
+        assert "DO NOT delete" in instruction
+        assert "taskStatus tool" in instruction
 
     def test_generate_task_instruction_all_tasks(self):
         """Test generating instruction for executing all tasks."""

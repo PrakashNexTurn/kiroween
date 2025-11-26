@@ -100,16 +100,19 @@ class InstructionGenerator:
 
         if task_number:
             instruction += (
-                f"Execute task {task_number} from .kiro/specs/{project_id}/tasks.md. "
-                f"After completing the task, update the task status in tasks.md by changing '- [ ] {task_number}' to '- [x] {task_number}'. "
-                f"If the task has sub-tasks, mark them as completed too. "
-                f"Use the taskStatus tool to update the task status."
+                f"You are implementing task {task_number} from the spec at .kiro/specs/{project_id}/tasks.md. "
+                f"Read the task description carefully and implement ONLY what is specified in that task. "
+                f"Create or modify code files as needed to complete the task requirements. "
+                f"DO NOT delete any existing project files unless the task explicitly requires it. "
+                f"After completing the implementation, use the taskStatus tool to mark task {task_number} as completed."
             )
         else:
             instruction += (
-                f"Execute all tasks from .kiro/specs/{project_id}/tasks.md in sequential order. "
-                f"After completing each task, update the task status in tasks.md by changing '- [ ]' to '- [x]'. "
-                f"Use the taskStatus tool to update task statuses as you complete them."
+                f"You are implementing ALL tasks from the spec at .kiro/specs/{project_id}/tasks.md in sequential order. "
+                f"For each task: 1) Read the task description, 2) Implement what is specified, 3) Use taskStatus tool to mark it complete. "
+                f"Create or modify code files as needed to complete each task. "
+                f"DO NOT delete any existing project files unless a specific task explicitly requires it. "
+                f"Work through tasks incrementally and update status after each completion."
             )
 
         return instruction
