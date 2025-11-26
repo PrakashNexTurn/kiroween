@@ -1476,6 +1476,88 @@ def _extract_test_failures(stdout: str, stderr: str) -> List[Dict[str, str]]:
     return failures
 
 
+class CustomInstructionRequest(BaseModel):
+    """Request model for custom instruction execution."""
+    instruction: str = Field(..., min_length=1, max_length=50000, description="Custom instruction to execute via kiro-cli")
+    
+    @field_validator('instruction')
+    @classmethod
+    def validate_instruction(cls, v: str) -> str:
+        """Validate that instruction is not just whitespace."""
+        if not v or not v.strip():
+            raise ValueError("instruction cannot be empty or whitespace only")
+        return v.strip()
+
+
+@app.post(
+    "/projects/{project_id}/custom",
+    response_model=OrchestratorResponse,
+    summary="Execute custom instruction",
+    description="Executes a custom user-provided instruction via kiro-cli",
+)
+@log_api_request("/projects/{project_id}/custom", "POST")
+async def execute_custom_instruction(
+    project_id: str,
+    request: CustomInstructionRequest
+) -> OrchestratorResponse:
+    """
+    Execute a custom instruction for a project.
+    
+    This endpoint allows users to provide their own instructions directly
+    instead of using the pre-defined instruction templates.
+    
+    Args:
+        project_id: The project identifier
+        request: CustomInstructionRequest with the instruction text
+        
+    Returns:
+        OrchestratorResponse with execution results
+        
+    Raises:
+        ProjectNotFoundError: If project not found
+        ValidationError: If instruction is invalid
+        CLIExecutionError: If execution fails
+    """
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Load the project to ensure it exists
+    project = project_manager.load_project(project_id)
+    
+    # Prepend /tools trust-all if not already present
+    instruction = request.instruction
+    if not instruction.startswith("/tools trust-all"):
+        instruction = "/tools trust-all\n" + instruction
+    
+    # Execute via kiro-cli
+    cli_result = cli_executor.execute_instruction(instruction, project_id)
+    
+    # Check if execution was successful
+    if cli_result.status == "failure":
+        return response_formatter.format_failure(
+            action="custom-instruction",
+            project_id=project_id,
+            error=cli_result.error or "Custom instruction execution failed",
+            logs=response_formatter._combine_logs(cli_result.stdout, cli_result.stderr)
+        )
+    
+    # Update project metadata timestamp
+    project.metadata.updated_at = datetime.utcnow()
+    project_manager.save_metadata(project_id, project.metadata)
+    
+    # Format success response
+    return response_formatter.format_success(
+        action="custom-instruction",
+        project_id=project_id,
+        cli_output=cli_result,
+        additional_output={
+            "instruction_length": len(request.instruction),
+            "updated_at": project.metadata.updated_at.isoformat(),
+        }
+    )
+
+
 # Health check endpoint
 @app.get(
     "/health",

@@ -65,12 +65,13 @@ class CLIExecutor:
                 f"Failed to write instruction file: {str(e)}"
             ) from e
 
-    def run_kiro_cli(self, instruction_file: str) -> subprocess.CompletedProcess:
+    def run_kiro_cli(self, instruction_file: str, working_dir: Optional[str] = None) -> subprocess.CompletedProcess:
         """
         Execute kiro-cli with the instruction file.
 
         Args:
             instruction_file: Path to the instruction file
+            working_dir: Working directory for command execution (optional)
 
         Returns:
             CompletedProcess object with execution results
@@ -86,13 +87,14 @@ class CLIExecutor:
             else:  # Unix-like systems
                 command = f'cat "{instruction_file}" | kiro-cli'
 
-            # Execute the command
+            # Execute the command with optional working directory
             result = subprocess.run(
                 command,
                 shell=True,
                 capture_output=True,
                 text=True,
-                timeout=300  # 5 minute timeout
+                timeout=300,  # 5 minute timeout
+                cwd=working_dir  # Set working directory
             )
 
             return result
@@ -208,13 +210,13 @@ class CLIExecutor:
         return "CLI execution failed with non-zero exit code"
 
     @log_operation("execute_instruction")
-    def execute_instruction(self, instruction: str, project_id: str) -> CLIResult:
+    def execute_instruction(self, instruction: str, project_id: str, working_dir: Optional[str] = None) -> CLIResult:
         """
         Main entry point for executing an instruction via kiro-cli.
 
         This method:
         1. Writes the instruction to a temp file
-        2. Executes kiro-cli with the instruction
+        2. Executes kiro-cli with the instruction in the project directory
         3. Parses the output
         4. Cleans up the temp file
         5. Returns the result
@@ -222,6 +224,7 @@ class CLIExecutor:
         Args:
             instruction: The instruction text to execute
             project_id: The project identifier
+            working_dir: Working directory for command execution (optional, defaults to project directory)
 
         Returns:
             CLIResult with execution results
@@ -235,10 +238,18 @@ class CLIExecutor:
             # Step 1: Write instruction file
             instruction_file = self.write_instruction_file(instruction, project_id)
             
-            # Step 2: Execute kiro-cli
-            process_result = self.run_kiro_cli(instruction_file)
+            # Step 2: Determine working directory
+            # If not provided, use the project directory (where source code should be generated)
+            if working_dir is None:
+                # Use the project directory as working directory
+                # This is .kiro/specs/{project_id} which contains the spec files
+                # and should also contain the generated source code
+                working_dir = str(Path(f".kiro/specs/{project_id}"))
             
-            # Step 3: Parse output
+            # Step 3: Execute kiro-cli with working directory
+            process_result = self.run_kiro_cli(instruction_file, working_dir)
+            
+            # Step 4: Parse output
             cli_result = self.parse_output(
                 process_result.stdout,
                 process_result.stderr,
@@ -248,7 +259,7 @@ class CLIExecutor:
             return cli_result
             
         finally:
-            # Step 4: Cleanup temp file
+            # Step 5: Cleanup temp file
             if instruction_file:
                 try:
                     self.file_ops.delete_file(instruction_file)

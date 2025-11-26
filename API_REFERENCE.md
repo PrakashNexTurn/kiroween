@@ -19,6 +19,7 @@ Complete API reference with curl examples for all endpoints.
   - [Build Project](#12-build-project)
   - [Run Tests](#13-run-tests)
   - [Fix Issues](#14-fix-issues)
+  - [Execute Custom Instruction](#15-execute-custom-instruction)
 - [Complete Workflow](#complete-workflow)
 - [Response Format](#response-format)
 - [Error Codes](#error-codes)
@@ -583,6 +584,49 @@ curl -X POST http://localhost:8000/projects/my-todo-app/fix \
   "logs": "Issues fixed and retested via kiro-cli"
 }
 ```
+
+---
+
+### 15. Execute Custom Instruction
+
+Execute a custom user-provided instruction via kiro-cli. This endpoint allows advanced users to provide their own instructions directly instead of using the pre-defined templates.
+
+**Endpoint:** `POST /projects/{project_id}/custom`
+
+```bash
+curl -X POST http://localhost:8000/projects/my-todo-app/custom \
+  -H "Content-Type: application/json" \
+  -d '{
+    "instruction": "Create a new Python module called utils.py with helper functions for date formatting and string manipulation"
+  }'
+```
+
+**Request Body:**
+```json
+{
+  "instruction": "string (required, max 50000 characters)"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "action": "custom-instruction",
+  "projectId": "my-todo-app",
+  "output": {
+    "files_modified": ["utils.py"],
+    "instruction_length": 98,
+    "updated_at": "2025-11-26T10:45:00Z"
+  },
+  "logs": "Custom instruction executed via kiro-cli"
+}
+```
+
+**Notes:**
+- The instruction will automatically have `/tools trust-all` prepended if not already present
+- The instruction is executed in the project's working directory (`.kiro/specs/{project_id}`)
+- This is useful for custom workflows, testing, or advanced operations not covered by standard endpoints
 
 ---
 
