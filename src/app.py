@@ -1150,9 +1150,10 @@ def _parse_tasks_md(content: str) -> Dict[str, Dict[str, Any]]:
     
     for line in lines:
         # Match task lines like: - [x] 1. Task description
-        # or: - [ ] 2.3 Task description
+        # or: - [ ] 2.3 Sub-task description (note: no period after 2.3)
         # or: - [-] 3.1 Task description (in progress)
-        match = re.match(r'^-\s*\[([ x\-])\]\*?\s+(\d+(?:\.\d+)?)\.\s+(.+)$', line.strip())
+        # Pattern matches: - [ ] 1. or - [ ] 1.1 (with optional period after number)
+        match = re.match(r'^-\s*\[([ x\-])\]\*?\s+(\d+(?:\.\d+)?)\.?\s+(.+)$', line.strip())
         if match:
             status_char = match.group(1)
             task_number = match.group(2)
