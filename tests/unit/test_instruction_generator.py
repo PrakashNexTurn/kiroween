@@ -28,8 +28,9 @@ class TestInstructionGenerator:
         # Verify instruction contains project details
         assert project_id in instruction
         assert description in instruction
-        assert ".kiro/specs/test-project/" in instruction
-        assert "requirements" in instruction.lower() or "spec" in instruction.lower()
+        assert ".kiro/specs/test-project/requirements.md" in instruction
+        assert "ONLY the requirements.md" in instruction
+        assert "Do not create design.md or tasks.md" in instruction
 
     def test_generate_spec_instruction_design(self):
         """Test generating design spec instruction."""
@@ -47,7 +48,9 @@ class TestInstructionGenerator:
 
         # Verify instruction contains project details
         assert project_id in instruction
-        assert ".kiro/specs/my-app/" in instruction
+        assert ".kiro/specs/my-app/design.md" in instruction
+        assert "ONLY the design.md" in instruction
+        assert "Do not create or modify tasks.md" in instruction
         assert "design" in instruction.lower()
         assert "requirements.md" in instruction
 
@@ -67,8 +70,9 @@ class TestInstructionGenerator:
 
         # Verify instruction contains project details
         assert project_id in instruction
-        assert ".kiro/specs/todo-app/" in instruction
-        assert "task" in instruction.lower()
+        assert ".kiro/specs/todo-app/tasks.md" in instruction
+        assert "ONLY the tasks.md" in instruction
+        assert "Do not create or modify requirements.md or design.md" in instruction
         assert "design.md" in instruction
 
     def test_generate_spec_instruction_invalid_type(self):

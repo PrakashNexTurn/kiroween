@@ -40,18 +40,21 @@ class InstructionGenerator:
 
         if spec_type == "requirements":
             instruction += (
-                f"Create a new feature spec for project '{project_id}' "
-                f"in .kiro/specs/{project_id}/ with the following description: {description}"
+                f"Generate ONLY the requirements.md file for project '{project_id}' "
+                f"in .kiro/specs/{project_id}/requirements.md with the following description: {description}\n"
+                f"Do not create design.md or tasks.md. Only create requirements.md following EARS patterns."
             )
         elif spec_type == "design":
             instruction += (
-                f"Generate the design document for project '{project_id}' "
-                f"in .kiro/specs/{project_id}/ based on the requirements.md file."
+                f"Generate ONLY the design.md file for project '{project_id}' "
+                f"in .kiro/specs/{project_id}/design.md based on the requirements.md file. "
+                f"Do not create or modify tasks.md. Only create design.md."
             )
         elif spec_type == "tasks":
             instruction += (
-                f"Generate the task list for project '{project_id}' "
-                f"in .kiro/specs/{project_id}/ based on the design.md file."
+                f"Generate ONLY the tasks.md file for project '{project_id}' "
+                f"in .kiro/specs/{project_id}/tasks.md based on the design.md file. "
+                f"Do not create or modify requirements.md or design.md. Only create tasks.md."
             )
 
         return instruction
