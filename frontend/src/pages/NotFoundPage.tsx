@@ -51,7 +51,7 @@ export function NotFoundPage() {
           className="text-3xl font-semibold mb-4"
           style={{ color: 'var(--color-text-primary)' }}
         >
-          Page Not Found
+          👻 The Ghost Got Lost
         </motion.h2>
 
         <motion.p
@@ -61,7 +61,7 @@ export function NotFoundPage() {
           className="text-lg mb-8"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          The page you're looking for doesn't exist or has been moved.
+          Even spirits get confused sometimes. This page has vanished into the void!
         </motion.p>
 
         {/* Action Buttons */}

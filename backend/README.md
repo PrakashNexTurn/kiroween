@@ -1,16 +1,18 @@
-# Kiro Project Orchestrator - Backend
+# 👻 Kiro's Ghost - Backend (The Spirit Engine)
 
-A backend system for automating software project lifecycles with support for multi-project management.
+The possessed backend that channels Kiro's AI powers without requiring IDE installation. Built for the Kiroween Hackathon, this haunted API brings AI-powered development to any device, anywhere.
 
-## Features
+## 🎃 Supernatural Features
 
-- **Multi-Project Support**: Manage multiple projects with separate base paths
-- **Spec-Driven Development**: Create requirements, design documents, and task lists
-- **Automated Code Generation**: Execute tasks using kiro-cli integration
-- **RESTful API**: Full API for project management and orchestration
-- **Flexible Configuration**: Environment-based configuration with CLI overrides
+- **🚫 No Kiro IDE Required**: Channel Kiro's AI without desktop installation
+- **📱 Universal Access**: Works from any device with a browser - desktop, tablet, or mobile
+- **👻 Multi-Project Possession**: Manage multiple haunted projects with separate base paths
+- **🔮 Spec-Driven Sorcery**: Create requirements, design documents, and task lists through AI
+- **🧙 Automated Code Manifestation**: Execute tasks using kiro-cli integration
+- **📡 Spectral RESTful API**: Complete API for project lifecycle management
+- **⚙️ Flexible Configuration**: Environment-based configuration with CLI overrides
 
-## Quick Start
+## 🕯️ Awakening the Spirit
 
 ### Installation
 

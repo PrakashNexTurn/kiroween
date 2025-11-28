@@ -130,15 +130,15 @@ export function ProjectBoardPage() {
               className="text-2xl font-semibold mb-2"
               style={{ color: 'var(--color-text-primary)' }}
             >
-              No Projects Yet
+              👻 The Ghost Awaits...
             </h2>
             <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
-              Get started by creating your first project. You'll be able to manage specs, tasks,
-              and track progress through the complete development lifecycle.
+              Summon your first project and let Kiro's spirit guide you from idea to production. 
+              No IDE installation required - just pure AI-powered development magic! ✨
             </p>
             <Button onClick={() => setShowCreateModal(true)} variant="primary">
               <Plus className="h-4 w-4 mr-2" />
-              Create Your First Project
+              Summon Your First Project
             </Button>
           </div>
         </div>
@@ -156,9 +156,12 @@ export function ProjectBoardPage() {
     >
       {/* Header Section */}
       <div>
-        <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
-          Projects
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+          👻 Your Haunted Projects
         </h1>
+        <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+          The ghost follows you everywhere - manage your projects from any device, anywhere
+        </p>
         
         {/* Search, Filter, and Create Project in one line */}
         <div className="flex flex-col lg:flex-row gap-4">

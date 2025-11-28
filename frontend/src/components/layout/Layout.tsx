@@ -52,14 +52,19 @@ export function Layout() {
         </div>
       </main>
 
-      {/* Optional Footer - can be added later */}
-      {/* <footer className="border-t" style={{ borderColor: 'var(--color-border)' }}>
+      {/* Footer */}
+      <footer className="border-t mt-auto" style={{ borderColor: 'var(--color-border)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <p className="text-sm text-center" style={{ color: 'var(--color-text-tertiary)' }}>
-            © 2025 Kiro Project Orchestrator
-          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p className="text-sm text-center sm:text-left" style={{ color: 'var(--color-text-tertiary)' }}>
+              Built with 💀 for the Kiroween Hackathon
+            </p>
+            <p className="text-xs italic text-center sm:text-right" style={{ color: 'var(--color-text-tertiary)' }}>
+              "Why install an IDE when the IDE can haunt you instead?"
+            </p>
+          </div>
         </div>
-      </footer> */}
+      </footer>
     </div>
   );
 }

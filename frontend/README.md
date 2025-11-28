@@ -1,17 +1,19 @@
-# Kiro Project Orchestrator - Frontend
+# 👻 Kiro's Ghost - Frontend (The Haunted Interface)
 
-A modern React-based frontend for the Kiro Project Orchestrator, providing an intuitive interface for managing software projects through spec-driven development.
+A possessed React-based frontend that channels Kiro's AI powers, providing an intuitive interface for managing software projects through spec-driven development - from any device, anywhere.
 
-## Features
+## 🎃 Supernatural Features
 
-- **Project Management**: Create, view, and manage multiple projects
-- **Spec Generation**: Generate requirements, design, and tasks through AI-powered workflows
-- **Task Execution**: Execute and track implementation tasks
-- **Real-time Updates**: Live progress tracking and log streaming
-- **Monaco Editor**: Integrated code editor for viewing and editing spec files
-- **Markdown Support**: Rich markdown rendering with syntax highlighting
-- **Theme System**: Light, dark, and Halloween themes with smooth transitions
-- **Responsive Design**: Mobile-friendly interface with Tailwind CSS
+- **📱 Mobile Haunting**: Fully responsive - works on phones, tablets, and desktops
+- **🚫 No Installation**: Access Kiro's AI from any browser, no IDE required
+- **👻 Project Possession**: Create, view, and manage multiple projects from anywhere
+- **🔮 Spec Conjuring**: Generate requirements, design, and tasks through AI-powered workflows
+- **⚡ Task Execution**: Execute and track implementation tasks with spectral progress
+- **🌙 Real-time Updates**: Live progress tracking and log streaming
+- **📝 Monaco Spirit Editor**: Integrated code editor for viewing and editing spec files
+- **✨ Markdown Sorcery**: Rich markdown rendering with syntax highlighting
+- **🎭 Theme Transformation**: Light, dark, and Halloween themes with smooth transitions
+- **🌍 Universal Access**: The only "IDE" that truly works on mobile devices
 
 ## Tech Stack
 
@@ -26,12 +28,12 @@ A modern React-based frontend for the Kiro Project Orchestrator, providing an in
 - **React Markdown** - Markdown rendering
 - **Lucide React** - Icon library
 
-## Quick Start
+## 🕯️ Summoning the Ghost
 
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn/pnpm
-- Backend server running (see [../backend/README.md](../backend/README.md))
+- Backend spirit running (see [../backend/README.md](../backend/README.md))
 
 ### Installation
 

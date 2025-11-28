@@ -1,7 +1,8 @@
 {
-  "name": "frontend",
+  "name": "kiros-ghost-frontend",
+  "description": "👻 Kiro's Ghost - The Phantom IDE Frontend. Channel Kiro's AI from anywhere, no installation required.",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

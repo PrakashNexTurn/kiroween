@@ -84,12 +84,12 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }: CreateProject
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Create New Project" size="md">
+    <Modal isOpen={isOpen} onClose={handleClose} title="👻 Summon a New Project" size="md">
       <form onSubmit={form.handleSubmit} className="space-y-6">
         {/* Project Name Input */}
         <Input
           label="Project Name"
-          placeholder="Enter project name"
+          placeholder="e.g., My Haunted App"
           value={form.values.name}
           onChange={(e) => form.handleChange('name')(e.target.value)}
           onBlur={form.handleBlur('name')}
@@ -102,7 +102,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }: CreateProject
         {/* Project Description Textarea */}
         <Textarea
           label="Project Description"
-          placeholder="Enter a brief description of your project"
+          placeholder="Describe what you want to build... The ghost will help bring it to life! ✨"
           value={form.values.description}
           onChange={(e) => form.handleChange('description')(e.target.value)}
           onBlur={form.handleBlur('description')}
@@ -128,7 +128,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }: CreateProject
             disabled={form.isSubmitting}
             loading={form.isSubmitting}
           >
-            {form.isSubmitting ? 'Creating...' : 'Create Project'}
+            {form.isSubmitting ? 'Summoning...' : 'Summon Project'}
           </Button>
         </div>
       </form>

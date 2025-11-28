@@ -3,9 +3,9 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kiro-project-orchestrator"
-version = "0.1.0"
-description = "Python backend for managing project lifecycles with kiro-cli"
+name = "kiros-ghost-backend"
+version = "1.0.0"
+description = "👻 Kiro's Ghost - The Phantom IDE Backend. Channel Kiro's AI from anywhere, no installation required."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [

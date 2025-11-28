@@ -80,8 +80,17 @@ export function Header() {
                 className="text-xl font-bold hidden sm:block"
                 style={{ color: 'var(--color-text-primary)' }}
               >
-                Project Orchestrator
+                👻 Kiro's Ghost
               </h1>
+              <span
+                className="text-xs hidden lg:block ml-2 px-2 py-1 rounded"
+                style={{ 
+                  color: 'var(--color-text-tertiary)',
+                  backgroundColor: 'var(--color-bg-tertiary)'
+                }}
+              >
+                The Phantom IDE
+              </span>
             </Link>
           </div>
 
