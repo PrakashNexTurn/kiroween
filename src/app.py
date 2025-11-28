@@ -4,6 +4,7 @@ import json
 from contextlib import asynccontextmanager
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, status, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field, field_validator
@@ -20,6 +21,7 @@ from src.models import OrchestratorResponse, ProjectSummary, Phase, ProjectMetad
 from src.instruction_generator import InstructionGenerator
 from src.cli_executor import CLIExecutor, CLIExecutionError
 from src.response_formatter import ResponseFormatter
+from src.config import settings
 from src.logger import get_logger, log_api_request, log_startup_info, log_shutdown_info
 
 
@@ -224,6 +226,16 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Configure CORS middleware
+if settings.cors_enabled:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 # Global exception handlers
