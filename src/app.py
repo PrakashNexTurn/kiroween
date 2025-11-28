@@ -109,7 +109,7 @@ class ExecuteTaskRequest(BaseModel):
 
 
 # Initialize components (will be used in lifespan)
-project_manager = ProjectManager()
+project_manager = ProjectManager(base_path=str(settings.base_path))
 instruction_generator = InstructionGenerator()
 cli_executor = CLIExecutor()
 response_formatter = ResponseFormatter()
