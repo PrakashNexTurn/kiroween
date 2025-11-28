@@ -1,3 +1,7 @@
+# ===========================
+# Backend (Python)
+# ===========================
+
 # Python
 __pycache__/
 *.py[cod]
@@ -32,12 +36,64 @@ ENV/
 htmlcov/
 .hypothesis/
 
-# IDE
-.vscode/
+# ===========================
+# Frontend (Node/React)
+# ===========================
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production
+frontend/dist/
+frontend/build/
+
+# Testing
+frontend/coverage/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
 *~
+*.sublime-project
+*.sublime-workspace
+
+# Vite
+.vite/
+.vite-temp/
+
+# TypeScript
+*.tsbuildinfo
+
+# ===========================
+# Kiro Orchestrator
+# ===========================
 
 # Logs
 *.log
@@ -47,3 +103,5 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+*.bak
+*.tmp

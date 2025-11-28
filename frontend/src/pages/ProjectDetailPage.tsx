@@ -1,0 +1,304 @@
+/**
+ * ProjectDetailPage Component
+ * Detailed view of a single project with tabs for Overview, Specs, and Tasks
+ * 
+ * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+ */
+
+import { useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
+import { useProjectDetail } from '../hooks/useProjectDetail';
+import { useKeyboard } from '../hooks/useKeyboard';
+import { LoadingSpinner, Badge, ProgressBar, Button } from '../components/common';
+import { OverviewTab, SpecsTab } from '../components/project';
+import { TasksTab } from '../components/task';
+import { Phase } from '../types/project.types';
+import { useNavigation } from '../utils';
+
+/**
+ * Tab type for navigation
+ */
+type TabType = 'overview' | 'specs' | 'tasks';
+
+/**
+ * Get phase color for badge
+ */
+function getPhaseColor(phase: Phase): 'blue' | 'gray' | 'cyan' | 'red' | 'green' {
+  switch (phase) {
+    case Phase.INIT:
+    case Phase.SPEC:
+      return 'blue';
+    case Phase.BUILD:
+      return 'gray';
+    case Phase.TEST:
+      return 'cyan';
+    case Phase.FIX:
+      return 'red';
+    case Phase.COMPLETE:
+      return 'green';
+    default:
+      return 'gray';
+  }
+}
+
+/**
+ * ProjectDetailPage component
+ * Displays detailed project information with tabbed navigation
+ */
+export function ProjectDetailPage() {
+  const { projectId } = useParams<{ projectId: string }>();
+  const { goToHome } = useNavigation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isExecutingTask, setIsExecutingTask] = useState(false);
+  const [isGeneratingSpec, setIsGeneratingSpec] = useState(false);
+  
+  // Get active tab from URL or default to 'overview'
+  const activeTab = (searchParams.get('tab') as TabType) || 'overview';
+  
+  // Fetch project data with auto-refresh (paused during task execution or spec generation)
+  const { project, loading, error, refetch } = useProjectDetail(
+    projectId || '',
+    true,
+    30000,
+    isExecutingTask || isGeneratingSpec // Pause polling when executing tasks or generating specs
+  );
+
+  // Handle tab switching
+  const handleTabChange = (tab: TabType) => {
+    setSearchParams({ tab });
+  };
+
+  // Handle back navigation
+  const handleBack = () => {
+    goToHome();
+  };
+
+  // Project detail keyboard shortcuts
+  // Requirements: 15.4, 15.5
+  useKeyboard([
+    {
+      key: 't',
+      callback: () => handleTabChange('tasks'),
+      description: 'Switch to Tasks tab',
+    },
+    {
+      key: 's',
+      callback: () => handleTabChange('specs'),
+      description: 'Switch to Specs tab',
+    },
+    {
+      key: 'o',
+      callback: () => handleTabChange('overview'),
+      description: 'Switch to Overview tab',
+    },
+  ]);
+
+  // Show loading state
+  if (loading && !project) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div
+          className="rounded-lg p-6 text-center"
+          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+        >
+          <p
+            className="text-lg font-medium mb-4"
+            style={{ color: 'var(--color-status-error)' }}
+          >
+            Error loading project
+          </p>
+          <p
+            className="mb-6"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            {error}
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button onClick={handleBack} variant="secondary">
+              Back to Projects
+            </Button>
+            <Button onClick={refetch} variant="primary">
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show not found state
+  if (!project) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div
+          className="rounded-lg p-6 text-center"
+          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+        >
+          <p
+            className="text-lg font-medium mb-4"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            Project not found
+          </p>
+          <p
+            className="mb-6"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            The project you're looking for doesn't exist or has been deleted.
+          </p>
+          <Button onClick={handleBack} variant="primary">
+            Back to Projects
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+    >
+      {/* Header Section */}
+      <div className="mb-6">
+        {/* Back Button and Project Name */}
+        <div className="flex items-center gap-4 mb-4">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 px-3 py-2 rounded-md transition-colors hover:opacity-80"
+            style={{
+              color: 'var(--color-text-secondary)',
+              backgroundColor: 'var(--color-bg-secondary)',
+            }}
+            aria-label="Back to projects"
+          >
+            <ArrowLeft size={20} />
+            <span className="hidden sm:inline">Back</span>
+          </button>
+          
+          <h1
+            className="text-2xl sm:text-3xl font-bold flex-1"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            {project.name}
+          </h1>
+        </div>
+
+        {/* Phase Badge and Progress */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <span
+              className="text-sm font-medium"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              Phase:
+            </span>
+            <Badge color={getPhaseColor(project.phase)} size="md">
+              {project.phase}
+            </Badge>
+          </div>
+          
+          <div className="flex-1 max-w-md">
+            <ProgressBar
+              percentage={project.completionPercentage}
+              variant="primary"
+              showLabel
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div
+        className="border-b mb-6"
+        style={{ borderColor: 'var(--color-border)' }}
+      >
+        <nav className="flex gap-8" aria-label="Project sections">
+          <button
+            onClick={() => handleTabChange('overview')}
+            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'overview' ? 'border-current' : 'border-transparent'
+            }`}
+            style={{
+              color:
+                activeTab === 'overview'
+                  ? 'var(--color-brand-primary)'
+                  : 'var(--color-text-secondary)',
+            }}
+            aria-current={activeTab === 'overview' ? 'page' : undefined}
+          >
+            Overview
+          </button>
+          
+          <button
+            onClick={() => handleTabChange('specs')}
+            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'specs' ? 'border-current' : 'border-transparent'
+            }`}
+            style={{
+              color:
+                activeTab === 'specs'
+                  ? 'var(--color-brand-primary)'
+                  : 'var(--color-text-secondary)',
+            }}
+            aria-current={activeTab === 'specs' ? 'page' : undefined}
+          >
+            Specs
+          </button>
+          
+          <button
+            onClick={() => handleTabChange('tasks')}
+            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'tasks' ? 'border-current' : 'border-transparent'
+            }`}
+            style={{
+              color:
+                activeTab === 'tasks'
+                  ? 'var(--color-brand-primary)'
+                  : 'var(--color-text-secondary)',
+            }}
+            aria-current={activeTab === 'tasks' ? 'page' : undefined}
+          >
+            Tasks
+          </button>
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="min-h-[400px]">
+        {activeTab === 'overview' && (
+          <OverviewTab project={project} onProjectUpdate={refetch} />
+        )}
+        
+        {activeTab === 'specs' && (
+          <SpecsTab 
+            projectId={projectId || ''} 
+            onGenerationStateChange={setIsGeneratingSpec}
+          />
+        )}
+        
+        {activeTab === 'tasks' && (
+          <TasksTab 
+            projectId={projectId || ''} 
+            onTaskComplete={refetch} 
+            onExecutionStateChange={setIsExecutingTask}
+          />
+        )}
+      </div>
+    </motion.div>
+  );
+}
