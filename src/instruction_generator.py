@@ -113,16 +113,16 @@ class InstructionGenerator:
                 f"Read the task description carefully and implement ONLY what is specified in that task. "
                 f"Create or modify code files in {project_root} as needed to complete the task requirements. "
                 f"DO NOT delete any existing project files unless the task explicitly requires it. "
-                f"After completing the implementation, use the taskStatus tool to mark task {task_number} as completed."
+                f"After completing the implementation, update {spec_dir}/tasks.md directly by changing the task checkbox from '- [ ]' to '- [x]' for task {task_number}."
             )
         else:
             instruction += (
                 f"You are implementing ALL tasks from the spec at {spec_dir}/tasks.md in sequential order. "
                 f"The project root directory is {project_root}. "
-                f"For each task: 1) Read the task description, 2) Implement what is specified, 3) Use taskStatus tool to mark it complete. "
+                f"For each task: 1) Read the task description, 2) Implement what is specified, 3) Update {spec_dir}/tasks.md by changing '- [ ]' to '- [x]' for that task. "
                 f"Create or modify code files in {project_root} as needed to complete each task. "
                 f"DO NOT delete any existing project files unless a specific task explicitly requires it. "
-                f"Work through tasks incrementally and update status after each completion."
+                f"Work through tasks incrementally and update the tasks.md file after each completion."
             )
 
         return instruction
@@ -140,8 +140,10 @@ class InstructionGenerator:
         """
         instruction = "/tools trust-all\n"
         instruction += (
-            f"Build the project in {project_root} "
-            f"using the configured build command"
+            f"Build the project in {project_root} using the configured build command. "
+            f"If the build fails, analyze the errors and fix them. "
+            f"Continue fixing issues until the build succeeds. "
+            f"The build MUST succeed before completing this task."
         )
 
         return instruction
@@ -158,7 +160,12 @@ class InstructionGenerator:
             Instruction string for kiro-cli
         """
         instruction = "/tools trust-all\n"
-        instruction += f"Run all tests for the project in {project_root}"
+        instruction += (
+            f"Run all tests for the project in {project_root}. "
+            f"If any tests fail, analyze the failures and fix the issues. "
+            f"Continue fixing and re-running tests until ALL tests pass. "
+            f"All test cases MUST pass before completing this task."
+        )
 
         return instruction
 
