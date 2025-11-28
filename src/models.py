@@ -69,7 +69,9 @@ class ProjectMetadata(BaseModel):
 class Project(BaseModel):
     """Complete project representation including metadata and file paths."""
     metadata: ProjectMetadata
-    project_path: str
+    project_root: str  # <base_path>/<project_id>/
+    spec_dir: str  # <base_path>/<project_id>/.kiro/specs/
+    project_path: str  # Deprecated: kept for backward compatibility
     requirements_path: str
     design_path: str
     tasks_path: str
@@ -78,6 +80,8 @@ class Project(BaseModel):
         """Convert to dictionary."""
         return {
             "metadata": self.metadata.to_dict(),
+            "project_root": self.project_root,
+            "spec_dir": self.spec_dir,
             "project_path": self.project_path,
             "requirements_path": self.requirements_path,
             "design_path": self.design_path,

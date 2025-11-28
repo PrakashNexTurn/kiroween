@@ -13,6 +13,7 @@ class InstructionGenerator:
     def generate_spec_instruction(
         self,
         project_id: str,
+        spec_dir: str,
         spec_type: str,
         description: str
     ) -> str:
@@ -21,6 +22,7 @@ class InstructionGenerator:
 
         Args:
             project_id: The project identifier
+            spec_dir: The spec directory path (e.g., <base_path>/<project_id>/.kiro/specs/)
             spec_type: Type of spec to generate ("requirements", "design", or "tasks")
             description: Project description or context for generation
 
@@ -40,7 +42,7 @@ class InstructionGenerator:
 
         if spec_type == "requirements":
             instruction += (
-                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/. "
+                f"You are working on a spec for feature '{project_id}' located at {spec_dir}. "
                 f"Generate the requirements.md file following the Kiro spec format: "
                 f"Use EARS (Easy Approach to Requirements Syntax) patterns, "
                 f"include Introduction, Glossary, and numbered Requirements sections, "
@@ -51,7 +53,7 @@ class InstructionGenerator:
             )
         elif spec_type == "design":
             instruction += (
-                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/. "
+                f"You are working on a spec for feature '{project_id}' located at {spec_dir}. "
                 f"The requirements.md file already exists. Now generate the design.md file following the Kiro spec format: "
                 f"Include sections: Overview, Architecture, Components and Interfaces, Data Models, "
                 f"Correctness Properties, Error Handling, Testing Strategy. "
@@ -62,7 +64,7 @@ class InstructionGenerator:
             )
         elif spec_type == "tasks":
             instruction += (
-                f"You are working on a spec for feature '{project_id}' located at .kiro/specs/{project_id}/. "
+                f"You are working on a spec for feature '{project_id}' located at {spec_dir}. "
                 f"The requirements.md and design.md files already exist. Now generate the tasks.md file following the exact Kiro spec format. "
                 f"CRITICAL FORMAT RULES: "
                 f"1) Start with title '# Implementation Plan' (not '# Tasks'), "
@@ -85,6 +87,8 @@ class InstructionGenerator:
     def generate_task_instruction(
         self,
         project_id: str,
+        spec_dir: str,
+        project_root: str,
         task_number: Optional[str] = None
     ) -> str:
         """
@@ -92,6 +96,8 @@ class InstructionGenerator:
 
         Args:
             project_id: The project identifier
+            spec_dir: The spec directory path (e.g., <base_path>/<project_id>/.kiro/specs/)
+            project_root: The project root directory (e.g., <base_path>/<project_id>/)
             task_number: Optional specific task number to execute (e.g., "2.3").
                         If None, executes all tasks.
 
@@ -102,59 +108,64 @@ class InstructionGenerator:
 
         if task_number:
             instruction += (
-                f"You are implementing task {task_number} from the spec at .kiro/specs/{project_id}/tasks.md. "
+                f"You are implementing task {task_number} from the spec at {spec_dir}/tasks.md. "
+                f"The project root directory is {project_root}. "
                 f"Read the task description carefully and implement ONLY what is specified in that task. "
-                f"Create or modify code files as needed to complete the task requirements. "
+                f"Create or modify code files in {project_root} as needed to complete the task requirements. "
                 f"DO NOT delete any existing project files unless the task explicitly requires it. "
                 f"After completing the implementation, use the taskStatus tool to mark task {task_number} as completed."
             )
         else:
             instruction += (
-                f"You are implementing ALL tasks from the spec at .kiro/specs/{project_id}/tasks.md in sequential order. "
+                f"You are implementing ALL tasks from the spec at {spec_dir}/tasks.md in sequential order. "
+                f"The project root directory is {project_root}. "
                 f"For each task: 1) Read the task description, 2) Implement what is specified, 3) Use taskStatus tool to mark it complete. "
-                f"Create or modify code files as needed to complete each task. "
+                f"Create or modify code files in {project_root} as needed to complete each task. "
                 f"DO NOT delete any existing project files unless a specific task explicitly requires it. "
                 f"Work through tasks incrementally and update status after each completion."
             )
 
         return instruction
 
-    def generate_build_instruction(self, project_id: str) -> str:
+    def generate_build_instruction(self, project_id: str, project_root: str) -> str:
         """
         Generate instruction for building the project.
 
         Args:
             project_id: The project identifier
+            project_root: The project root directory
 
         Returns:
             Instruction string for kiro-cli
         """
         instruction = "/tools trust-all\n"
         instruction += (
-            f"Build the project in .kiro/specs/{project_id}/ "
+            f"Build the project in {project_root} "
             f"using the configured build command"
         )
 
         return instruction
 
-    def generate_test_instruction(self, project_id: str) -> str:
+    def generate_test_instruction(self, project_id: str, project_root: str) -> str:
         """
         Generate instruction for running tests.
 
         Args:
             project_id: The project identifier
+            project_root: The project root directory
 
         Returns:
             Instruction string for kiro-cli
         """
         instruction = "/tools trust-all\n"
-        instruction += f"Run all tests for the project in .kiro/specs/{project_id}/"
+        instruction += f"Run all tests for the project in {project_root}"
 
         return instruction
 
     def generate_fix_instruction(
         self,
         project_id: str,
+        project_root: str,
         failure_details: str
     ) -> str:
         """
@@ -162,6 +173,7 @@ class InstructionGenerator:
 
         Args:
             project_id: The project identifier
+            project_root: The project root directory
             failure_details: Details about the failures to fix
 
         Returns:
@@ -169,7 +181,7 @@ class InstructionGenerator:
         """
         instruction = "/tools trust-all\n"
         instruction += (
-            f"The following tests are failing in .kiro/specs/{project_id}/: "
+            f"The following tests are failing in {project_root}: "
             f"{failure_details}. "
             f"Please analyze and fix these issues."
         )

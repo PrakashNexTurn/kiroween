@@ -290,7 +290,9 @@ async def project_not_found_handler(request: Request, exc: ProjectNotFoundError)
     logger = get_logger()
     project_id = request.path_params.get("project_id", "unknown")
     
-    logger.warning(f"Project not found: {str(exc)}")
+    # Include expected path in error message
+    expected_path = project_manager.base_path / project_id
+    logger.warning(f"Project not found: {str(exc)} (expected at: {expected_path.resolve()})")
     
     response = OrchestratorResponse(
         status="failure",
@@ -302,10 +304,11 @@ async def project_not_found_handler(request: Request, exc: ProjectNotFoundError)
                 "message": str(exc),
                 "details": {
                     "project_id": project_id,
+                    "expected_path": str(expected_path.resolve()),
                 }
             }
         },
-        logs=f"Project not found: {str(exc)}"
+        logs=f"Project not found: {str(exc)} (expected at: {expected_path.resolve()})"
     )
     
     return JSONResponse(
@@ -477,7 +480,14 @@ async def file_not_found_handler(request: Request, exc: FileNotFoundError) -> JS
     logger = get_logger()
     project_id = request.path_params.get("project_id", "unknown")
     
-    logger.warning(f"File not found: {str(exc)}")
+    # Try to get the project path for better error messages
+    try:
+        project = project_manager.load_project(project_id)
+        spec_dir = str(project.spec_dir)
+    except:
+        spec_dir = str((project_manager.base_path / project_id / ".kiro" / "specs").resolve())
+    
+    logger.warning(f"File not found: {str(exc)} (project spec dir: {spec_dir})")
     
     response = OrchestratorResponse(
         status="failure",
@@ -489,10 +499,11 @@ async def file_not_found_handler(request: Request, exc: FileNotFoundError) -> JS
                 "message": str(exc),
                 "details": {
                     "project_id": project_id,
+                    "spec_dir": spec_dir,
                 }
             }
         },
-        logs=f"File not found: {str(exc)}"
+        logs=f"File not found: {str(exc)} (project spec dir: {spec_dir})"
     )
     
     return JSONResponse(
@@ -576,7 +587,9 @@ async def create_project(request: CreateProjectRequest) -> OrchestratorResponse:
         project_id=project.metadata.project_id,
         output={
             "project": project.metadata.to_dict(),
-            "project_path": project.project_path,
+            "project_root": project.project_root,
+            "spec_dir": project.spec_dir,
+            "project_path": project.project_path,  # Deprecated: kept for backward compatibility
             "files_created": [
                 project.requirements_path,
                 project.design_path,
@@ -697,11 +710,11 @@ async def generate_spec(
             requirements_content = project_manager.file_ops.read_file(project.requirements_path)
             if not requirements_content.strip():
                 raise InvalidStateTransitionError(
-                    "Cannot generate design: requirements.md does not exist or is empty. Generate requirements first."
+                    f"Cannot generate design: requirements.md does not exist or is empty at {project.requirements_path}. Generate requirements first."
                 )
         except Exception:
             raise InvalidStateTransitionError(
-                "Cannot generate design: requirements.md does not exist or is empty. Generate requirements first."
+                f"Cannot generate design: requirements.md does not exist or is empty at {project.requirements_path}. Generate requirements first."
             )
     
     if request.spec_type == "tasks":
@@ -710,22 +723,23 @@ async def generate_spec(
             design_content = project_manager.file_ops.read_file(project.design_path)
             if not design_content.strip():
                 raise InvalidStateTransitionError(
-                    "Cannot generate tasks: design.md does not exist or is empty. Generate design first."
+                    f"Cannot generate tasks: design.md does not exist or is empty at {project.design_path}. Generate design first."
                 )
         except Exception:
             raise InvalidStateTransitionError(
-                "Cannot generate tasks: design.md does not exist or is empty. Generate design first."
+                f"Cannot generate tasks: design.md does not exist or is empty at {project.design_path}. Generate design first."
             )
     
     # Generate instruction
     instruction = instruction_generator.generate_spec_instruction(
         project_id=project_id,
+        spec_dir=project.spec_dir,
         spec_type=request.spec_type,
         description=request.description or project.metadata.description
     )
     
     # Execute via kiro-cli
-    cli_result = cli_executor.execute_instruction(instruction, project_id)
+    cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
     
     # Check if execution was successful
     if cli_result.status == "failure":
@@ -834,7 +848,7 @@ async def read_file(project_id: str, file_name: str) -> Dict[str, Any]:
     try:
         content = project_manager.file_ops.read_file(file_path)
     except Exception as e:
-        raise FileNotFoundError(f"File '{file_name}' not found: {str(e)}")
+        raise FileNotFoundError(f"File '{file_name}' not found at path: {file_path}. Error: {str(e)}")
     
     # Return content with metadata
     return {
@@ -910,7 +924,7 @@ async def update_file(
     instruction = f"/tools trust-all\nUpdate the file {file_path} with the following content:\n\n{content}"
     
     # Execute via kiro-cli
-    cli_result = cli_executor.execute_instruction(instruction, project_id)
+    cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
     
     # Check if execution was successful
     if cli_result.status == "failure":
@@ -977,11 +991,11 @@ async def execute_tasks(
         tasks_content = project_manager.file_ops.read_file(project.tasks_path)
         if not tasks_content.strip():
             raise InvalidStateTransitionError(
-                "Cannot execute tasks: tasks.md does not exist or is empty. Generate tasks first."
+                f"Cannot execute tasks: tasks.md does not exist or is empty at {project.tasks_path}. Generate tasks first."
             )
     except Exception:
         raise InvalidStateTransitionError(
-            "Cannot execute tasks: tasks.md does not exist or is empty. Generate tasks first."
+            f"Cannot execute tasks: tasks.md does not exist or is empty at {project.tasks_path}. Generate tasks first."
         )
     
     # Parse tasks.md to validate task_number if provided
@@ -995,11 +1009,13 @@ async def execute_tasks(
         # Generate instruction for task execution
         instruction = instruction_generator.generate_task_instruction(
             project_id=project_id,
+            spec_dir=project.spec_dir,
+            project_root=project.project_root,
             task_number=request.task_number
         )
         
         # Execute via kiro-cli
-        cli_result = cli_executor.execute_instruction(instruction, project_id)
+        cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
         
         # Check if execution was successful
         if cli_result.status == "failure":
@@ -1065,11 +1081,13 @@ async def execute_tasks(
         # Execute all tasks
         instruction = instruction_generator.generate_task_instruction(
             project_id=project_id,
+            spec_dir=project.spec_dir,
+            project_root=project.project_root,
             task_number=None  # None means execute all
         )
         
         # Execute via kiro-cli
-        cli_result = cli_executor.execute_instruction(instruction, project_id)
+        cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
         
         # Check if execution was successful
         if cli_result.status == "failure":
@@ -1245,10 +1263,10 @@ async def build_project(project_id: str) -> OrchestratorResponse:
     project = project_manager.load_project(project_id)
     
     # Generate build instruction
-    instruction = instruction_generator.generate_build_instruction(project_id)
+    instruction = instruction_generator.generate_build_instruction(project_id, project.project_root)
     
     # Execute via kiro-cli
-    cli_result = cli_executor.execute_instruction(instruction, project_id)
+    cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
     
     # Check if execution was successful
     if cli_result.status == "failure":
@@ -1311,10 +1329,10 @@ async def test_project(project_id: str) -> OrchestratorResponse:
     project = project_manager.load_project(project_id)
     
     # Generate test instruction
-    instruction = instruction_generator.generate_test_instruction(project_id)
+    instruction = instruction_generator.generate_test_instruction(project_id, project.project_root)
     
     # Execute via kiro-cli
-    cli_result = cli_executor.execute_instruction(instruction, project_id)
+    cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
     
     # Check if execution was successful
     if cli_result.status == "failure":
@@ -1397,11 +1415,12 @@ async def fix_project(project_id: str, request: FixRequest) -> OrchestratorRespo
     # Generate fix instruction with failure details
     instruction = instruction_generator.generate_fix_instruction(
         project_id=project_id,
+        project_root=project.project_root,
         failure_details=request.failure_details
     )
     
     # Execute via kiro-cli
-    cli_result = cli_executor.execute_instruction(instruction, project_id)
+    cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
     
     # Check if execution was successful
     if cli_result.status == "failure":
@@ -1416,8 +1435,8 @@ async def fix_project(project_id: str, request: FixRequest) -> OrchestratorRespo
         )
     
     # After successful fix, run tests again to verify
-    test_instruction = instruction_generator.generate_test_instruction(project_id)
-    test_result = cli_executor.execute_instruction(test_instruction, project_id)
+    test_instruction = instruction_generator.generate_test_instruction(project_id, project.project_root)
+    test_result = cli_executor.execute_instruction(test_instruction, project.spec_dir, project.project_root)
     
     # Update phase based on test results
     if test_result.status == "success":
@@ -1531,7 +1550,7 @@ async def execute_custom_instruction(
         instruction = "/tools trust-all\n" + instruction
     
     # Execute via kiro-cli
-    cli_result = cli_executor.execute_instruction(instruction, project_id)
+    cli_result = cli_executor.execute_instruction(instruction, project.spec_dir, project.project_root)
     
     # Check if execution was successful
     if cli_result.status == "failure":

@@ -59,7 +59,9 @@ class TestStartupLoading:
             if not pm.file_ops.directory_exists(str(item_path)):
                 continue
             
-            metadata_path = item_path / "project.json"
+            # Check for .kiro/specs/project.json in new structure
+            spec_dir = item_path / ".kiro" / "specs"
+            metadata_path = spec_dir / "project.json"
             if not pm.file_ops.file_exists(str(metadata_path)):
                 continue
             
@@ -85,8 +87,8 @@ class TestStartupLoading:
         # Create a valid project first
         pm.create_project("valid-project", "Valid project")
         
-        # Create a directory with corrupted JSON
-        corrupted_path = pm.base_path / "corrupted-project"
+        # Create a directory with corrupted JSON in new structure
+        corrupted_path = pm.base_path / "corrupted-project" / ".kiro" / "specs"
         pm.file_ops.create_directory(str(corrupted_path))
         
         # Write invalid JSON
@@ -103,7 +105,9 @@ class TestStartupLoading:
             if not pm.file_ops.directory_exists(str(item_path)):
                 continue
             
-            metadata_path = item_path / "project.json"
+            # Check for .kiro/specs/project.json in new structure
+            spec_dir = item_path / ".kiro" / "specs"
+            metadata_path = spec_dir / "project.json"
             if not pm.file_ops.file_exists(str(metadata_path)):
                 continue
             
@@ -133,8 +137,8 @@ class TestStartupLoading:
         # Create a valid project first
         pm.create_project("valid-project", "Valid project")
         
-        # Create a directory with invalid metadata (missing required fields)
-        invalid_path = pm.base_path / "invalid-project"
+        # Create a directory with invalid metadata (missing required fields) in new structure
+        invalid_path = pm.base_path / "invalid-project" / ".kiro" / "specs"
         pm.file_ops.create_directory(str(invalid_path))
         
         # Write JSON with missing required fields
@@ -158,7 +162,9 @@ class TestStartupLoading:
             if not pm.file_ops.directory_exists(str(item_path)):
                 continue
             
-            metadata_path = item_path / "project.json"
+            # Check for .kiro/specs/project.json in new structure
+            spec_dir = item_path / ".kiro" / "specs"
+            metadata_path = spec_dir / "project.json"
             if not pm.file_ops.file_exists(str(metadata_path)):
                 continue
             
@@ -202,7 +208,9 @@ class TestStartupLoading:
             if not pm.file_ops.directory_exists(str(item_path)):
                 continue
             
-            metadata_path = item_path / "project.json"
+            # Check for .kiro/specs/project.json in new structure
+            spec_dir = item_path / ".kiro" / "specs"
+            metadata_path = spec_dir / "project.json"
             if not pm.file_ops.file_exists(str(metadata_path)):
                 skipped_count += 1
                 continue
@@ -240,7 +248,9 @@ class TestStartupLoading:
             if not pm.file_ops.directory_exists(str(item_path)):
                 continue
             
-            metadata_path = item_path / "project.json"
+            # Check for .kiro/specs/project.json in new structure
+            spec_dir = item_path / ".kiro" / "specs"
+            metadata_path = spec_dir / "project.json"
             if not pm.file_ops.file_exists(str(metadata_path)):
                 continue
             

@@ -34,13 +34,13 @@ class CLIExecutor:
         """
         self.file_ops = file_ops or FileOperations()
 
-    def write_instruction_file(self, instruction: str, project_id: str) -> str:
+    def write_instruction_file(self, instruction: str, spec_dir: str) -> str:
         """
         Write instruction to a temporary file.
 
         Args:
             instruction: The instruction text to write
-            project_id: The project identifier
+            spec_dir: The spec directory path for the project
 
         Returns:
             Path to the created instruction file
@@ -48,13 +48,13 @@ class CLIExecutor:
         Raises:
             InstructionFileError: If the file cannot be written
         """
-        # Create instruction file path in project directory
-        project_path = Path(f".kiro/specs/{project_id}")
-        instruction_path = project_path / "instruction.txt"
+        # Create instruction file path in spec directory
+        spec_path = Path(spec_dir)
+        instruction_path = spec_path / "instruction.txt"
 
         try:
-            # Ensure project directory exists
-            self.file_ops.create_directory(str(project_path))
+            # Ensure spec directory exists
+            self.file_ops.create_directory(str(spec_path))
             
             # Write instruction to file
             self.file_ops.write_file(str(instruction_path), instruction)
@@ -210,21 +210,21 @@ class CLIExecutor:
         return "CLI execution failed with non-zero exit code"
 
     @log_operation("execute_instruction")
-    def execute_instruction(self, instruction: str, project_id: str, working_dir: Optional[str] = None) -> CLIResult:
+    def execute_instruction(self, instruction: str, spec_dir: str, project_root: str) -> CLIResult:
         """
         Main entry point for executing an instruction via kiro-cli.
 
         This method:
         1. Writes the instruction to a temp file
-        2. Executes kiro-cli with the instruction in the project directory
+        2. Executes kiro-cli with the instruction in the project root directory
         3. Parses the output
         4. Cleans up the temp file
         5. Returns the result
 
         Args:
             instruction: The instruction text to execute
-            project_id: The project identifier
-            working_dir: Working directory for command execution (optional, defaults to project directory)
+            spec_dir: The spec directory path for the project
+            project_root: The project root directory (working directory for execution)
 
         Returns:
             CLIResult with execution results
@@ -235,21 +235,13 @@ class CLIExecutor:
         instruction_file = None
         
         try:
-            # Step 1: Write instruction file
-            instruction_file = self.write_instruction_file(instruction, project_id)
+            # Step 1: Write instruction file to spec directory
+            instruction_file = self.write_instruction_file(instruction, spec_dir)
             
-            # Step 2: Determine working directory
-            # If not provided, use the project directory (where source code should be generated)
-            if working_dir is None:
-                # Use the project directory as working directory
-                # This is .kiro/specs/{project_id} which contains the spec files
-                # and should also contain the generated source code
-                working_dir = str(Path(f".kiro/specs/{project_id}"))
+            # Step 2: Execute kiro-cli with project root as working directory
+            process_result = self.run_kiro_cli(instruction_file, project_root)
             
-            # Step 3: Execute kiro-cli with working directory
-            process_result = self.run_kiro_cli(instruction_file, working_dir)
-            
-            # Step 4: Parse output
+            # Step 3: Parse output
             cli_result = self.parse_output(
                 process_result.stdout,
                 process_result.stderr,
@@ -259,7 +251,7 @@ class CLIExecutor:
             return cli_result
             
         finally:
-            # Step 5: Cleanup temp file
+            # Step 4: Cleanup temp file
             if instruction_file:
                 try:
                     self.file_ops.delete_file(instruction_file)

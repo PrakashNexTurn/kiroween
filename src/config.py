@@ -4,7 +4,7 @@ import os
 from enum import Enum
 from pathlib import Path
 from typing import Optional
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -78,9 +78,52 @@ class Settings(BaseSettings):
     
     # Project storage configuration
     base_path: Path = Field(
-        default=Path(".kiro/specs"),
-        description="Base directory for project storage"
+        default=Path("."),
+        description="Root directory for all projects (each project will have its own subdirectory)"
     )
+    
+    @field_validator('base_path', mode='before')
+    @classmethod
+    def validate_base_path(cls, v):
+        """
+        Validate and resolve the base path.
+        
+        Args:
+            v: The base path value (string or Path)
+            
+        Returns:
+            Resolved absolute Path object
+            
+        Raises:
+            ValueError: If the path is invalid or cannot be created
+        """
+        if v is None:
+            v = "."
+        
+        path = Path(v).resolve()
+        
+        # Check if path exists and is a file (not a directory)
+        if path.exists() and not path.is_dir():
+            raise ValueError(f"Base path '{path}' exists but is not a directory")
+        
+        # Try to create the directory if it doesn't exist
+        if not path.exists():
+            try:
+                path.mkdir(parents=True, exist_ok=True)
+            except PermissionError as e:
+                raise ValueError(f"Permission denied when creating base path '{path}': {e}")
+            except OSError as e:
+                raise ValueError(f"Cannot create base path '{path}': {e}")
+        
+        # Verify the path exists and is a directory
+        if not path.exists():
+            raise ValueError(f"Base path '{path}' does not exist and could not be created")
+        
+        # Check write permissions
+        if not os.access(path, os.W_OK):
+            raise ValueError(f"Base path '{path}' is not writable")
+        
+        return path
     
     # CLI configuration
     kiro_cli_command: str = Field(
@@ -129,11 +172,13 @@ class Settings(BaseSettings):
         """
         Get the absolute path to the log file.
         
+        The log file is stored in the base path root, not within individual projects.
+        
         Returns:
             Absolute path to log file, or None if not configured
         """
         if not self.log_file:
-            # Default log file location
+            # Default log file location in base path root
             return self.base_path / "orchestrator.log"
         
         log_path = Path(self.log_file)
@@ -187,7 +232,7 @@ class TestingSettings(Settings):
     environment: Environment = Environment.TESTING
     debug: bool = True
     log_level: str = "DEBUG"
-    base_path: Path = Path(".kiro/specs/test")
+    base_path: Path = Path(".")
 
 
 def get_settings(environment: Optional[str] = None) -> Settings:

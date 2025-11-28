@@ -98,14 +98,18 @@ def test_project_model():
     
     project = Project(
         metadata=metadata,
-        project_path=".kiro/specs/test-project",
-        requirements_path=".kiro/specs/test-project/requirements.md",
-        design_path=".kiro/specs/test-project/design.md",
-        tasks_path=".kiro/specs/test-project/tasks.md",
+        project_root="./test-project",
+        spec_dir="./test-project/.kiro/specs",
+        project_path="./test-project/.kiro/specs",
+        requirements_path="./test-project/.kiro/specs/requirements.md",
+        design_path="./test-project/.kiro/specs/design.md",
+        tasks_path="./test-project/.kiro/specs/tasks.md",
     )
     
     assert project.metadata.project_id == "test-project"
-    assert project.project_path == ".kiro/specs/test-project"
+    assert project.project_root == "./test-project"
+    assert project.spec_dir == "./test-project/.kiro/specs"
+    assert project.project_path == "./test-project/.kiro/specs"
 
 
 def test_task_model():

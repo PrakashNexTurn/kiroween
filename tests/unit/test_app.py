@@ -321,8 +321,8 @@ class TestFileOperations:
         })
         project_id = create_response.json()["projectId"]
         
-        # Write some content to requirements.md
-        project_path = Path(temp_base_path) / project_id
+        # Write some content to requirements.md in new structure
+        project_path = Path(temp_base_path) / project_id / ".kiro" / "specs"
         requirements_path = project_path / "requirements.md"
         test_content = "# Test Requirements\n\nThis is a test."
         requirements_path.write_text(test_content, encoding='utf-8')
@@ -375,8 +375,8 @@ class TestFileOperations:
         })
         project_id = create_response.json()["projectId"]
         
-        # Delete the requirements.md file
-        project_path = Path(temp_base_path) / project_id
+        # Delete the requirements.md file in new structure
+        project_path = Path(temp_base_path) / project_id / ".kiro" / "specs"
         requirements_path = project_path / "requirements.md"
         requirements_path.unlink()
         
@@ -408,7 +408,7 @@ class TestFileOperations:
             error=None
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         from src import app
@@ -527,7 +527,7 @@ class TestFileOperations:
             error=None
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         from src import app
@@ -648,7 +648,7 @@ class TestExecuteTasks:
             error=None
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             # Simulate task completion by updating tasks.md
             updated_tasks = """# Implementation Plan
 
@@ -661,7 +661,7 @@ class TestExecuteTasks:
 - [ ] 3. Third task
   - Even more details
 """
-            project = app.project_manager.load_project(proj_id)
+            project = app.project_manager.load_project(project_id)
             app.project_manager.file_ops.write_file(project.tasks_path, updated_tasks)
             return mock_result
         
@@ -717,7 +717,7 @@ class TestExecuteTasks:
             error=None
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             # Simulate all tasks completion
             updated_tasks = """# Implementation Plan
 
@@ -727,7 +727,7 @@ class TestExecuteTasks:
 - [x] 2. Second task
   - More details
 """
-            project = app.project_manager.load_project(proj_id)
+            project = app.project_manager.load_project(project_id)
             app.project_manager.file_ops.write_file(project.tasks_path, updated_tasks)
             return mock_result
         
@@ -782,14 +782,14 @@ class TestExecuteTasks:
             error=None
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             # Simulate task in progress
             updated_tasks = """# Implementation Plan
 
 - [-] 1. First task
   - Some details
 """
-            project = app.project_manager.load_project(proj_id)
+            project = app.project_manager.load_project(project_id)
             app.project_manager.file_ops.write_file(project.tasks_path, updated_tasks)
             return mock_result
         
@@ -836,7 +836,7 @@ class TestExecuteTasks:
             error="Task execution failed"
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         monkeypatch.setattr(app.cli_executor, "execute_instruction", mock_execute_instruction)
@@ -883,7 +883,7 @@ class TestBuildProject:
             error=None
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         monkeypatch.setattr(app.cli_executor, "execute_instruction", mock_execute_instruction)
@@ -933,7 +933,7 @@ class TestBuildProject:
             error="Build failed: compilation error"
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         monkeypatch.setattr(app.cli_executor, "execute_instruction", mock_execute_instruction)
@@ -978,7 +978,7 @@ class TestTestProject:
             error=None
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         monkeypatch.setattr(app.cli_executor, "execute_instruction", mock_execute_instruction)
@@ -1028,7 +1028,7 @@ class TestTestProject:
             error="Tests failed"
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         monkeypatch.setattr(app.cli_executor, "execute_instruction", mock_execute_instruction)
@@ -1086,7 +1086,7 @@ class TestFixProject:
         
         call_count = [0]
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             call_count[0] += 1
             if call_count[0] == 1:
                 return fix_result
@@ -1147,7 +1147,7 @@ class TestFixProject:
             error="Unable to fix issues"
         )
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             return mock_result
         
         monkeypatch.setattr(app.cli_executor, "execute_instruction", mock_execute_instruction)
@@ -1201,7 +1201,7 @@ class TestFixProject:
         
         call_count = [0]
         
-        def mock_execute_instruction(instruction, proj_id):
+        def mock_execute_instruction(instruction, spec_dir, project_root):
             call_count[0] += 1
             if call_count[0] == 1:
                 return fix_result

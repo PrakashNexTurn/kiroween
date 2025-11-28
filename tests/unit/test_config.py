@@ -28,7 +28,7 @@ class TestSettings:
         assert settings.environment == Environment.DEVELOPMENT
         assert settings.debug is False
         assert settings.log_level == "INFO"
-        assert settings.base_path == Path(".kiro/specs")
+        assert settings.base_path == Path(".").resolve()
         assert settings.kiro_cli_command == "kiro-cli"
         assert settings.cors_enabled is True
     
@@ -37,14 +37,14 @@ class TestSettings:
         settings = Settings()
         log_path = settings.get_log_file_path()
         
-        assert log_path == Path(".kiro/specs/orchestrator.log")
+        assert log_path == Path(".").resolve() / "orchestrator.log"
     
     def test_get_log_file_path_custom_relative(self):
         """Test get_log_file_path with custom relative path."""
         settings = Settings(log_file="custom.log")
         log_path = settings.get_log_file_path()
         
-        assert log_path == Path(".kiro/specs/custom.log")
+        assert log_path == Path(".").resolve() / "custom.log"
     
     def test_get_log_file_path_custom_absolute(self):
         """Test get_log_file_path with custom absolute path."""
@@ -115,7 +115,7 @@ class TestTestingSettings:
         assert settings.environment == Environment.TESTING
         assert settings.debug is True
         assert settings.log_level == "DEBUG"
-        assert settings.base_path == Path(".kiro/specs/test")
+        assert settings.base_path == Path(".").resolve()
 
 
 class TestGetSettings:
@@ -228,3 +228,55 @@ class TestEnvironmentVariables:
             else:
                 if "KIRO_LOG_LEVEL" in os.environ:
                     del os.environ["KIRO_LOG_LEVEL"]
+
+
+class TestBasePathValidation:
+    """Test base path validation."""
+    
+    def test_base_path_resolves_to_absolute(self):
+        """Test that base path is resolved to absolute path."""
+        settings = Settings(base_path=".")
+        assert settings.base_path.is_absolute()
+    
+    def test_base_path_creates_directory(self, tmp_path):
+        """Test that base path creates directory if it doesn't exist."""
+        new_dir = tmp_path / "new_base_path"
+        assert not new_dir.exists()
+        
+        settings = Settings(base_path=str(new_dir))
+        assert settings.base_path == new_dir
+        assert new_dir.exists()
+        assert new_dir.is_dir()
+    
+    def test_base_path_accepts_existing_directory(self, tmp_path):
+        """Test that base path accepts existing directory."""
+        settings = Settings(base_path=str(tmp_path))
+        assert settings.base_path == tmp_path
+    
+    def test_base_path_rejects_file(self, tmp_path):
+        """Test that base path rejects a file path."""
+        file_path = tmp_path / "file.txt"
+        file_path.write_text("test")
+        
+        with pytest.raises(ValueError, match="is not a directory"):
+            Settings(base_path=str(file_path))
+    
+    def test_base_path_none_defaults_to_current(self):
+        """Test that None base path defaults to current directory."""
+        settings = Settings(base_path=None)
+        assert settings.base_path == Path(".").resolve()
+    
+    def test_base_path_env_var_override(self, tmp_path):
+        """Test that KIRO_BASE_PATH environment variable overrides default."""
+        old_base_path = os.environ.get("KIRO_BASE_PATH")
+        
+        try:
+            os.environ["KIRO_BASE_PATH"] = str(tmp_path)
+            settings = Settings()
+            assert settings.base_path == tmp_path
+        finally:
+            if old_base_path:
+                os.environ["KIRO_BASE_PATH"] = old_base_path
+            else:
+                if "KIRO_BASE_PATH" in os.environ:
+                    del os.environ["KIRO_BASE_PATH"]

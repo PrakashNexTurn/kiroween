@@ -51,6 +51,30 @@ class ProjectManager:
         self.base_path = Path(base_path)
         self.file_ops = FileOperations()
 
+    def _get_project_root(self, project_id: str) -> Path:
+        """
+        Get the root directory for a project.
+
+        Args:
+            project_id: The project identifier
+
+        Returns:
+            Path to project root: <base_path>/<project_id>/
+        """
+        return self.base_path / project_id
+
+    def _get_spec_dir(self, project_id: str) -> Path:
+        """
+        Get the spec directory for a project.
+
+        Args:
+            project_id: The project identifier
+
+        Returns:
+            Path to spec directory: <base_path>/<project_id>/.kiro/specs/
+        """
+        return self._get_project_root(project_id) / ".kiro" / "specs"
+
     @staticmethod
     def sanitize_project_name(name: str) -> str:
         """
@@ -113,16 +137,25 @@ class ProjectManager:
         # Sanitize the project name
         project_id = self.sanitize_project_name(name)
 
+        # Get project paths using new structure
+        project_root = self._get_project_root(project_id)
+        spec_dir = self._get_spec_dir(project_id)
+
         # Check if project already exists
-        project_path = self.base_path / project_id
-        if self.file_ops.directory_exists(str(project_path)):
+        if self.file_ops.directory_exists(str(project_root)):
             raise ProjectAlreadyExistsError(
-                f"Project '{project_id}' already exists at {project_path}"
+                f"Project '{project_id}' already exists at {project_root.resolve()}"
             )
 
+        # Log the paths being created
+        from src.logger import get_logger
+        logger = get_logger()
+        logger.info(f"Creating project '{project_id}' at {project_root.resolve()}")
+        logger.info(f"Spec directory will be created at {spec_dir.resolve()}")
+
         try:
-            # Create project directory
-            self.file_ops.create_directory(str(project_path))
+            # Create project directory structure: <base_path>/<project_id>/.kiro/specs/
+            self.file_ops.create_directory(str(spec_dir))
 
             # Create metadata
             now = datetime.utcnow()
@@ -139,14 +172,14 @@ class ProjectManager:
                 completion_percentage=0.0,
             )
 
-            # Save metadata to project.json
-            metadata_path = project_path / "project.json"
+            # Save metadata to project.json in spec directory
+            metadata_path = spec_dir / "project.json"
             self.file_ops.write_json(str(metadata_path), metadata.to_dict())
 
-            # Create empty spec files
-            requirements_path = project_path / "requirements.md"
-            design_path = project_path / "design.md"
-            tasks_path = project_path / "tasks.md"
+            # Create empty spec files in spec directory
+            requirements_path = spec_dir / "requirements.md"
+            design_path = spec_dir / "design.md"
+            tasks_path = spec_dir / "tasks.md"
 
             self.file_ops.write_file(str(requirements_path), "")
             self.file_ops.write_file(str(design_path), "")
@@ -155,7 +188,9 @@ class ProjectManager:
             # Create and return Project object
             return Project(
                 metadata=metadata,
-                project_path=str(project_path),
+                project_root=str(project_root),
+                spec_dir=str(spec_dir),
+                project_path=str(spec_dir),  # Backward compatibility
                 requirements_path=str(requirements_path),
                 design_path=str(design_path),
                 tasks_path=str(tasks_path),
@@ -163,7 +198,7 @@ class ProjectManager:
 
         except FileOperationError as e:
             raise ProjectManagerError(
-                f"Failed to create project '{project_id}': {str(e)}"
+                f"Failed to create project '{project_id}' at {project_root.resolve()}: {str(e)}"
             ) from e
 
     @log_operation("load_project")
@@ -181,25 +216,67 @@ class ProjectManager:
             ProjectNotFoundError: If the project does not exist
             ProjectManagerError: If project loading fails
         """
-        project_path = self.base_path / project_id
+        # Get project paths using new structure
+        project_root = self._get_project_root(project_id)
+        spec_dir = self._get_spec_dir(project_id)
 
-        if not self.file_ops.directory_exists(str(project_path)):
-            raise ProjectNotFoundError(f"Project '{project_id}' not found")
+        # Check if project root exists
+        if not self.file_ops.directory_exists(str(project_root)):
+            raise ProjectNotFoundError(
+                f"Project '{project_id}' not found. Expected project root at: {project_root.resolve()}"
+            )
+
+        # Check if spec directory exists
+        if not self.file_ops.directory_exists(str(spec_dir)):
+            raise ProjectNotFoundError(
+                f"Project '{project_id}' spec directory not found. Expected at: {spec_dir.resolve()}"
+            )
+
+        # Log the paths being loaded
+        from src.logger import get_logger
+        logger = get_logger()
+        logger.info(f"Loading project '{project_id}' from {project_root.resolve()}")
+        logger.info(f"Spec directory: {spec_dir.resolve()}")
 
         try:
-            # Load metadata
-            metadata_path = project_path / "project.json"
+            # Load metadata from spec directory
+            metadata_path = spec_dir / "project.json"
+            
+            # Check if metadata file exists and provide clear error if missing
+            if not self.file_ops.file_exists(str(metadata_path)):
+                raise ProjectNotFoundError(
+                    f"Project metadata file missing. Expected at: {metadata_path.resolve()}"
+                )
+            
             metadata_dict = self.file_ops.read_json(str(metadata_path))
             metadata = ProjectMetadata.from_dict(metadata_dict)
 
-            # Build file paths
-            requirements_path = project_path / "requirements.md"
-            design_path = project_path / "design.md"
-            tasks_path = project_path / "tasks.md"
+            # Build file paths in spec directory
+            requirements_path = spec_dir / "requirements.md"
+            design_path = spec_dir / "design.md"
+            tasks_path = spec_dir / "tasks.md"
+            
+            # Check for missing spec files and report them
+            missing_files = []
+            if not self.file_ops.file_exists(str(requirements_path)):
+                missing_files.append(f"requirements.md at {requirements_path.resolve()}")
+            if not self.file_ops.file_exists(str(design_path)):
+                missing_files.append(f"design.md at {design_path.resolve()}")
+            if not self.file_ops.file_exists(str(tasks_path)):
+                missing_files.append(f"tasks.md at {tasks_path.resolve()}")
+            
+            if missing_files:
+                from src.logger import get_logger
+                logger = get_logger()
+                logger.warning(
+                    f"Project '{project_id}' is missing spec files: {', '.join(missing_files)}"
+                )
 
             return Project(
                 metadata=metadata,
-                project_path=str(project_path),
+                project_root=str(project_root),
+                spec_dir=str(spec_dir),
+                project_path=str(spec_dir),  # Backward compatibility
                 requirements_path=str(requirements_path),
                 design_path=str(design_path),
                 tasks_path=str(tasks_path),
@@ -207,11 +284,11 @@ class ProjectManager:
 
         except FileOperationError as e:
             raise ProjectManagerError(
-                f"Failed to load project '{project_id}': {str(e)}"
+                f"Failed to load project '{project_id}' from {project_root.resolve()}: {str(e)}"
             ) from e
         except Exception as e:
             raise ProjectManagerError(
-                f"Failed to parse project metadata for '{project_id}': {str(e)}"
+                f"Failed to parse project metadata for '{project_id}' at {spec_dir.resolve()}/project.json: {str(e)}"
             ) from e
 
     @log_operation("list_projects")
@@ -219,15 +296,22 @@ class ProjectManager:
         """
         List all projects in the base directory.
 
+        Scans base path for directories containing .kiro/specs/project.json
+
         Returns:
             List of ProjectSummary objects for all valid projects
 
         Raises:
             ProjectManagerError: If listing projects fails
         """
+        from src.logger import get_logger
+        logger = get_logger()
+        
         if not self.file_ops.directory_exists(str(self.base_path)):
+            logger.info(f"Base path does not exist: {self.base_path.resolve()}")
             return []
 
+        logger.info(f"Listing projects in base path: {self.base_path.resolve()}")
         projects = []
 
         try:
@@ -237,6 +321,14 @@ class ProjectManager:
             for item in items:
                 item_path = self.base_path / item
                 if not self.file_ops.directory_exists(str(item_path)):
+                    continue
+
+                # Check if this directory contains .kiro/specs/project.json
+                spec_dir = item_path / ".kiro" / "specs"
+                metadata_path = spec_dir / "project.json"
+
+                if not self.file_ops.file_exists(str(metadata_path)):
+                    # Skip directories without valid project structure
                     continue
 
                 # Try to load project metadata
@@ -259,7 +351,7 @@ class ProjectManager:
 
         except FileOperationError as e:
             raise ProjectManagerError(
-                f"Failed to list projects: {str(e)}"
+                f"Failed to list projects in base path {self.base_path.resolve()}: {str(e)}"
             ) from e
 
     @log_operation("update_project_phase")
@@ -275,9 +367,14 @@ class ProjectManager:
             ProjectNotFoundError: If the project does not exist
             ProjectManagerError: If updating the phase fails
         """
+        from src.logger import get_logger
+        logger = get_logger()
+        
         project = self.load_project(project_id)
         project.metadata.phase = phase
         project.metadata.updated_at = datetime.utcnow()
+        
+        logger.info(f"Updating project '{project_id}' phase to {phase.value} at {project.project_root}")
         self.save_metadata(project_id, project.metadata)
 
     def calculate_completion(self, project_id: str) -> float:
@@ -327,8 +424,9 @@ class ProjectManager:
             project = self.load_project(project_id)
             metadata = project.metadata
 
-        project_path = self.base_path / project_id
-        metadata_path = project_path / "project.json"
+        # Use new path structure: <base_path>/<project_id>/.kiro/specs/project.json
+        spec_dir = self._get_spec_dir(project_id)
+        metadata_path = spec_dir / "project.json"
 
         # Update the updated_at timestamp
         metadata.updated_at = datetime.utcnow()
@@ -337,6 +435,6 @@ class ProjectManager:
             self.file_ops.write_json(str(metadata_path), metadata.to_dict())
         except FileOperationError as e:
             raise ProjectManagerError(
-                f"Failed to save metadata for project '{project_id}': {str(e)}"
+                f"Failed to save metadata for project '{project_id}' at {metadata_path.resolve()}: {str(e)}"
             ) from e
 

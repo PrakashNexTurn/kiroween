@@ -75,18 +75,24 @@ class TestProjectManager:
         assert project.metadata.phase == Phase.INIT
         assert project.metadata.completion_percentage == 0.0
 
-        # Verify directory structure
-        project_path = Path(temp_dir) / "test-project"
-        assert project_path.exists()
-        assert (project_path / "project.json").exists()
-        assert (project_path / "requirements.md").exists()
-        assert (project_path / "design.md").exists()
-        assert (project_path / "tasks.md").exists()
+        # Verify new fields
+        assert project.project_root == str(Path(temp_dir) / "test-project")
+        assert project.spec_dir == str(Path(temp_dir) / "test-project" / ".kiro" / "specs")
+
+        # Verify directory structure: <base_path>/<project_id>/.kiro/specs/
+        project_root = Path(temp_dir) / "test-project"
+        spec_dir = project_root / ".kiro" / "specs"
+        assert project_root.exists()
+        assert spec_dir.exists()
+        assert (spec_dir / "project.json").exists()
+        assert (spec_dir / "requirements.md").exists()
+        assert (spec_dir / "design.md").exists()
+        assert (spec_dir / "tasks.md").exists()
 
         # Verify empty spec files
-        assert (project_path / "requirements.md").read_text() == ""
-        assert (project_path / "design.md").read_text() == ""
-        assert (project_path / "tasks.md").read_text() == ""
+        assert (spec_dir / "requirements.md").read_text() == ""
+        assert (spec_dir / "design.md").read_text() == ""
+        assert (spec_dir / "tasks.md").read_text() == ""
 
     def test_create_project_duplicate_raises_error(self, project_manager):
         """Test that creating a duplicate project raises an error."""
