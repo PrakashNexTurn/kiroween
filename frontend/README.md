@@ -14,6 +14,9 @@ A possessed React-based frontend that channels Kiro's AI powers, providing an in
 - **✨ Markdown Sorcery**: Rich markdown rendering with syntax highlighting
 - **🎭 Theme Transformation**: Light, dark, and Halloween themes with smooth transitions
 - **🌍 Universal Access**: The only "IDE" that truly works on mobile devices
+- **📁 File Explorer**: Browse project files with syntax highlighting, search, and keyboard navigation
+- **🎯 Steering Management**: View and edit AI steering files to customize AI behavior
+- **⚡ Adhoc Task Execution**: Run custom instructions with templates, history, and real-time status (Ctrl+K)
 
 ## Tech Stack
 

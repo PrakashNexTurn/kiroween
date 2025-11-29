@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { Save, AlertCircle, FileText } from 'lucide-react';
 import { Button, EditorSkeleton } from '../common';
-import toast from 'react-hot-toast';
+import { showSuccess, showError } from '../common/Toast';
 import { steeringService } from '../../services';
 
 /**
@@ -125,10 +125,12 @@ export function SteeringFileViewer({
       }
 
       setHasChanges(false);
-      toast.success(`${fileName} saved successfully`);
+      showSuccess(`${fileName} saved successfully`);
       onSaveSuccess?.();
     } catch (err: any) {
-      toast.error(err.message || `Failed to save ${fileName}`);
+      showError(err.message || `Failed to save ${fileName}`, {
+        onRetry: handleSave
+      });
     } finally {
       setSaving(false);
     }

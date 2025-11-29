@@ -1847,20 +1847,38 @@ async def generate_steering(
     
     try:
         # Generate steering files
-        generated_files = steering_generator.generate_all(project, force=request.force)
+        result = steering_generator.generate_all(project, force=request.force)
         
-        if not generated_files:
-            # All files were skipped
+        # Handle skipped files
+        if result.get("status") == "skipped":
             return OrchestratorResponse(
                 status="success",
                 action="generate-steering",
                 project_id=project_id,
                 output={
-                    "message": "All steering files already exist. Use force=true to overwrite.",
+                    "message": result.get("message", "All steering files already exist. Use force=true to overwrite."),
                     "files_generated": [],
-                    "files_skipped": ["product.md", "tech.md", "structure.md"]
+                    "files_skipped": list(result.get("files", {}).keys())
                 },
-                logs="Steering files already exist. No files generated."
+                logs=result.get("logs", "Steering files already exist. No files generated.")
+            )
+        
+        # Handle successful generation
+        generated_files = result.get("files", {})
+        if not generated_files:
+            # No files were generated
+            return OrchestratorResponse(
+                status="failure",
+                action="generate-steering",
+                project_id=project_id,
+                output={
+                    "error": {
+                        "code": "NO_FILES_GENERATED",
+                        "message": result.get("error", "No steering files were generated"),
+                        "details": {}
+                    }
+                },
+                logs=result.get("logs", "")
             )
         
         logger.info(f"Generated {len(generated_files)} steering files for project '{project_id}'")
@@ -1874,7 +1892,7 @@ async def generate_steering(
                 "files_generated": list(generated_files.keys()),
                 "file_paths": generated_files
             },
-            logs=f"Generated steering files: {', '.join(generated_files.keys())}"
+            logs=result.get("logs", f"Generated steering files: {', '.join(generated_files.keys())}")
         )
         
     except SteeringGeneratorError as e:

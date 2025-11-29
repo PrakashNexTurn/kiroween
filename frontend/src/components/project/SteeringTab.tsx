@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { FileText, Plus, AlertCircle } from 'lucide-react';
-import { Button, Card, SteeringFileListSkeleton } from '../common';
+import { Button, Card, SteeringFileListSkeleton, showError } from '../common';
 import { SteeringFileViewer } from './SteeringFileViewer';
 import { steeringService } from '../../services';
 
@@ -50,6 +50,7 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
 
   /**
    * Load steering files from API
+   * Requirement 3.3.5: Enhanced error handling with retry
    */
   const loadSteeringFiles = async () => {
     try {
@@ -61,6 +62,12 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load steering files';
       setError(errorMessage);
+      
+      // Show error toast with retry functionality (Requirement 3.3.5)
+      showError(errorMessage, {
+        onRetry: loadSteeringFiles,
+        duration: 7000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -94,19 +101,25 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
   }
 
   /**
-   * Render error state
+   * Render error state with graceful degradation
+   * Requirement 3.3.5: User-friendly error messages and retry functionality
    */
   if (error) {
     return (
       <Card>
-        <div className="flex items-center gap-3 text-center py-8">
-          <AlertCircle
-            size={24}
-            style={{ color: 'var(--color-status-error)' }}
-          />
-          <div>
+        <div className="flex flex-col items-center justify-center py-12 px-6 gap-4">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: 'var(--color-status-error-bg)' }}
+          >
+            <AlertCircle
+              size={32}
+              style={{ color: 'var(--color-status-error)' }}
+            />
+          </div>
+          <div className="text-center max-w-md">
             <p
-              className="text-base font-medium mb-2"
+              className="text-lg font-semibold mb-2"
               style={{ color: 'var(--color-text-primary)' }}
             >
               Failed to load steering files
@@ -117,10 +130,34 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
             >
               {error}
             </p>
-            <Button onClick={loadSteeringFiles} variant="primary" size="sm">
-              Retry
-            </Button>
+            <p
+              className="text-xs mb-6"
+              style={{ color: 'var(--color-text-tertiary)' }}
+            >
+              💡 Make sure the backend server is running and the project exists
+            </p>
           </div>
+          <Button 
+            onClick={loadSteeringFiles} 
+            variant="primary" 
+            size="md"
+            className="flex items-center gap-2"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Retry
+          </Button>
         </div>
       </Card>
     );

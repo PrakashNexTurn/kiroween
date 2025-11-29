@@ -5,10 +5,12 @@
 
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
 import { Layout } from './components/layout';
 import { ToastContainer, ErrorBoundary } from './components/common';
 import { ProjectBoardPage, ProjectDetailPage, NotFoundPage } from './pages';
 import { FileTreeProvider } from './contexts/FileTreeContext';
+import { setupKeyboardUserDetection } from './utils/accessibility';
 import './App.css';
 
 /**
@@ -32,6 +34,33 @@ function AnimatedRoutes() {
 }
 
 function App() {
+  // Initialize accessibility features
+  useEffect(() => {
+    // Set up keyboard user detection for improved focus indicators
+    setupKeyboardUserDetection();
+    
+    // Add skip link for keyboard navigation
+    const skipLink = document.createElement('a');
+    skipLink.href = '#main-content';
+    skipLink.className = 'skip-link';
+    skipLink.textContent = 'Skip to main content';
+    skipLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        mainContent.focus();
+        mainContent.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+    document.body.insertBefore(skipLink, document.body.firstChild);
+    
+    return () => {
+      if (skipLink.parentNode) {
+        skipLink.parentNode.removeChild(skipLink);
+      }
+    };
+  }, []);
+
   return (
     <ErrorBoundary>
       <FileTreeProvider>

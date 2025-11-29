@@ -61,10 +61,13 @@ apiClient.interceptors.request.use(
  * Handles common error scenarios and provides user-friendly error messages
  * 
  * Error handling:
+ * - Timeout: Request took too long
  * - 404: Resource not found
  * - 500: Server error
  * - Network errors: Connection issues
  * - Other errors: Generic error handling
+ * 
+ * Requirement 3.3.5: Enhanced error handling with better messages
  */
 apiClient.interceptors.response.use(
   (response) => {
@@ -85,25 +88,40 @@ apiClient.interceptors.response.use(
     console.error(`[API Error] ${method} ${url}`, {
       status,
       message: error.message,
+      code: error.code,
       response: error.response?.data,
     });
 
-    // Handle specific error cases
+    // Handle timeout errors
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      const timeoutError: ApiError = {
+        code: 'TIMEOUT',
+        message: 'The request took too long to complete. The server may be busy or the operation is complex.',
+        details: {
+          url,
+          method,
+          timeout: error.config?.timeout,
+        },
+      };
+      return Promise.reject(timeoutError);
+    }
+
+    // Handle network errors - no response received
     if (!error.response) {
-      // Network error - no response received
       const networkError: ApiError = {
         code: 'NETWORK_ERROR',
         message: 'Unable to connect to the server. Please check your internet connection and ensure the backend is running.',
         details: {
           originalError: error.message,
           baseURL: API_BASE_URL,
+          url,
         },
       };
       return Promise.reject(networkError);
     }
 
+    // Handle 404 - Resource not found
     if (status === 404) {
-      // Resource not found
       const notFoundError: ApiError = {
         code: 'NOT_FOUND',
         message: 'The requested resource was not found.',
@@ -115,8 +133,8 @@ apiClient.interceptors.response.use(
       return Promise.reject(notFoundError);
     }
 
+    // Handle 401/403 - Authentication/Authorization error
     if (status === 401 || status === 403) {
-      // Authentication/Authorization error
       const authError: ApiError = {
         code: 'UNAUTHORIZED',
         message: 'You are not authorized to perform this action.',
@@ -128,11 +146,25 @@ apiClient.interceptors.response.use(
       return Promise.reject(authError);
     }
 
+    // Handle 400 - Bad Request / Validation Error
+    if (status === 400) {
+      const validationError: ApiError = {
+        code: 'VALIDATION_ERROR',
+        message: error.response?.data?.output?.error?.message || 'The request data is invalid.',
+        details: {
+          url,
+          method,
+          response: error.response?.data,
+        },
+      };
+      return Promise.reject(validationError);
+    }
+
+    // Handle 500 - Server error
     if (status === 500) {
-      // Server error
       const serverError: ApiError = {
         code: 'SERVER_ERROR',
-        message: 'An internal server error occurred. Please try again later.',
+        message: 'An internal server error occurred. The backend may be experiencing issues.',
         details: {
           url,
           method,
@@ -140,6 +172,19 @@ apiClient.interceptors.response.use(
         },
       };
       return Promise.reject(serverError);
+    }
+
+    // Handle 503 - Service Unavailable
+    if (status === 503) {
+      const unavailableError: ApiError = {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'The service is temporarily unavailable. Please try again in a moment.',
+        details: {
+          url,
+          method,
+        },
+      };
+      return Promise.reject(unavailableError);
     }
 
     // Check if the backend returned a structured error

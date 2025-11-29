@@ -147,7 +147,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="bg-black bg-opacity-50"
+        className="bg-black bg-opacity-50 transition-opacity duration-base"
         aria-hidden="true"
         style={{
           position: 'absolute',
@@ -162,9 +162,8 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal */}
       <div
         ref={modalRef}
-        className={`relative w-full ${sizeStyles[size]} rounded-lg shadow-xl p-8`}
+        className={`relative w-full ${sizeStyles[size]} bg-background-primary rounded-lg shadow-xl p-8 border border-border`}
         style={{
-          backgroundColor: 'var(--color-bg-primary)',
           animation: 'scaleIn 0.2s ease-out',
           zIndex: 10000,
         }}
@@ -176,24 +175,14 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="flex items-center justify-between mb-6">
           <h2
             id="modal-title"
-            className="text-2xl font-semibold"
-            style={{ color: 'var(--color-text-primary)' }}
+            className="text-2xl font-semibold text-text-primary"
           >
             {title}
           </h2>
           {showCloseButton && (
             <button
               onClick={onClose}
-              className="transition-colors focus:outline-none focus:ring-2 rounded"
-              style={{
-                color: 'var(--color-text-secondary)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
-              }}
+              className="text-text-secondary hover:text-text-primary transition-colors duration-base focus:outline-none focus:ring-2 focus:ring-brand-primary rounded p-1"
               aria-label="Close modal"
             >
               <X className="h-6 w-6" />
@@ -202,7 +191,7 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Content */}
-        <div style={{ color: 'var(--color-text-primary)' }}>{children}</div>
+        <div className="text-text-primary">{children}</div>
       </div>
     </div>,
     document.body

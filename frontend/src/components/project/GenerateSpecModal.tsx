@@ -77,7 +77,7 @@ export function GenerateSpecModal({
         onClose();
       } catch (err) {
         // Handle API error with user-friendly message
-        handleApiError(err, 'Failed to generate spec');
+        handleApiError(err, { customMessage: 'Failed to generate spec' });
       } finally {
         // Notify parent that generation is complete
         if (onGenerationStateChange) {

@@ -20,15 +20,15 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const errorId = `${selectId}-error`;
     const helperId = `${selectId}-helper`;
     
-    // Professional styling: 48px height, 12px border-radius, 2px dark blue border
-    const baseStyles = 'w-full px-4 py-3 text-base rounded-xl transition-all duration-200 focus:outline-none appearance-none bg-no-repeat shadow-[0_2px_8px_rgba(0,82,163,0.15)] cursor-pointer';
-    const normalStyles = 'border-2 border-[#0052A3] bg-white text-[#003D7A] hover:border-[#003D7A] hover:shadow-[0_4px_12px_rgba(0,82,163,0.25)] focus:border-[#003D7A] focus:ring-4 focus:ring-[rgba(0,82,163,0.15)]';
-    const errorStyles = 'border-2 border-[#DC3545] bg-white text-[#003D7A] focus:ring-4 focus:ring-[rgba(220,53,69,0.15)]';
-    const disabledStyles = 'bg-[#E9ECEF] cursor-not-allowed opacity-50 border-[#DEE2E6]';
+    // Use theme variables for consistent styling
+    const baseStyles = 'w-full px-4 py-3 text-base rounded-xl transition-all duration-base focus:outline-none appearance-none bg-no-repeat shadow-sm cursor-pointer';
+    const normalStyles = 'border-2 border-brand-primary bg-background-primary text-text-primary hover:border-brand-secondary hover:shadow-md focus:border-brand-secondary focus:ring-4 focus:ring-brand-primary focus:ring-opacity-15';
+    const errorStyles = 'border-2 border-status-error bg-background-primary text-text-primary focus:ring-4 focus:ring-status-error focus:ring-opacity-15';
+    const disabledStyles = 'bg-disabled cursor-not-allowed opacity-50 border-border';
     
     const sizeStyles = {
       sm: 'h-10 text-sm',
-      md: 'h-12 text-base', // 48px height, 16px font
+      md: 'h-12 text-base',
       lg: 'h-14 text-lg',
     };
     
@@ -41,7 +41,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-sm font-medium text-[#003D7A] mb-2"
+            className="block text-sm font-medium text-text-primary mb-2"
           >
             {label}
           </label>
@@ -62,9 +62,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          {/* Dark blue arrow icon (20px) */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-            <ChevronDown className="w-5 h-5 text-[#0052A3]" aria-hidden="true" />
+            <ChevronDown className="w-5 h-5 text-brand-primary" aria-hidden="true" />
           </div>
         </div>
         {error && (

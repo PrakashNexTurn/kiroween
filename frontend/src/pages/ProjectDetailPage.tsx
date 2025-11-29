@@ -17,7 +17,7 @@ import { TasksTab } from '../components/task';
 import { Phase } from '../types/project.types';
 import { useNavigation } from '../utils';
 import { steeringService } from '../services';
-import toast from 'react-hot-toast';
+import { showSuccess, showError, showLongRunning } from '../components/common';
 
 /**
  * Tab type for navigation
@@ -92,6 +92,9 @@ export function ProjectDetailPage() {
     try {
       setIsGeneratingSteering(true);
       
+      // Show long-running operation toast
+      showLongRunning('Generating steering files...');
+      
       const response = await steeringService.generateSteering(projectId || '', force);
       
       // Close modal on success
@@ -103,14 +106,16 @@ export function ProjectDetailPage() {
       // Show success message
       const filesGenerated = response.output.files_generated || [];
       if (filesGenerated.length > 0) {
-        toast.success(`Generated ${filesGenerated.length} steering file(s): ${filesGenerated.join(', ')}`);
+        showSuccess(`Generated ${filesGenerated.length} steering file(s): ${filesGenerated.join(', ')}`);
       } else {
-        toast.success('All steering files already exist. Use force regeneration to overwrite.');
+        showSuccess('All steering files already exist. Use force regeneration to overwrite.');
       }
     } catch (error) {
       console.error('Failed to generate steering files:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate steering files';
-      toast.error(errorMessage);
+      showError(errorMessage, {
+        onRetry: () => handleGenerateSteering(force)
+      });
     } finally {
       setIsGeneratingSteering(false);
     }
@@ -300,15 +305,15 @@ export function ProjectDetailPage() {
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Responsive with horizontal scroll on mobile */}
       <div
-        className="border-b mb-6"
+        className="border-b mb-6 -mx-4 sm:mx-0"
         style={{ borderColor: 'var(--color-border)' }}
       >
-        <nav className="flex gap-8" aria-label="Project sections">
+        <nav className="flex gap-4 sm:gap-8 overflow-x-auto px-4 sm:px-0 scrollbar-hide" aria-label="Project sections">
           <button
             onClick={() => handleTabChange('overview')}
-            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
               activeTab === 'overview' ? 'border-current' : 'border-transparent'
             }`}
             style={{
@@ -324,7 +329,7 @@ export function ProjectDetailPage() {
           
           <button
             onClick={() => handleTabChange('specs')}
-            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
               activeTab === 'specs' ? 'border-current' : 'border-transparent'
             }`}
             style={{
@@ -340,7 +345,7 @@ export function ProjectDetailPage() {
           
           <button
             onClick={() => handleTabChange('tasks')}
-            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
               activeTab === 'tasks' ? 'border-current' : 'border-transparent'
             }`}
             style={{
@@ -356,7 +361,7 @@ export function ProjectDetailPage() {
           
           <button
             onClick={() => handleTabChange('files')}
-            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
               activeTab === 'files' ? 'border-current' : 'border-transparent'
             }`}
             style={{
@@ -372,7 +377,7 @@ export function ProjectDetailPage() {
           
           <button
             onClick={() => handleTabChange('steering')}
-            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
               activeTab === 'steering' ? 'border-current' : 'border-transparent'
             }`}
             style={{

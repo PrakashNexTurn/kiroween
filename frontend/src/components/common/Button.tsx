@@ -10,23 +10,23 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', loading = false, disabled, children, className = '', ...props }, ref) => {
-    // Professional styling: 48px height, 12px border-radius, 16px font, weight 600
-    const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all duration-200 focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none';
+    // Base styles with smooth transitions
+    const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all duration-base ease-out focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none';
     
     const variantStyles = {
-      // Primary: Dark blue (#0052A3) background, white text
-      primary: 'bg-[#0052A3] text-white hover:bg-[#003D7A] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(0,82,163,0.4)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,82,163,0.3)] focus:ring-[rgba(0,82,163,0.15)] shadow-[0_4px_12px_rgba(0,82,163,0.3)]',
-      // Secondary: White background, dark blue border (2px), dark blue text
-      secondary: 'bg-white text-[#0052A3] border-2 border-[#0052A3] hover:bg-[#0052A3] hover:text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,82,163,0.25)] active:translate-y-0 focus:ring-[rgba(0,82,163,0.15)]',
+      // Primary: Uses theme brand colors
+      primary: 'bg-brand-primary text-text-inverse hover:bg-brand-secondary hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md focus:ring-brand-primary focus:ring-opacity-15 shadow-md',
+      // Secondary: Background with brand border
+      secondary: 'bg-background-primary text-brand-primary border-2 border-brand-primary hover:bg-brand-primary hover:text-text-inverse hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 focus:ring-brand-primary focus:ring-opacity-15',
       // Danger: Red for destructive actions
-      danger: 'bg-[#DC3545] text-white hover:bg-[#C82333] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(220,53,69,0.4)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(220,53,69,0.3)] focus:ring-[rgba(220,53,69,0.15)] shadow-[0_4px_12px_rgba(220,53,69,0.3)]',
+      danger: 'bg-status-error text-text-inverse hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md focus:ring-status-error focus:ring-opacity-15 shadow-md',
       // Ghost: Transparent with hover effect
-      ghost: 'bg-transparent text-[#0052A3] hover:bg-[#F8F9FA] focus:ring-[rgba(0,82,163,0.15)]',
+      ghost: 'bg-transparent text-brand-primary hover:bg-hover focus:ring-brand-primary focus:ring-opacity-15',
     };
     
     const sizeStyles = {
       sm: 'px-4 py-2 text-sm h-10 rounded-lg',
-      md: 'px-6 py-3 text-base h-12 rounded-xl', // 48px height, 12px border-radius, 16px font
+      md: 'px-6 py-3 text-base h-12 rounded-xl',
       lg: 'px-8 py-4 text-lg h-14 rounded-xl',
     };
     

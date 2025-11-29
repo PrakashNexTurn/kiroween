@@ -87,6 +87,153 @@ select option:checked {
   white-space: normal;
 }
 
+/* High Contrast Mode Support */
+@media (prefers-contrast: high), (-ms-high-contrast: active) {
+  /* Ensure borders are visible in high contrast mode */
+  button, input, select, textarea, .border {
+    border: 2px solid currentColor !important;
+  }
+  
+  /* Ensure focus indicators are visible */
+  *:focus-visible {
+    outline: 3px solid currentColor !important;
+    outline-offset: 3px !important;
+  }
+  
+  /* Ensure icons are visible */
+  svg {
+    fill: currentColor;
+    stroke: currentColor;
+  }
+  
+  /* Ensure backgrounds have sufficient contrast */
+  .bg-brand-primary,
+  .bg-status-success,
+  .bg-status-error,
+  .bg-status-warning,
+  .bg-status-info {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable all custom animations */
+  .animate-fadeIn,
+  .animate-scaleIn,
+  .animate-slideInRight,
+  .animate-slideOutRight,
+  .animate-slideInUp,
+  .animate-shimmer {
+    animation: none !important;
+  }
+}
+
+/* Keyboard User Detection */
+body.keyboard-user *:focus {
+  outline: 2px solid var(--color-brand-primary) !important;
+  outline-offset: 2px !important;
+}
+
+body:not(.keyboard-user) *:focus {
+  outline: none;
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-brand-primary);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  z-index: 100;
+  transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Improved focus indicators for interactive elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="link"]:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.15);
+}
+
+/* Ensure sufficient touch target sizes on mobile */
+@media (max-width: 768px) {
+  button,
+  a,
+  [role="button"],
+  [role="link"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ARIA live region for screen reader announcements */
+#a11y-announcer {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Hide scrollbar for horizontal scrolling tabs on mobile */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure touch-friendly tap targets on mobile (minimum 44x44px) */
+@media (max-width: 640px) {
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+}
+
+/* Prevent text selection on interactive elements for better mobile UX */
+button, .cursor-pointer {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Ensure proper text wrapping on mobile */
+@media (max-width: 640px) {
+  h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {

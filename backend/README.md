@@ -11,6 +11,9 @@ The possessed backend that channels Kiro's AI powers without requiring IDE insta
 - **🧙 Automated Code Manifestation**: Execute tasks using kiro-cli integration
 - **📡 Spectral RESTful API**: Complete API for project lifecycle management
 - **⚙️ Flexible Configuration**: Environment-based configuration with CLI overrides
+- **🎯 Steering Generation**: Auto-generate AI context files (product.md, tech.md, structure.md)
+- **📂 File System Service**: Secure file tree browsing with binary detection and path validation
+- **⚡ Custom Instructions**: Execute adhoc tasks via API for flexible workflows
 
 ## 🕯️ Awakening the Spirit
 

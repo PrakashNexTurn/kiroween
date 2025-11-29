@@ -14,11 +14,11 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const helperId = `${textareaId}-helper`;
     const internalRef = useRef<HTMLTextAreaElement | null>(null);
     
-    // Professional styling: 12px border-radius, 2px dark blue border, 16px font, padding 12px 16px
-    const baseStyles = 'w-full px-4 py-3 text-base rounded-xl transition-all duration-200 focus:outline-none shadow-[0_2px_8px_rgba(0,82,163,0.15)] resize-y';
-    const normalStyles = 'border-2 border-[#0052A3] bg-white text-[#003D7A] hover:border-[#003D7A] hover:shadow-[0_4px_12px_rgba(0,82,163,0.25)] focus:border-[#003D7A] focus:ring-4 focus:ring-[rgba(0,82,163,0.15)]';
-    const errorStyles = 'border-2 border-[#DC3545] bg-white text-[#003D7A] focus:ring-4 focus:ring-[rgba(220,53,69,0.15)]';
-    const disabledStyles = 'bg-[#E9ECEF] cursor-not-allowed opacity-50 border-[#DEE2E6]';
+    // Use theme variables for consistent styling
+    const baseStyles = 'w-full px-4 py-3 text-base rounded-xl transition-all duration-base focus:outline-none shadow-sm resize-y';
+    const normalStyles = 'border-2 border-brand-primary bg-background-primary text-text-primary hover:border-brand-secondary hover:shadow-md focus:border-brand-secondary focus:ring-4 focus:ring-brand-primary focus:ring-opacity-15';
+    const errorStyles = 'border-2 border-status-error bg-background-primary text-text-primary focus:ring-4 focus:ring-status-error focus:ring-opacity-15';
+    const disabledStyles = 'bg-disabled cursor-not-allowed opacity-50 border-border';
     
     const textareaStyles = error
       ? `${baseStyles} ${errorStyles}`
@@ -57,7 +57,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label
             htmlFor={textareaId}
-            className="block text-sm font-medium text-[#003D7A] mb-2"
+            className="block text-sm font-medium text-text-primary mb-2"
           >
             {label}
           </label>

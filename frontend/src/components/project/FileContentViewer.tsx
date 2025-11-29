@@ -10,7 +10,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { FileText, AlertCircle } from 'lucide-react';
 import { getFileContent, type FileContentResponse } from '../../services/fileSystemService';
-import { FileContentSkeleton } from '../common';
+import { FileContentSkeleton, showError } from '../common';
 
 // Lazy load Monaco editor (Optimization: Requirement 3.4.5)
 const Editor = lazy(() => import('@monaco-editor/react'));
@@ -120,8 +120,16 @@ export function FileContentViewer({ projectId, filePath }: FileContentViewerProp
           setFileData(data);
         }
       } catch (err: any) {
+        // Requirement 3.3.5: User-friendly error messages
+        const errorMessage = err.response?.data?.message || err.message || 'Failed to load file content';
         if (isMounted) {
-          setError(err.response?.data?.message || err.message || 'Failed to load file content');
+          setError(errorMessage);
+          
+          // Show error toast with retry functionality (Requirement 3.3.5)
+          showError(errorMessage, {
+            onRetry: fetchFileContent,
+            duration: 7000
+          });
         }
       } finally {
         if (isMounted) {
@@ -143,20 +151,39 @@ export function FileContentViewer({ projectId, filePath }: FileContentViewerProp
     return <FileContentSkeleton />;
   }
 
-  // Error state
+  // Error state with graceful degradation (Requirement 3.3.5)
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3">
-        <AlertCircle
-          size={48}
-          style={{ color: 'var(--color-status-error)' }}
-        />
-        <p
-          className="text-sm text-center"
-          style={{ color: 'var(--color-text-secondary)' }}
+      <div className="flex flex-col items-center justify-center h-full gap-4 p-6">
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: 'var(--color-status-error-bg)' }}
         >
-          {error}
-        </p>
+          <AlertCircle
+            size={32}
+            style={{ color: 'var(--color-status-error)' }}
+          />
+        </div>
+        <div className="text-center max-w-md">
+          <p
+            className="text-base font-medium mb-2"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            Failed to load file
+          </p>
+          <p
+            className="text-sm mb-4"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            {error}
+          </p>
+          <p
+            className="text-xs"
+            style={{ color: 'var(--color-text-tertiary)' }}
+          >
+            💡 You can still view this file in your local editor or IDE
+          </p>
+        </div>
       </div>
     );
   }

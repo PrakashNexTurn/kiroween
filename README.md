@@ -166,6 +166,104 @@ User Request → Frontend → Backend API → kiro-cli → Kiro AI
 
 ---
 
+## 🆕 New Features
+
+### 📁 File Explorer
+
+Browse your project files directly in the browser with a powerful, intuitive file explorer:
+
+- **Interactive File Tree**: Expand/collapse folders, navigate your project structure
+- **Syntax Highlighting**: View files with Monaco editor and language-specific highlighting
+- **Search & Filter**: Quickly find files with real-time search (Ctrl+F)
+- **Keyboard Navigation**: Arrow keys for navigation, Enter to open files
+- **Context Menu**: Right-click for quick actions like "Copy Path"
+- **Binary Detection**: Automatically detects and handles binary files
+- **Large File Handling**: Gracefully handles files over 1MB with warnings
+- **Security**: Path validation prevents access outside project directory
+
+**Usage:**
+1. Navigate to any project
+2. Click the "Files" tab
+3. Browse the file tree on the left
+4. Click any file to view its contents in the Monaco editor
+5. Use the search bar to filter files
+6. Use keyboard shortcuts for faster navigation
+
+### 🎯 Steering File Management
+
+Generate and manage AI steering files to provide context and guidance to AI assistants:
+
+- **Auto-Generation**: Create steering files automatically on project creation
+- **Three Default Files**:
+  - `product.md` - Product overview and goals
+  - `tech.md` - Technology stack and commands
+  - `structure.md` - Project structure and conventions
+- **In-Browser Editing**: Edit steering files with Monaco editor
+- **Regeneration**: Update steering files as your project evolves
+- **API Integration**: Full REST API support for steering operations
+
+**Usage:**
+1. Create a new project with "Generate Steering" option enabled
+2. Or click "Generate Steering" button on any existing project
+3. Navigate to the "Steering" tab to view/edit files
+4. Customize the content to match your project's needs
+5. AI assistants will use these files for better context
+
+**API Endpoints:**
+- `POST /projects/{project_id}/steering/generate` - Generate steering files
+- `GET /projects/{project_id}/steering/files` - List steering files
+- `GET /projects/{project_id}/steering/files/{file_name}` - Read steering file
+- `PUT /projects/{project_id}/steering/files/{file_name}` - Update steering file
+
+### ⚡ Adhoc Task Execution
+
+Execute custom instructions that aren't part of your predefined task list:
+
+- **Quick Access**: Press Ctrl+K (Cmd+K on Mac) to open the adhoc task modal
+- **Large Text Input**: Up to 50,000 characters for complex instructions
+- **Instruction Templates**: 5 built-in templates for common tasks:
+  - Fix linting errors
+  - Add unit tests
+  - Update documentation
+  - Refactor code
+  - Debug issues
+- **Task History**: View and rerun previous adhoc tasks
+- **Real-Time Status**: Animated execution indicator with live updates
+- **Local Storage**: History persists across sessions (last 50 tasks)
+- **Keyboard Shortcuts**: Ctrl+Enter to execute, Escape to close
+
+**Usage:**
+1. Navigate to the "Tasks" tab
+2. Click "Execute Adhoc Task" or press Ctrl+K
+3. Type your custom instruction or select a template
+4. Click "Execute" or press Ctrl+Enter
+5. Watch real-time execution status
+6. View results in the task history below
+
+**Example Instructions:**
+- "Add error handling to all API calls in the frontend"
+- "Create a new component for displaying user profiles"
+- "Refactor the authentication logic to use JWT tokens"
+- "Add TypeScript types to all utility functions"
+
+**API Endpoint:**
+- `POST /projects/{project_id}/custom` - Execute custom instruction
+
+### 🎹 Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+K` / `Cmd+K` | Open adhoc task modal |
+| `Ctrl+Enter` / `Cmd+Enter` | Execute adhoc task |
+| `Escape` | Close modal |
+| `Ctrl+F` | Focus file search (when in file tree) |
+| `Arrow Up/Down` | Navigate file tree |
+| `Arrow Right` | Expand folder |
+| `Arrow Left` | Collapse folder |
+| `Enter` | Open selected file |
+
+---
+
 ## 🕯️ Summoning the Ghost (Quick Start)
 
 Ready to be possessed by Kiro's spirit? Follow these incantations...
@@ -238,6 +336,10 @@ See [frontend/README.md](frontend/README.md) for complete frontend documentation
 - **🚫 No Installation Curse**: Break free from desktop-only development - work from coffee shops, trains, or your couch
 
 ## Documentation
+
+### Getting Started
+- **[USER_GUIDE.md](USER_GUIDE.md)** - Comprehensive user guide with tutorials and best practices
+- **[KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)** - Complete keyboard shortcuts reference
 
 ### Backend
 - **[backend/README.md](backend/README.md)** - Backend setup and overview

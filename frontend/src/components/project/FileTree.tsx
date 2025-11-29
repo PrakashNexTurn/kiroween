@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { getFileTree } from '../../services/fileSystemService';
-import { FileTreeSkeleton } from '../common';
+import { FileTreeSkeleton, showError } from '../common';
 import { FileTreeNode as FileTreeNodeComponent } from './FileTreeNode';
 import { useFileTreeKeyboard } from '../../hooks/useFileTreeKeyboard';
 import { useFileTreeContext } from '../../contexts/FileTreeContext';
@@ -96,6 +96,7 @@ export const FileTree: React.FC<FileTreeProps> = ({
   /**
    * Load file tree from API with caching
    * Optimization: Check cache first (Requirement 3.4.5)
+   * Requirement 3.3.5: Enhanced error handling with retry
    */
   const loadFileTree = useCallback(async () => {
     try {
@@ -125,6 +126,12 @@ export const FileTree: React.FC<FileTreeProps> = ({
       console.error('Failed to load file tree:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to load file tree';
       setError(errorMessage);
+      
+      // Show error toast with retry functionality (Requirement 3.3.5)
+      showError(errorMessage, {
+        onRetry: loadFileTree,
+        duration: 7000
+      });
     } finally {
       setLoading(false);
     }
@@ -222,20 +229,48 @@ export const FileTree: React.FC<FileTreeProps> = ({
   }
 
   /**
-   * Render error state
+   * Render error state with graceful degradation
+   * Requirement 3.3.5: User-friendly error messages and retry functionality
    */
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 px-4">
-        <p
-          className="text-sm text-center mb-4"
-          style={{ color: 'var(--color-error)' }}
+      <div className="flex flex-col items-center justify-center py-8 px-4 gap-3">
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: 'var(--color-status-error-bg)' }}
         >
-          {error}
-        </p>
+          <svg
+            className="w-6 h-6"
+            style={{ color: 'var(--color-status-error)' }}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+        <div className="text-center">
+          <p
+            className="text-sm font-medium mb-1"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            Failed to load file tree
+          </p>
+          <p
+            className="text-xs mb-4"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            {error}
+          </p>
+        </div>
         <button
           onClick={loadFileTree}
-          className="px-4 py-2 rounded text-sm font-medium transition-colors"
+          className="px-4 py-2 rounded text-sm font-medium transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
           style={{
             backgroundColor: 'var(--color-brand-primary)',
             color: 'var(--color-bg-primary)',
@@ -247,6 +282,19 @@ export const FileTree: React.FC<FileTreeProps> = ({
             e.currentTarget.style.opacity = '1';
           }}
         >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
           Retry
         </button>
       </div>

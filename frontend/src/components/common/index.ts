@@ -22,7 +22,8 @@ export type { ProgressBarProps } from './ProgressBar';
 export { LoadingSpinner } from './LoadingSpinner';
 export type { LoadingSpinnerProps } from './LoadingSpinner';
 
-export { ToastContainer, showSuccess, showError, showInfo, showWarning } from './Toast';
+export { ToastContainer, showSuccess, showError, showInfo, showWarning, showLongRunning } from './Toast';
+export type { ToastOptionsWithRetry } from './Toast';
 
 export { Breadcrumbs } from './Breadcrumbs';
 

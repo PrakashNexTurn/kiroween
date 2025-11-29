@@ -20,6 +20,12 @@ Complete API reference with curl examples for all endpoints.
   - [Run Tests](#13-run-tests)
   - [Fix Issues](#14-fix-issues)
   - [Execute Custom Instruction](#15-execute-custom-instruction)
+  - [Generate Steering Files](#16-generate-steering-files)
+  - [List Steering Files](#17-list-steering-files)
+  - [Read Steering File](#18-read-steering-file)
+  - [Update Steering File](#19-update-steering-file)
+  - [Get File Tree](#20-get-file-tree)
+  - [Get File Content](#21-get-file-content)
 - [Complete Workflow](#complete-workflow)
 - [Response Format](#response-format)
 - [Error Codes](#error-codes)
@@ -639,6 +645,279 @@ curl -X POST http://localhost:8000/projects/my-todo-app/custom \
 
 ---
 
+### 16. Generate Steering Files
+
+Generate AI steering files (product.md, tech.md, structure.md) to provide context for AI assistants.
+
+**Endpoint:** `POST /projects/{project_id}/steering/generate`
+
+```bash
+curl -X POST http://localhost:8000/projects/my-todo-app/steering/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "force": false
+  }'
+```
+
+**Request Body:**
+```json
+{
+  "force": "boolean (optional, default: false) - Overwrite existing files"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "action": "generate-steering",
+  "projectId": "my-todo-app",
+  "output": {
+    "files_created": [
+      ".kiro/steering/product.md",
+      ".kiro/steering/tech.md",
+      ".kiro/steering/structure.md"
+    ],
+    "generated_at": "2025-11-29T10:30:00Z"
+  },
+  "logs": "Generated 3 steering files successfully"
+}
+```
+
+**Notes:**
+- Creates three default steering files with project-specific content
+- If files exist and `force` is false, returns error
+- Files are created in `<project_root>/.kiro/steering/`
+
+---
+
+### 17. List Steering Files
+
+Get a list of all steering files for a project.
+
+**Endpoint:** `GET /projects/{project_id}/steering/files`
+
+```bash
+curl http://localhost:8000/projects/my-todo-app/steering/files
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "action": "list-steering-files",
+  "projectId": "my-todo-app",
+  "output": {
+    "files": [
+      {
+        "fileName": "product.md",
+        "filePath": ".kiro/steering/product.md",
+        "exists": true,
+        "size": 1024,
+        "modifiedAt": "2025-11-29T10:30:00Z"
+      },
+      {
+        "fileName": "tech.md",
+        "filePath": ".kiro/steering/tech.md",
+        "exists": true,
+        "size": 2048,
+        "modifiedAt": "2025-11-29T10:30:00Z"
+      },
+      {
+        "fileName": "structure.md",
+        "filePath": ".kiro/steering/structure.md",
+        "exists": true,
+        "size": 1536,
+        "modifiedAt": "2025-11-29T10:30:00Z"
+      }
+    ],
+    "total": 3
+  },
+  "logs": "Listed 3 steering files"
+}
+```
+
+---
+
+### 18. Read Steering File
+
+Read the content of a specific steering file.
+
+**Endpoint:** `GET /projects/{project_id}/steering/files/{file_name}`
+
+```bash
+curl http://localhost:8000/projects/my-todo-app/steering/files/product.md
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "action": "read-steering-file",
+  "projectId": "my-todo-app",
+  "output": {
+    "fileName": "product.md",
+    "content": "# Product Overview\n\n**My Todo App** is a simple todo list application...",
+    "size": 1024,
+    "modifiedAt": "2025-11-29T10:30:00Z"
+  },
+  "logs": "Steering file read successfully"
+}
+```
+
+---
+
+### 19. Update Steering File
+
+Update the content of a steering file.
+
+**Endpoint:** `PUT /projects/{project_id}/steering/files/{file_name}`
+
+```bash
+curl -X PUT http://localhost:8000/projects/my-todo-app/steering/files/product.md \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "# Product Overview\n\nUpdated content..."
+  }'
+```
+
+**Request Body:**
+```json
+{
+  "content": "string (required)"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "action": "update-steering-file",
+  "projectId": "my-todo-app",
+  "output": {
+    "fileName": "product.md",
+    "updatedAt": "2025-11-29T11:45:00Z"
+  },
+  "logs": "Steering file updated successfully"
+}
+```
+
+---
+
+### 20. Get File Tree
+
+Get the complete directory tree for a project.
+
+**Endpoint:** `GET /projects/{project_id}/files/tree`
+
+```bash
+curl http://localhost:8000/projects/my-todo-app/files/tree
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "action": "get-file-tree",
+  "projectId": "my-todo-app",
+  "output": {
+    "name": "my-todo-app",
+    "path": "/",
+    "type": "folder",
+    "children": [
+      {
+        "name": "src",
+        "path": "/src",
+        "type": "folder",
+        "children": [
+          {
+            "name": "app.py",
+            "path": "/src/app.py",
+            "type": "file",
+            "size": 2048,
+            "extension": "py"
+          }
+        ]
+      },
+      {
+        "name": "README.md",
+        "path": "/README.md",
+        "type": "file",
+        "size": 1024,
+        "extension": "md"
+      }
+    ]
+  },
+  "logs": "File tree retrieved successfully"
+}
+```
+
+**Notes:**
+- Excludes common directories: node_modules, .git, __pycache__, .venv, dist, build
+- Maximum depth: 10 levels
+- Cached for 5 minutes for performance
+
+---
+
+### 21. Get File Content
+
+Read the content of a specific file.
+
+**Endpoint:** `GET /projects/{project_id}/files/content?path={file_path}`
+
+```bash
+curl "http://localhost:8000/projects/my-todo-app/files/content?path=/src/app.py"
+```
+
+**Query Parameters:**
+- `path` (required): Relative path to the file from project root
+
+**Response:**
+```json
+{
+  "status": "success",
+  "action": "get-file-content",
+  "projectId": "my-todo-app",
+  "output": {
+    "filePath": "/src/app.py",
+    "content": "from fastapi import FastAPI\n\napp = FastAPI()\n...",
+    "isBinary": false,
+    "isTruncated": false,
+    "size": 2048,
+    "encoding": "utf-8",
+    "language": "python"
+  },
+  "logs": "File content retrieved successfully"
+}
+```
+
+**Binary File Response:**
+```json
+{
+  "status": "success",
+  "action": "get-file-content",
+  "projectId": "my-todo-app",
+  "output": {
+    "filePath": "/image.png",
+    "content": null,
+    "isBinary": true,
+    "isTruncated": false,
+    "size": 51200,
+    "encoding": null,
+    "language": null
+  },
+  "logs": "Binary file detected"
+}
+```
+
+**Notes:**
+- Maximum file size: 1MB (files larger than this are truncated)
+- Binary files are detected and content is not returned
+- Path validation prevents access outside project directory
+- Returns 403 for invalid paths
+
+---
+
 ## Complete Workflow
 
 Here's a complete end-to-end workflow:
@@ -745,7 +1024,12 @@ curl http://localhost:8000/projects/todo-app/status
 | `TASK_EXECUTION_FAILED` | 500 | Task execution error |
 | `CLI_EXECUTION_ERROR` | 500 | kiro-cli execution failed |
 | `FILE_NOT_FOUND` | 404 | Requested file doesn't exist |
-| `INVALID_FILE_NAME` | 400 | Invalid file name (must be requirements.md, design.md, or tasks.md) |
+| `INVALID_FILE_NAME` | 400 | Invalid file name |
+| `STEERING_FILES_EXIST` | 409 | Steering files already exist (use force=true to overwrite) |
+| `STEERING_GENERATION_FAILED` | 500 | Failed to generate steering files |
+| `INVALID_PATH` | 403 | File path is outside project directory |
+| `BINARY_FILE` | 400 | Cannot read binary file content |
+| `FILE_TOO_LARGE` | 413 | File exceeds maximum size (1MB) |
 
 ---
 

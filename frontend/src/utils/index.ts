@@ -17,14 +17,30 @@ export type { BreadcrumbItem } from './navigation';
 export {
   isApiError,
   getErrorMessage,
+  getErrorSeverity,
+  getErrorSuggestion,
   handleApiError,
   handleNetworkError,
   handleNotFoundError,
   handleAuthError,
   handleServerError,
+  handleTimeoutError,
   handleValidationError,
   createErrorHandler,
+  retryWithBackoff,
+  withFallback,
+  ErrorSeverity,
 } from './errorHandler';
+export type { HandleErrorOptions } from './errorHandler';
+
+export {
+  handleFileTreeError,
+  handleFileContentError,
+  handleFileSearchError,
+  handleSteeringFileError,
+  handleSteeringSaveError,
+  handleSteeringGenerationError,
+} from './fileErrorHandler';
 
 export {
   required,
@@ -57,3 +73,17 @@ export {
   clearAdhocHistory,
   getMaxHistoryItems,
 } from './adhocTaskStorage';
+
+export {
+  announceToScreenReader,
+  generateA11yId,
+  prefersReducedMotion,
+  isKeyboardUser,
+  setupKeyboardUserDetection,
+  getFileTypeLabel,
+  formatStatusForScreenReader,
+  createSkipLink,
+  isHighContrastMode,
+  getAnimationDuration,
+  trapFocus,
+} from './accessibility';

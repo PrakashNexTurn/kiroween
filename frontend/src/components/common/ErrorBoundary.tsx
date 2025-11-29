@@ -30,8 +30,11 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log error to console
+    // Log error to console with full details
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // Log to external error tracking service if available
+    // Example: Sentry.captureException(error, { extra: errorInfo });
     
     this.setState({
       error,
@@ -47,6 +50,15 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo: null,
     });
     window.location.reload();
+  };
+
+  handleReset = (): void => {
+    // Try to recover without full page reload (graceful degradation)
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    });
   };
 
   render(): ReactNode {
@@ -100,13 +112,26 @@ export class ErrorBoundary extends Component<Props, State> {
                 </div>
               )}
 
-              <Button
-                onClick={this.handleReload}
-                variant="primary"
-                size="lg"
-              >
-                Reload Page
-              </Button>
+              <div className="flex gap-3 justify-center">
+                <Button
+                  onClick={this.handleReset}
+                  variant="secondary"
+                  size="lg"
+                >
+                  Try Again
+                </Button>
+                <Button
+                  onClick={this.handleReload}
+                  variant="primary"
+                  size="lg"
+                >
+                  Reload Page
+                </Button>
+              </div>
+              
+              <p className="text-xs text-text-tertiary mt-6">
+                💡 If this problem persists, try clearing your browser cache or checking the browser console for more details
+              </p>
             </div>
           </div>
         </div>

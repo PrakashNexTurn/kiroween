@@ -13,7 +13,7 @@ import { createPortal } from 'react-dom';
 import { Play, PlayCircle, AlertCircle, Zap } from 'lucide-react';
 import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import { showSuccess, showError } from '../common/Toast';
+import { showSuccess, showError, showLongRunning } from '../common/Toast';
 import { TaskItem } from './TaskItem';
 import { LogViewer } from './LogViewer';
 import { AdhocTaskModal } from './AdhocTaskModal';
@@ -106,7 +106,9 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load tasks';
       setError(errorMessage);
-      showError(errorMessage);
+      showError(errorMessage, {
+        onRetry: fetchTasks
+      });
     } finally {
       setLoading(false);
     }
@@ -124,6 +126,9 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
     try {
       updateExecutingState(true);
       setLogs(''); // Clear previous logs
+      
+      // Show long-running operation toast
+      showLongRunning(`Executing task ${nextTask.number}...`);
       
       // Update task status to in_progress
       setTasks(prevTasks =>
@@ -161,11 +166,15 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
           onTaskComplete();
         }
       } else {
-        showError(`Task ${nextTask.number} failed`);
+        showError(`Task ${nextTask.number} failed`, {
+          onRetry: executeNextTask
+        });
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Task execution failed';
-      showError(errorMessage);
+      showError(errorMessage, {
+        onRetry: executeNextTask
+      });
       
       // Mark task as failed
       setTasks(prevTasks =>
@@ -198,6 +207,9 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
     try {
       updateExecutingState(true);
       setLogs(''); // Clear previous logs
+      
+      // Show long-running operation toast
+      showLongRunning(`Executing section ${sectionNumber}...`);
       
       // Update all tasks in this section to in_progress
       setTasks(prevTasks =>
@@ -245,11 +257,15 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
           )
         );
         
-        showError(`Section ${sectionNumber} execution failed`);
+        showError(`Section ${sectionNumber} execution failed`, {
+          onRetry: () => executeSectionTasks(sectionNumber)
+        });
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Section execution failed';
-      showError(errorMessage);
+      showError(errorMessage, {
+        onRetry: () => executeSectionTasks(sectionNumber)
+      });
       
       // Mark tasks as failed
       setTasks(prevTasks =>
@@ -299,6 +315,9 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
       setIsAdhocExecuting(true);
       setLogs(''); // Clear previous logs
       
+      // Show long-running operation toast
+      showLongRunning('Executing adhoc task...');
+      
       // Call API to execute custom instruction
       const response = await customInstructionService.executeCustomInstruction(
         projectId,
@@ -337,12 +356,16 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
         }
         await fetchTasks();
       } else {
-        showError('Adhoc task failed');
+        showError('Adhoc task failed', {
+          onRetry: () => handleExecuteAdhocTask(instruction)
+        });
         // Keep modal open on failure so user can see error
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Adhoc task execution failed';
-      showError(errorMessage);
+      showError(errorMessage, {
+        onRetry: () => handleExecuteAdhocTask(instruction)
+      });
       
       // Create failure history item
       const historyItem: AdhocTaskHistoryItem = {
@@ -385,6 +408,9 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
       updateExecutingState(true);
       setLogs(''); // Clear previous logs
       
+      // Show long-running operation toast
+      showLongRunning(`Executing task ${task.number}...`);
+      
       // Update task status to in_progress
       setTasks(prevTasks =>
         prevTasks.map(t =>
@@ -421,11 +447,15 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
           onTaskComplete();
         }
       } else {
-        showError(`Task ${task.number} failed`);
+        showError(`Task ${task.number} failed`, {
+          onRetry: () => executeSpecificTask(task)
+        });
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Task execution failed';
-      showError(errorMessage);
+      showError(errorMessage, {
+        onRetry: () => executeSpecificTask(task)
+      });
       
       // Mark task as failed
       setTasks(prevTasks =>

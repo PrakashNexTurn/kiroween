@@ -61,7 +61,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }: CreateProject
         onSuccess();
       } catch (error) {
         // Handle API error with user-friendly message
-        handleApiError(error, 'Failed to create project. Please try again.');
+        handleApiError(error, { customMessage: 'Failed to create project. Please try again.' });
       }
     },
     validateOnBlur: true,

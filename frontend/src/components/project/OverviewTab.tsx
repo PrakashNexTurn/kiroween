@@ -11,7 +11,7 @@ import type { ProjectMetadata } from '../../types/project.types';
 import { Card, Button, Modal } from '../common';
 import { PhaseTimeline } from './PhaseTimeline';
 import { projectService } from '../../services/projectService';
-import { showSuccess, showError } from '../common';
+import { showSuccess, showError, showLongRunning } from '../common';
 import { Phase } from '../../types/project.types';
 
 /**
@@ -76,6 +76,10 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
   const handleBuildProject = async () => {
     try {
       setIsBuilding(true);
+      
+      // Show long-running operation toast
+      showLongRunning('Building project...');
+      
       const response = await projectService.buildProject(project.projectId);
       
       setResultTitle('Build Complete');
@@ -87,11 +91,15 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
         showSuccess('Project built successfully');
         onProjectUpdate?.();
       } else {
-        showError('Build failed. Check logs for details.');
+        showError('Build failed. Check logs for details.', {
+          onRetry: handleBuildProject
+        });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to build project';
-      showError(errorMessage);
+      showError(errorMessage, {
+        onRetry: handleBuildProject
+      });
       setResultTitle('Build Error');
       setResultMessage(errorMessage);
       setResultLogs('');
@@ -107,6 +115,10 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
   const handleTestProject = async () => {
     try {
       setIsTesting(true);
+      
+      // Show long-running operation toast
+      showLongRunning('Running tests...');
+      
       const response = await projectService.testProject(project.projectId);
       
       setResultTitle('Test Complete');
@@ -118,11 +130,15 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
         showSuccess('All tests passed');
         onProjectUpdate?.();
       } else {
-        showError('Some tests failed. Check logs for details.');
+        showError('Some tests failed. Check logs for details.', {
+          onRetry: handleTestProject
+        });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to run tests';
-      showError(errorMessage);
+      showError(errorMessage, {
+        onRetry: handleTestProject
+      });
       setResultTitle('Test Error');
       setResultMessage(errorMessage);
       setResultLogs('');
