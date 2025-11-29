@@ -49,3 +49,11 @@ export {
   parseLogsForRendering,
 } from './logFormatter';
 export type { FormattedLogLine } from './logFormatter';
+
+export {
+  saveAdhocHistory,
+  loadAdhocHistory,
+  addAdhocTaskToHistory,
+  clearAdhocHistory,
+  getMaxHistoryItems,
+} from './adhocTaskStorage';

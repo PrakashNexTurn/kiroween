@@ -76,3 +76,15 @@ export interface Task {
   parent: string | null;
   subtasks: string[];
 }
+
+/**
+ * File tree node representing a file or folder
+ */
+export interface FileTreeNode {
+  name: string;
+  path: string;
+  type: 'file' | 'folder';
+  size?: number;
+  extension?: string | null;
+  children?: FileTreeNode[];
+}

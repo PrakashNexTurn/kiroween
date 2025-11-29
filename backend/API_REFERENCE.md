@@ -63,7 +63,7 @@ curl http://localhost:8000/health
 
 ### 2. Create Project
 
-Create a new project with a name and description.
+Create a new project with a name and description. Optionally generate steering files for AI context.
 
 **Endpoint:** `POST /projects/create`
 
@@ -72,7 +72,8 @@ curl -X POST http://localhost:8000/projects/create \
   -H "Content-Type: application/json" \
   -d '{
     "name": "My Todo App",
-    "description": "A simple todo list application with user authentication"
+    "description": "A simple todo list application with user authentication",
+    "generateSteering": true
   }'
 ```
 
@@ -80,7 +81,8 @@ curl -X POST http://localhost:8000/projects/create \
 ```json
 {
   "name": "string (required)",
-  "description": "string (required)"
+  "description": "string (required)",
+  "generateSteering": "boolean (optional, default: false)"
 }
 ```
 
@@ -96,9 +98,14 @@ curl -X POST http://localhost:8000/projects/create \
     "description": "A simple todo list application with user authentication",
     "phase": "INIT",
     "createdAt": "2025-11-26T10:30:00Z",
-    "updatedAt": "2025-11-26T10:30:00Z"
+    "updatedAt": "2025-11-26T10:30:00Z",
+    "steering_files_created": [
+      "/path/to/project/.kiro/steering/product.md",
+      "/path/to/project/.kiro/steering/tech.md",
+      "/path/to/project/.kiro/steering/structure.md"
+    ]
   },
-  "logs": "Project created successfully"
+  "logs": "Project created successfully\nGenerated 3 steering files: product.md, tech.md, structure.md"
 }
 ```
 
@@ -106,6 +113,8 @@ curl -X POST http://localhost:8000/projects/create \
 - Project names are automatically sanitized to kebab-case
 - Creates directory at `.kiro/specs/<project-id>/`
 - Initializes empty spec files
+- If `generateSteering` is true, creates steering files in `.kiro/steering/`
+- Steering generation errors don't fail project creation (logged as warnings)
 
 ---
 

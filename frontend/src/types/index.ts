@@ -11,6 +11,7 @@ export {
   type Task,
   type TaskStats,
   type BuildConfig,
+  type FileTreeNode,
   type Phase as PhaseType,
 } from './project.types';
 

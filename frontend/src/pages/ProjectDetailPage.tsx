@@ -12,15 +12,17 @@ import { ArrowLeft } from 'lucide-react';
 import { useProjectDetail } from '../hooks/useProjectDetail';
 import { useKeyboard } from '../hooks/useKeyboard';
 import { LoadingSpinner, Badge, ProgressBar, Button } from '../components/common';
-import { OverviewTab, SpecsTab } from '../components/project';
+import { OverviewTab, SpecsTab, SteeringTab, GenerateSteeringModal, FilesTab } from '../components/project';
 import { TasksTab } from '../components/task';
 import { Phase } from '../types/project.types';
 import { useNavigation } from '../utils';
+import { steeringService } from '../services';
+import toast from 'react-hot-toast';
 
 /**
  * Tab type for navigation
  */
-type TabType = 'overview' | 'specs' | 'tasks';
+type TabType = 'overview' | 'specs' | 'tasks' | 'files' | 'steering';
 
 /**
  * Get phase color for badge
@@ -53,6 +55,9 @@ export function ProjectDetailPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isExecutingTask, setIsExecutingTask] = useState(false);
   const [isGeneratingSpec, setIsGeneratingSpec] = useState(false);
+  const [isGeneratingSteering, setIsGeneratingSteering] = useState(false);
+  const [showSteeringModal, setShowSteeringModal] = useState(false);
+  const [steeringRefreshTrigger, setSteeringRefreshTrigger] = useState(0);
   
   // Get active tab from URL or default to 'overview'
   const activeTab = (searchParams.get('tab') as TabType) || 'overview';
@@ -75,6 +80,42 @@ export function ProjectDetailPage() {
     goToHome();
   };
 
+  // Handle generate steering button click
+  // Requirement 1.3.1: Add button to project detail page header
+  const handleGenerateSteeringClick = () => {
+    setShowSteeringModal(true);
+  };
+
+  // Handle steering generation
+  // Requirement 1.3.1: Open GenerateSteeringModal on click
+  const handleGenerateSteering = async (force: boolean) => {
+    try {
+      setIsGeneratingSteering(true);
+      
+      const response = await steeringService.generateSteering(projectId || '', force);
+      
+      // Close modal on success
+      setShowSteeringModal(false);
+      
+      // Requirement 1.3.1: Refresh steering tab after generation
+      setSteeringRefreshTrigger(prev => prev + 1);
+      
+      // Show success message
+      const filesGenerated = response.output.files_generated || [];
+      if (filesGenerated.length > 0) {
+        toast.success(`Generated ${filesGenerated.length} steering file(s): ${filesGenerated.join(', ')}`);
+      } else {
+        toast.success('All steering files already exist. Use force regeneration to overwrite.');
+      }
+    } catch (error) {
+      console.error('Failed to generate steering files:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate steering files';
+      toast.error(errorMessage);
+    } finally {
+      setIsGeneratingSteering(false);
+    }
+  };
+
   // Project detail keyboard shortcuts
   // Requirements: 15.4, 15.5
   useKeyboard([
@@ -92,6 +133,16 @@ export function ProjectDetailPage() {
       key: 'o',
       callback: () => handleTabChange('overview'),
       description: 'Switch to Overview tab',
+    },
+    {
+      key: 'f',
+      callback: () => handleTabChange('files'),
+      description: 'Switch to Files tab',
+    },
+    {
+      key: 'g',
+      callback: () => handleTabChange('steering'),
+      description: 'Switch to Steering tab',
     },
   ]);
 
@@ -196,6 +247,17 @@ export function ProjectDetailPage() {
           >
             {project.name}
           </h1>
+
+          {/* Generate Steering Button */}
+          {/* Requirement 1.3.1: Add button to project detail page header */}
+          <Button
+            onClick={handleGenerateSteeringClick}
+            variant="secondary"
+            size="sm"
+            className="hidden sm:flex"
+          >
+            Generate Steering
+          </Button>
         </div>
 
         {/* Phase Badge and Progress */}
@@ -275,6 +337,38 @@ export function ProjectDetailPage() {
           >
             Tasks
           </button>
+          
+          <button
+            onClick={() => handleTabChange('files')}
+            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'files' ? 'border-current' : 'border-transparent'
+            }`}
+            style={{
+              color:
+                activeTab === 'files'
+                  ? 'var(--color-brand-primary)'
+                  : 'var(--color-text-secondary)',
+            }}
+            aria-current={activeTab === 'files' ? 'page' : undefined}
+          >
+            Files
+          </button>
+          
+          <button
+            onClick={() => handleTabChange('steering')}
+            className={`pb-4 px-2 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'steering' ? 'border-current' : 'border-transparent'
+            }`}
+            style={{
+              color:
+                activeTab === 'steering'
+                  ? 'var(--color-brand-primary)'
+                  : 'var(--color-text-secondary)',
+            }}
+            aria-current={activeTab === 'steering' ? 'page' : undefined}
+          >
+            Steering
+          </button>
         </nav>
       </div>
 
@@ -298,7 +392,31 @@ export function ProjectDetailPage() {
             onExecutionStateChange={setIsExecutingTask}
           />
         )}
+        
+        {activeTab === 'files' && (
+          <FilesTab 
+            projectId={projectId || ''} 
+          />
+        )}
+        
+        {activeTab === 'steering' && (
+          <SteeringTab 
+            projectId={projectId || ''} 
+            onGenerateClick={handleGenerateSteeringClick}
+            key={steeringRefreshTrigger}
+          />
+        )}
       </div>
+
+      {/* Generate Steering Modal */}
+      {/* Requirement 1.3.1: Open GenerateSteeringModal on click */}
+      <GenerateSteeringModal
+        isOpen={showSteeringModal}
+        onClose={() => setShowSteeringModal(false)}
+        onGenerate={handleGenerateSteering}
+        isGenerating={isGeneratingSteering}
+        hasExistingFiles={false}
+      />
     </motion.div>
   );
 }

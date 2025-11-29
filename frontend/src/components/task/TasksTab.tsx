@@ -3,20 +3,27 @@
  * 
  * Displays task list with execution controls and log viewer
  * Implements task execution workflow
+ * Enhanced with adhoc task execution functionality
  * 
- * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5
+ * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 2.1.1, 2.1.2, 2.1.3, 2.1.4, 2.1.5, 2.3.5
  */
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Play, PlayCircle, AlertCircle } from 'lucide-react';
+import { Play, PlayCircle, AlertCircle, Zap } from 'lucide-react';
 import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { showSuccess, showError } from '../common/Toast';
 import { TaskItem } from './TaskItem';
 import { LogViewer } from './LogViewer';
+import { AdhocTaskModal } from './AdhocTaskModal';
+import { AdhocTaskHistory } from './AdhocTaskHistory';
+import type { AdhocTaskHistoryItem } from './AdhocTaskHistory';
 import { projectService } from '../../services/projectService';
+import { customInstructionService } from '../../services/customInstructionService';
 import { parseTasksFromMarkdown, getNextPendingTask } from '../../utils/taskParser';
+import { loadAdhocHistory, addAdhocTaskToHistory } from '../../utils/adhocTaskStorage';
+import { useKeyboard } from '../../hooks/useKeyboard';
 import type { Task } from '../../types';
 
 export interface TasksTabProps {
@@ -34,6 +41,12 @@ export interface TasksTabProps {
  * - 7.3: Find next pending task and execute
  * - 7.4: Show loading state during execution
  * - 7.5: Stream logs and update task status
+ * - 2.1.1: Display "Execute Adhoc Task" button
+ * - 2.1.2: Open modal on button click
+ * - 2.1.3: Use distinct visual style for adhoc button
+ * - 2.1.4: Disable button when project is loading
+ * - 2.1.5: Disable button when adhoc task is executing
+ * - 2.3.5: Refresh project status after adhoc task completion
  */
 export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: TasksTabProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -41,6 +54,12 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
   const [executing, setExecuting] = useState(false);
   const [logs, setLogs] = useState('');
   const [error, setError] = useState<string | null>(null);
+  
+  // Adhoc task state
+  const [isAdhocModalOpen, setIsAdhocModalOpen] = useState(false);
+  const [isAdhocExecuting, setIsAdhocExecuting] = useState(false);
+  const [adhocHistory, setAdhocHistory] = useState<AdhocTaskHistoryItem[]>([]);
+  const [adhocInitialInstruction, setAdhocInitialInstruction] = useState('');
 
   // Notify parent component when execution state changes
   const updateExecutingState = (isExecuting: boolean) => {
@@ -54,6 +73,26 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
   useEffect(() => {
     fetchTasks();
   }, [projectId]);
+
+  // Load adhoc task history from local storage (Requirement 2.5.1)
+  useEffect(() => {
+    const history = loadAdhocHistory();
+    setAdhocHistory(history);
+  }, []);
+
+  // Keyboard shortcut: Ctrl+K (Cmd+K) to open adhoc task modal (Requirement 2.1.2)
+  useKeyboard([
+    {
+      key: 'k',
+      ctrl: true,
+      callback: () => {
+        if (!loading && !executing && !isAdhocExecuting) {
+          handleOpenAdhocModal();
+        }
+      },
+      description: 'Open adhoc task modal',
+    },
+  ]);
 
   const fetchTasks = async () => {
     try {
@@ -231,6 +270,108 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
   // Clear logs
   const handleClearLogs = () => {
     setLogs('');
+  };
+
+  /**
+   * Open adhoc task modal
+   * Requirement 2.1.2: Open modal on button click
+   */
+  const handleOpenAdhocModal = () => {
+    setAdhocInitialInstruction('');
+    setIsAdhocModalOpen(true);
+  };
+
+  /**
+   * Close adhoc task modal
+   */
+  const handleCloseAdhocModal = () => {
+    setIsAdhocModalOpen(false);
+    setAdhocInitialInstruction('');
+  };
+
+  /**
+   * Execute adhoc task
+   * Requirement 2.3.1: Call API to execute custom instruction
+   * Requirement 2.3.5: Refresh project status after completion
+   */
+  const handleExecuteAdhocTask = async (instruction: string) => {
+    try {
+      setIsAdhocExecuting(true);
+      setLogs(''); // Clear previous logs
+      
+      // Call API to execute custom instruction
+      const response = await customInstructionService.executeCustomInstruction(
+        projectId,
+        instruction
+      );
+      
+      // Display logs
+      if (response.logs) {
+        setLogs(response.logs);
+      }
+
+      // Create history item
+      const historyItem: AdhocTaskHistoryItem = {
+        id: `adhoc-${Date.now()}`,
+        instruction,
+        status: response.status === 'success' ? 'success' : 'failure',
+        executedAt: new Date(),
+        logs: response.logs || '',
+        error: response.status === 'failure' ? (typeof response.output === 'string' ? response.output : JSON.stringify(response.output)) : undefined,
+        filesModified: response.output?.filesModified || [],
+      };
+
+      // Add to history and save to local storage
+      const updatedHistory = addAdhocTaskToHistory(historyItem, adhocHistory);
+      setAdhocHistory(updatedHistory);
+
+      if (response.status === 'success') {
+        showSuccess('Adhoc task completed successfully');
+        
+        // Close modal on success
+        handleCloseAdhocModal();
+        
+        // Refresh project status and tasks
+        if (onTaskComplete) {
+          onTaskComplete();
+        }
+        await fetchTasks();
+      } else {
+        showError('Adhoc task failed');
+        // Keep modal open on failure so user can see error
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Adhoc task execution failed';
+      showError(errorMessage);
+      
+      // Create failure history item
+      const historyItem: AdhocTaskHistoryItem = {
+        id: `adhoc-${Date.now()}`,
+        instruction,
+        status: 'failure',
+        executedAt: new Date(),
+        logs: logs || '',
+        error: errorMessage,
+      };
+
+      // Add to history
+      const updatedHistory = addAdhocTaskToHistory(historyItem, adhocHistory);
+      setAdhocHistory(updatedHistory);
+      
+      // Add error to logs
+      setLogs(prev => prev + '\n\nError: ' + errorMessage);
+    } finally {
+      setIsAdhocExecuting(false);
+    }
+  };
+
+  /**
+   * Handle rerun from history
+   * Requirement 2.5.4: Rerun button opens modal with instruction pre-filled
+   */
+  const handleRerunAdhocTask = (instruction: string) => {
+    setAdhocInitialInstruction(instruction);
+    setIsAdhocModalOpen(true);
   };
 
   // Execute a specific task when clicked
@@ -437,6 +578,34 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
         </div>
       </div>
 
+      {/* Execute Adhoc Task Button - Requirement 2.1.1, 2.1.3, 2.1.4, 2.1.5 */}
+      <div className="flex justify-center">
+        <Button
+          onClick={handleOpenAdhocModal}
+          disabled={loading || executing || isAdhocExecuting}
+          variant="primary"
+          size="md"
+          className="w-full max-w-md"
+          style={{
+            background: 'linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-accent-secondary) 100%)',
+            border: 'none',
+          }}
+          title="Execute Adhoc Task (Ctrl+K or Cmd+K)"
+        >
+          <Zap className="w-5 h-5" />
+          <span className="font-semibold">Execute Adhoc Task</span>
+          <kbd 
+            className="ml-2 px-2 py-0.5 text-xs rounded"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              fontFamily: 'monospace',
+            }}
+          >
+            {navigator.platform.includes('Mac') ? '⌘K' : 'Ctrl+K'}
+          </kbd>
+        </Button>
+      </div>
+
       {/* Compact Progress bar */}
       <div 
         className="w-full bg-background-tertiary rounded-full h-1.5"
@@ -511,8 +680,24 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
       {/* Log viewer (Requirement 7.5) */}
       <LogViewer
         logs={logs}
-        isStreaming={executing}
+        isStreaming={executing || isAdhocExecuting}
         onClear={handleClearLogs}
+      />
+
+      {/* Adhoc Task History - Requirement 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.5.5 */}
+      <AdhocTaskHistory
+        history={adhocHistory}
+        onRerun={handleRerunAdhocTask}
+        className="mt-8"
+      />
+
+      {/* Adhoc Task Modal - Requirement 2.1.2 */}
+      <AdhocTaskModal
+        isOpen={isAdhocModalOpen}
+        onClose={handleCloseAdhocModal}
+        onExecute={handleExecuteAdhocTask}
+        isExecuting={isAdhocExecuting}
+        initialInstruction={adhocInitialInstruction}
       />
     </div>
     </>

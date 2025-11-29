@@ -21,6 +21,8 @@ from src.models import OrchestratorResponse, ProjectSummary, Phase, ProjectMetad
 from src.instruction_generator import InstructionGenerator
 from src.cli_executor import CLIExecutor, CLIExecutionError
 from src.response_formatter import ResponseFormatter
+from src.steering_generator import SteeringGenerator, SteeringGeneratorError
+from src.file_system_service import FileSystemService, FileSystemError, PathValidationError
 from src.config import settings
 from src.logger import get_logger, log_api_request, log_startup_info, log_shutdown_info
 
@@ -41,6 +43,10 @@ class CreateProjectRequest(BaseModel):
     """Request model for creating a new project."""
     name: str = Field(..., min_length=1, max_length=200, description="Project name")
     description: str = Field(..., min_length=1, max_length=2000, description="Project description")
+    generate_steering: bool = Field(default=False, alias="generateSteering", description="If True, generate steering files after project creation")
+    
+    class Config:
+        populate_by_name = True
     
     @field_validator('name')
     @classmethod
@@ -108,11 +114,29 @@ class ExecuteTaskRequest(BaseModel):
         return v
 
 
+class GenerateSteeringRequest(BaseModel):
+    """Request model for generating steering files."""
+    force: bool = Field(default=False, description="If True, overwrite existing files. If False, skip existing files.")
+    
+    class Config:
+        populate_by_name = True
+
+
+class UpdateSteeringFileRequest(BaseModel):
+    """Request model for updating a steering file."""
+    content: str = Field(..., description="New content for the steering file")
+    
+    class Config:
+        populate_by_name = True
+
+
 # Initialize components (will be used in lifespan)
 project_manager = ProjectManager(base_path=str(settings.base_path))
 instruction_generator = InstructionGenerator()
 cli_executor = CLIExecutor()
 response_formatter = ResponseFormatter()
+steering_generator = SteeringGenerator()
+file_system_service = FileSystemService()
 
 
 @asynccontextmanager
@@ -477,6 +501,84 @@ async def validation_error_handler(request: Request, exc: ValidationError) -> JS
     )
 
 
+@app.exception_handler(PathValidationError)
+async def path_validation_error_handler(request: Request, exc: PathValidationError) -> JSONResponse:
+    """
+    Handle PathValidationError and return proper OrchestratorResponse format.
+    
+    Args:
+        request: The incoming request
+        exc: The exception
+        
+    Returns:
+        JSONResponse with OrchestratorResponse format
+    """
+    logger = get_logger()
+    project_id = request.path_params.get("project_id", "unknown")
+    
+    logger.warning(f"Path validation error: {str(exc)}")
+    
+    response = OrchestratorResponse(
+        status="failure",
+        action=f"{request.method.lower()}-{request.url.path.split('/')[-1]}",
+        project_id=project_id,
+        output={
+            "error": {
+                "code": "PATH_VALIDATION_ERROR",
+                "message": str(exc),
+                "details": {
+                    "project_id": project_id,
+                }
+            }
+        },
+        logs=f"Path validation error: {str(exc)}"
+    )
+    
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content=response.to_dict()
+    )
+
+
+@app.exception_handler(FileSystemError)
+async def file_system_error_handler(request: Request, exc: FileSystemError) -> JSONResponse:
+    """
+    Handle FileSystemError and return proper OrchestratorResponse format.
+    
+    Args:
+        request: The incoming request
+        exc: The exception
+        
+    Returns:
+        JSONResponse with OrchestratorResponse format
+    """
+    logger = get_logger()
+    project_id = request.path_params.get("project_id", "unknown")
+    
+    logger.error(f"File system error: {str(exc)}")
+    
+    response = OrchestratorResponse(
+        status="failure",
+        action=f"{request.method.lower()}-{request.url.path.split('/')[-1]}",
+        project_id=project_id,
+        output={
+            "error": {
+                "code": "FILE_SYSTEM_ERROR",
+                "message": str(exc),
+                "details": {
+                    "project_id": project_id,
+                }
+            }
+        },
+        logs=f"File system error: {str(exc)}"
+    )
+    
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=response.to_dict()
+    )
+
+
 @app.exception_handler(FileNotFoundError)
 async def file_not_found_handler(request: Request, exc: FileNotFoundError) -> JSONResponse:
     """
@@ -578,7 +680,7 @@ async def create_project(request: CreateProjectRequest) -> OrchestratorResponse:
     Create a new project.
     
     Args:
-        request: CreateProjectRequest with name and description
+        request: CreateProjectRequest with name, description, and optional generate_steering flag
         
     Returns:
         OrchestratorResponse with project creation details
@@ -588,27 +690,52 @@ async def create_project(request: CreateProjectRequest) -> OrchestratorResponse:
         ProjectAlreadyExistsError: If project already exists
         ProjectManagerError: If project creation fails
     """
+    logger = get_logger()
+    
     project = project_manager.create_project(
         name=request.name,
         description=request.description
     )
     
+    # Prepare response output
+    output = {
+        "project": project.metadata.to_dict(),
+        "project_root": project.project_root,
+        "spec_dir": project.spec_dir,
+        "project_path": project.project_path,  # Deprecated: kept for backward compatibility
+        "files_created": [
+            project.requirements_path,
+            project.design_path,
+            project.tasks_path,
+        ]
+    }
+    
+    logs = [f"Project '{project.metadata.project_id}' created successfully"]
+    
+    # Generate steering files if requested
+    if request.generate_steering:
+        try:
+            logger.info(f"Generating steering files for project '{project.metadata.project_id}'")
+            generated_files = steering_generator.generate_all(project, force=False)
+            
+            if generated_files:
+                output["steering_files_created"] = list(generated_files.values())
+                logs.append(f"Generated {len(generated_files)} steering files: {', '.join(generated_files.keys())}")
+            else:
+                logs.append("No steering files generated (files may already exist)")
+                
+        except SteeringGeneratorError as e:
+            # Log the error but don't fail the project creation
+            logger.error(f"Failed to generate steering files: {str(e)}")
+            output["steering_generation_error"] = str(e)
+            logs.append(f"Warning: Failed to generate steering files: {str(e)}")
+    
     return OrchestratorResponse(
         status="success",
         action="create-project",
         project_id=project.metadata.project_id,
-        output={
-            "project": project.metadata.to_dict(),
-            "project_root": project.project_root,
-            "spec_dir": project.spec_dir,
-            "project_path": project.project_path,  # Deprecated: kept for backward compatibility
-            "files_created": [
-                project.requirements_path,
-                project.design_path,
-                project.tasks_path,
-            ]
-        },
-        logs=f"Project '{project.metadata.project_id}' created successfully"
+        output=output,
+        logs="\n".join(logs)
     )
 
 
@@ -1587,6 +1714,410 @@ async def execute_custom_instruction(
             "updated_at": project.metadata.updated_at.isoformat(),
         }
     )
+
+
+# Steering file endpoints
+@app.post(
+    "/projects/{project_id}/steering/generate",
+    response_model=OrchestratorResponse,
+    summary="Generate steering files",
+    description="Generates steering files (product.md, tech.md, structure.md) for a project",
+)
+@log_api_request("/projects/{project_id}/steering/generate", "POST")
+async def generate_steering(
+    project_id: str,
+    request: GenerateSteeringRequest
+) -> OrchestratorResponse:
+    """
+    Generate steering files for a project.
+    
+    Args:
+        project_id: The project identifier
+        request: GenerateSteeringRequest with force flag
+        
+    Returns:
+        OrchestratorResponse with generation results
+        
+    Raises:
+        ProjectNotFoundError: If project not found
+        SteeringGeneratorError: If generation fails
+    """
+    logger = get_logger()
+    
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Load the project to ensure it exists
+    project = project_manager.load_project(project_id)
+    
+    try:
+        # Generate steering files
+        generated_files = steering_generator.generate_all(project, force=request.force)
+        
+        if not generated_files:
+            # All files were skipped
+            return OrchestratorResponse(
+                status="success",
+                action="generate-steering",
+                project_id=project_id,
+                output={
+                    "message": "All steering files already exist. Use force=true to overwrite.",
+                    "files_generated": [],
+                    "files_skipped": ["product.md", "tech.md", "structure.md"]
+                },
+                logs="Steering files already exist. No files generated."
+            )
+        
+        logger.info(f"Generated {len(generated_files)} steering files for project '{project_id}'")
+        
+        return OrchestratorResponse(
+            status="success",
+            action="generate-steering",
+            project_id=project_id,
+            output={
+                "message": f"Successfully generated {len(generated_files)} steering file(s)",
+                "files_generated": list(generated_files.keys()),
+                "file_paths": generated_files
+            },
+            logs=f"Generated steering files: {', '.join(generated_files.keys())}"
+        )
+        
+    except SteeringGeneratorError as e:
+        logger.error(f"Failed to generate steering files for project '{project_id}': {str(e)}")
+        return OrchestratorResponse(
+            status="failure",
+            action="generate-steering",
+            project_id=project_id,
+            output={
+                "error": {
+                    "code": "STEERING_GENERATION_ERROR",
+                    "message": str(e),
+                    "details": {}
+                }
+            },
+            logs=f"Steering generation failed: {str(e)}"
+        )
+
+
+@app.get(
+    "/projects/{project_id}/steering/files",
+    response_model=Dict[str, Any],
+    summary="List steering files",
+    description="Returns a list of all steering files for a project",
+)
+@log_api_request("/projects/{project_id}/steering/files", "GET")
+async def list_steering_files(project_id: str) -> Dict[str, Any]:
+    """
+    List all steering files for a project.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dictionary with list of steering files and their metadata
+        
+    Raises:
+        ProjectNotFoundError: If project not found
+    """
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Load the project to ensure it exists
+    project = project_manager.load_project(project_id)
+    
+    # Get steering directory
+    steering_dir = steering_generator._get_steering_dir(project.project_root)
+    
+    # Check if steering directory exists
+    if not project_manager.file_ops.directory_exists(str(steering_dir)):
+        return {
+            "projectId": project_id,
+            "files": [],
+            "message": "No steering files found. Generate them first."
+        }
+    
+    # List all markdown files in steering directory
+    try:
+        all_files = project_manager.file_ops.list_directory(str(steering_dir))
+        steering_files = [f for f in all_files if f.endswith('.md')]
+        
+        # Get metadata for each file
+        files_info = []
+        for file_name in steering_files:
+            file_path = steering_dir / file_name
+            try:
+                size = project_manager.file_ops.get_file_size(str(file_path))
+                files_info.append({
+                    "fileName": file_name,
+                    "filePath": str(file_path),
+                    "exists": True,
+                    "size": size
+                })
+            except Exception as e:
+                files_info.append({
+                    "fileName": file_name,
+                    "filePath": str(file_path),
+                    "exists": False,
+                    "error": str(e)
+                })
+        
+        return {
+            "projectId": project_id,
+            "files": files_info,
+            "count": len(files_info)
+        }
+        
+    except Exception as e:
+        return {
+            "projectId": project_id,
+            "files": [],
+            "error": str(e)
+        }
+
+
+@app.get(
+    "/projects/{project_id}/steering/files/{file_name}",
+    response_model=Dict[str, Any],
+    summary="Read a steering file",
+    description="Returns the content of a steering file",
+)
+@log_api_request("/projects/{project_id}/steering/files/{file_name}", "GET")
+async def read_steering_file(project_id: str, file_name: str) -> Dict[str, Any]:
+    """
+    Read a steering file from a project.
+    
+    Args:
+        project_id: The project identifier
+        file_name: Name of the steering file to read (e.g., product.md, tech.md, structure.md)
+        
+    Returns:
+        Dictionary with file content and metadata
+        
+    Raises:
+        ValidationError: If file name is invalid
+        ProjectNotFoundError: If project not found
+        FileNotFoundError: If file not found
+    """
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Validate file name (must be .md file)
+    if not file_name.endswith('.md'):
+        raise ValidationError(f"Invalid file name '{file_name}'. Must be a markdown file (.md)")
+    
+    # Load the project to ensure it exists
+    project = project_manager.load_project(project_id)
+    
+    # Get steering directory and file path
+    steering_dir = steering_generator._get_steering_dir(project.project_root)
+    file_path = steering_dir / file_name
+    
+    # Read the file content
+    try:
+        content = project_manager.file_ops.read_file(str(file_path))
+        size = project_manager.file_ops.get_file_size(str(file_path))
+    except Exception as e:
+        raise FileNotFoundError(
+            f"Steering file '{file_name}' not found at path: {file_path}. Error: {str(e)}"
+        )
+    
+    # Return content with metadata
+    return {
+        "projectId": project_id,
+        "fileName": file_name,
+        "content": content,
+        "metadata": {
+            "projectName": project.metadata.name,
+            "size": size,
+            "filePath": str(file_path)
+        }
+    }
+
+
+@app.put(
+    "/projects/{project_id}/steering/files/{file_name}",
+    response_model=OrchestratorResponse,
+    summary="Update a steering file",
+    description="Updates the content of a steering file",
+)
+@log_api_request("/projects/{project_id}/steering/files/{file_name}", "PUT")
+async def update_steering_file(
+    project_id: str,
+    file_name: str,
+    request: UpdateSteeringFileRequest
+) -> OrchestratorResponse:
+    """
+    Update a steering file for a project.
+    
+    Args:
+        project_id: The project identifier
+        file_name: Name of the steering file to update
+        request: UpdateSteeringFileRequest with new content
+        
+    Returns:
+        OrchestratorResponse with update results
+        
+    Raises:
+        ValidationError: If file name is invalid
+        ProjectNotFoundError: If project not found
+        FileNotFoundError: If file not found
+    """
+    logger = get_logger()
+    
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Validate file name (must be .md file)
+    if not file_name.endswith('.md'):
+        raise ValidationError(f"Invalid file name '{file_name}'. Must be a markdown file (.md)")
+    
+    # Load the project to ensure it exists
+    project = project_manager.load_project(project_id)
+    
+    # Get steering directory and file path
+    steering_dir = steering_generator._get_steering_dir(project.project_root)
+    file_path = steering_dir / file_name
+    
+    # Check if file exists
+    if not project_manager.file_ops.file_exists(str(file_path)):
+        raise FileNotFoundError(
+            f"Steering file '{file_name}' not found at path: {file_path}. Generate steering files first."
+        )
+    
+    try:
+        # Write the updated content
+        project_manager.file_ops.write_file(str(file_path), request.content)
+        
+        logger.info(f"Updated steering file '{file_name}' for project '{project_id}'")
+        
+        return OrchestratorResponse(
+            status="success",
+            action="update-steering-file",
+            project_id=project_id,
+            output={
+                "message": f"Successfully updated {file_name}",
+                "fileName": file_name,
+                "filePath": str(file_path),
+                "size": len(request.content)
+            },
+            logs=f"Updated steering file: {file_name}"
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to update steering file '{file_name}' for project '{project_id}': {str(e)}")
+        return OrchestratorResponse(
+            status="failure",
+            action="update-steering-file",
+            project_id=project_id,
+            output={
+                "error": {
+                    "code": "FILE_UPDATE_ERROR",
+                    "message": str(e),
+                    "details": {
+                        "fileName": file_name,
+                        "filePath": str(file_path)
+                    }
+                }
+            },
+            logs=f"Failed to update steering file: {str(e)}"
+        )
+
+
+# File explorer endpoints
+@app.get(
+    "/projects/{project_id}/files/tree",
+    response_model=Dict[str, Any],
+    summary="Get project file tree",
+    description="Returns the complete directory structure for a project",
+)
+@log_api_request("/projects/{project_id}/files/tree", "GET")
+async def get_file_tree(project_id: str) -> Dict[str, Any]:
+    """
+    Get the file tree for a project.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dictionary with the complete directory tree
+        
+    Raises:
+        ProjectNotFoundError: If project not found
+        FileSystemError: If file system access fails
+    """
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Load the project to ensure it exists and get the project root
+    project = project_manager.load_project(project_id)
+    
+    # Get the directory tree
+    try:
+        tree = file_system_service.get_directory_tree(project.project_root, max_depth=10)
+        
+        return {
+            "projectId": project_id,
+            "projectRoot": project.project_root,
+            "tree": tree,
+        }
+    except FileSystemError as e:
+        logger.error(f"Failed to get file tree for project {project_id}: {str(e)}")
+        raise
+
+
+@app.get(
+    "/projects/{project_id}/files/content",
+    response_model=Dict[str, Any],
+    summary="Get file content",
+    description="Returns the content of a specific file in the project",
+)
+@log_api_request("/projects/{project_id}/files/content", "GET")
+async def get_file_content(project_id: str, file_path: str) -> Dict[str, Any]:
+    """
+    Get the content of a file in a project.
+    
+    Args:
+        project_id: The project identifier
+        file_path: Path to the file (relative to project root)
+        
+    Returns:
+        Dictionary with file content and metadata
+        
+    Raises:
+        ProjectNotFoundError: If project not found
+        PathValidationError: If file path is outside project root
+        FileSystemError: If file cannot be read
+    """
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Validate file_path parameter
+    if not file_path or not file_path.strip():
+        raise ValidationError("file_path query parameter is required")
+    
+    # Load the project to ensure it exists and get the project root
+    project = project_manager.load_project(project_id)
+    
+    # Read the file content
+    try:
+        file_data = file_system_service.read_file_content(
+            project.project_root, 
+            file_path
+        )
+        
+        # Add project context to response
+        file_data["projectId"] = project_id
+        
+        return file_data
+    except (PathValidationError, FileSystemError) as e:
+        logger.error(f"Failed to read file {file_path} for project {project_id}: {str(e)}")
+        raise
 
 
 # Health check endpoint

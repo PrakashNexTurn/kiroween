@@ -30,3 +30,6 @@ export { ErrorBoundary } from './ErrorBoundary';
 
 export { Select } from './Select';
 export type { SelectProps, SelectOption } from './Select';
+
+export { ContextMenu } from './ContextMenu';
+export type { ContextMenuProps, ContextMenuItem } from './ContextMenu';

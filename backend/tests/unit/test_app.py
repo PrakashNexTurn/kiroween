@@ -112,6 +112,91 @@ class TestCreateProject:
         response_data = response.json()
         assert response_data["status"] == "failure"
         assert "empty string after sanitization" in response_data["output"]["error"]["message"].lower()
+    
+    def test_create_project_with_steering_generation(self, client, temp_base_path):
+        """Test project creation with steering file generation enabled."""
+        request_data = {
+            "name": "Project With Steering",
+            "description": "Testing steering generation",
+            "generateSteering": True
+        }
+        
+        response = client.post("/projects/create", json=request_data)
+        
+        assert response.status_code == 201
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["projectId"] == "project-with-steering"
+        
+        # Check that steering files were created
+        assert "steering_files_created" in data["output"]
+        steering_files = data["output"]["steering_files_created"]
+        assert len(steering_files) == 3
+        
+        # Verify the files exist
+        from pathlib import Path
+        project_root = Path(temp_base_path) / "project-with-steering"
+        steering_dir = project_root / ".kiro" / "steering"
+        assert (steering_dir / "product.md").exists()
+        assert (steering_dir / "tech.md").exists()
+        assert (steering_dir / "structure.md").exists()
+        
+        # Verify logs mention steering generation
+        assert "steering files" in data["logs"].lower()
+    
+    def test_create_project_without_steering_generation(self, client, temp_base_path):
+        """Test project creation without steering file generation (default behavior)."""
+        request_data = {
+            "name": "Project Without Steering",
+            "description": "Testing default behavior"
+        }
+        
+        response = client.post("/projects/create", json=request_data)
+        
+        assert response.status_code == 201
+        data = response.json()
+        assert data["status"] == "success"
+        
+        # Check that steering files were NOT created
+        assert "steering_files_created" not in data["output"]
+        
+        # Verify the steering directory doesn't exist
+        from pathlib import Path
+        project_root = Path(temp_base_path) / "project-without-steering"
+        steering_dir = project_root / ".kiro" / "steering"
+        assert not steering_dir.exists()
+    
+    def test_create_project_steering_generation_error_handled_gracefully(self, client, temp_base_path, monkeypatch):
+        """Test that steering generation errors don't fail project creation."""
+        from src.steering_generator import SteeringGeneratorError
+        
+        # Mock the steering generator to raise an error
+        def mock_generate_all(*args, **kwargs):
+            raise SteeringGeneratorError("Simulated steering generation error")
+        
+        from src import app
+        monkeypatch.setattr(app.steering_generator, "generate_all", mock_generate_all)
+        
+        request_data = {
+            "name": "Project With Steering Error",
+            "description": "Testing error handling",
+            "generateSteering": True
+        }
+        
+        response = client.post("/projects/create", json=request_data)
+        
+        # Project creation should still succeed
+        assert response.status_code == 201
+        data = response.json()
+        assert data["status"] == "success"
+        
+        # Check that error is reported in output
+        assert "steering_generation_error" in data["output"]
+        assert "Simulated steering generation error" in data["output"]["steering_generation_error"]
+        
+        # Check that warning is in logs
+        assert "Warning" in data["logs"]
+        assert "Failed to generate steering files" in data["logs"]
 
 
 class TestListProjects:
