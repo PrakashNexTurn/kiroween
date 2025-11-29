@@ -33,3 +33,13 @@ export type { SelectProps, SelectOption } from './Select';
 
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuProps, ContextMenuItem } from './ContextMenu';
+
+export {
+  Skeleton,
+  FileTreeSkeleton,
+  FileContentSkeleton,
+  SteeringFileListSkeleton,
+  EditorSkeleton,
+  CardSkeleton,
+} from './Skeleton';
+export type { SkeletonProps } from './Skeleton';

@@ -3,13 +3,17 @@
  * Displays file content using Monaco editor with syntax highlighting
  * 
  * Requirements: 3.5.1, 3.5.2, 3.5.3, 3.5.4, 3.5.5
+ * 
+ * Optimization: Lazy load Monaco editor (Requirement 3.4.5)
  */
 
-import { useEffect, useState } from 'react';
-import Editor from '@monaco-editor/react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { FileText, AlertCircle } from 'lucide-react';
 import { getFileContent, type FileContentResponse } from '../../services/fileSystemService';
-import { LoadingSpinner } from '../common';
+import { FileContentSkeleton } from '../common';
+
+// Lazy load Monaco editor (Optimization: Requirement 3.4.5)
+const Editor = lazy(() => import('@monaco-editor/react'));
 
 /**
  * Props for FileContentViewer component
@@ -133,13 +137,10 @@ export function FileContentViewer({ projectId, filePath }: FileContentViewerProp
     };
   }, [projectId, filePath]);
 
-  // Loading state
+  // Loading state with skeleton
+  // Requirement 3.3.4: Loading indicator for file content
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <FileContentSkeleton />;
   }
 
   // Error state
@@ -217,32 +218,30 @@ export function FileContentViewer({ projectId, filePath }: FileContentViewerProp
         </div>
       )}
 
-      {/* Monaco Editor */}
+      {/* Monaco Editor with lazy loading (Optimization: Requirement 3.4.5) */}
       <div className="flex-1">
-        <Editor
-          value={fileData.content}
-          language={language}
-          theme="vs-dark"
-          options={{
-            readOnly: true,
-            minimap: { enabled: true },
-            scrollBeyondLastLine: false,
-            fontSize: 14,
-            lineNumbers: 'on',
-            folding: true,
-            wordWrap: 'off',
-            automaticLayout: true,
-            scrollbar: {
-              vertical: 'auto',
-              horizontal: 'auto',
-            },
-          }}
-          loading={
-            <div className="flex items-center justify-center h-full">
-              <LoadingSpinner size="md" />
-            </div>
-          }
-        />
+        <Suspense fallback={<FileContentSkeleton />}>
+          <Editor
+            value={fileData.content}
+            language={language}
+            theme="vs-dark"
+            options={{
+              readOnly: true,
+              minimap: { enabled: true },
+              scrollBeyondLastLine: false,
+              fontSize: 14,
+              lineNumbers: 'on',
+              folding: true,
+              wordWrap: 'off',
+              automaticLayout: true,
+              scrollbar: {
+                vertical: 'auto',
+                horizontal: 'auto',
+              },
+            }}
+            loading={<FileContentSkeleton />}
+          />
+        </Suspense>
       </div>
     </div>
   );

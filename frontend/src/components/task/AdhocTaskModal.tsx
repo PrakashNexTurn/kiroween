@@ -5,7 +5,7 @@
  * Requirements: 2.1.2, 2.2.1, 2.2.2, 2.2.3, 2.2.4, 2.2.5, 2.4.1, 2.4.2
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Modal, Button, Select, Textarea } from '../common';
 import type { SelectOption } from '../common';
 import { useKeyboard } from '../../hooks/useKeyboard';
@@ -93,9 +93,13 @@ export function AdhocTaskModal({
   const [pendingTemplate, setPendingTemplate] = useState<InstructionTemplate | null>(null);
   const [characterCount, setCharacterCount] = useState(0);
 
-  // Update character count when instruction changes
+  // Debounce character count updates (Optimization: Task 31)
   useEffect(() => {
-    setCharacterCount(instruction.length);
+    const timeoutId = setTimeout(() => {
+      setCharacterCount(instruction.length);
+    }, 100); // 100ms debounce
+
+    return () => clearTimeout(timeoutId);
   }, [instruction]);
 
   // Reset form when modal opens/closes
@@ -136,11 +140,11 @@ export function AdhocTaskModal({
   ]);
 
   /**
-   * Handle template selection
+   * Handle template selection (Optimization: Task 31 - useCallback)
    * Requirement 2.4.2: Populate textarea with template text
    * Requirement 2.4.5: Warn before overwriting custom text
    */
-  const handleTemplateSelect = (templateId: string) => {
+  const handleTemplateSelect = useCallback((templateId: string) => {
     setSelectedTemplate(templateId);
     
     if (!templateId) return;
@@ -159,44 +163,44 @@ export function AdhocTaskModal({
       // No custom text, apply template immediately
       setInstruction(template.instruction);
     }
-  };
+  }, [instruction, initialInstruction]);
 
   /**
-   * Confirm template overwrite
+   * Confirm template overwrite (Optimization: Task 31 - useCallback)
    */
-  const confirmTemplateOverwrite = () => {
+  const confirmTemplateOverwrite = useCallback(() => {
     if (pendingTemplate) {
       setInstruction(pendingTemplate.instruction);
     }
     setShowOverwriteWarning(false);
     setPendingTemplate(null);
-  };
+  }, [pendingTemplate]);
 
   /**
-   * Cancel template overwrite
+   * Cancel template overwrite (Optimization: Task 31 - useCallback)
    */
-  const cancelTemplateOverwrite = () => {
+  const cancelTemplateOverwrite = useCallback(() => {
     setSelectedTemplate('');
     setShowOverwriteWarning(false);
     setPendingTemplate(null);
-  };
+  }, []);
 
   /**
-   * Handle instruction change
+   * Handle instruction change (Optimization: Task 31 - useCallback)
    * Requirement 2.2.4: Real-time validation
    */
-  const handleInstructionChange = (value: string) => {
+  const handleInstructionChange = useCallback((value: string) => {
     // Enforce character limit
     if (value.length <= MAX_CHARACTERS) {
       setInstruction(value);
     }
-  };
+  }, []);
 
   /**
-   * Handle execute button click
+   * Handle execute button click (Optimization: Task 31 - useCallback)
    * Requirement 2.2.5: Disable execute button when instruction is empty
    */
-  const handleExecute = async () => {
+  const handleExecute = useCallback(async () => {
     const trimmedInstruction = instruction.trim();
     if (!trimmedInstruction || isExecuting) return;
 
@@ -207,42 +211,44 @@ export function AdhocTaskModal({
       // Error handling is done by parent component
       console.error('Failed to execute adhoc task:', error);
     }
-  };
+  }, [instruction, isExecuting, onExecute]);
 
   /**
-   * Handle modal close
+   * Handle modal close (Optimization: Task 31 - useCallback)
    */
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (!isExecuting) {
       onClose();
     }
-  };
+  }, [isExecuting, onClose]);
 
   /**
-   * Check if execute button should be disabled
+   * Check if execute button should be disabled (Optimization: Task 31 - useMemo)
    */
-  const isExecuteDisabled = !instruction.trim() || isExecuting;
+  const isExecuteDisabled = useMemo(() => {
+    return !instruction.trim() || isExecuting;
+  }, [instruction, isExecuting]);
 
   /**
-   * Get character counter color based on usage
+   * Get character counter color based on usage (Optimization: Task 31 - useMemo)
    */
-  const getCharacterCounterColor = () => {
+  const characterCounterColor = useMemo(() => {
     const percentage = (characterCount / MAX_CHARACTERS) * 100;
     if (percentage >= 95) return 'text-status-error';
     if (percentage >= 80) return 'text-status-warning';
     return 'text-text-tertiary';
-  };
+  }, [characterCount]);
 
   /**
-   * Prepare template options for Select component
+   * Prepare template options for Select component (Optimization: Task 31 - useMemo to cache)
    */
-  const templateOptions: SelectOption[] = [
+  const templateOptions: SelectOption[] = useMemo(() => [
     { value: '', label: 'Select a template...' },
     ...DEFAULT_TEMPLATES.map(template => ({
       value: template.id,
       label: `${template.name} - ${template.description}`,
     })),
-  ];
+  ], []); // Empty dependency array since DEFAULT_TEMPLATES is constant
 
   return (
     <>
@@ -313,7 +319,7 @@ export function AdhocTaskModal({
               <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
                 Minimum 1 character required
               </p>
-              <p className={`text-xs font-mono ${getCharacterCounterColor()}`}>
+              <p className={`text-xs font-mono ${characterCounterColor}`}>
                 {characterCount.toLocaleString()} / {MAX_CHARACTERS.toLocaleString()}
               </p>
             </div>

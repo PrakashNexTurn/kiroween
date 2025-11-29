@@ -11,7 +11,7 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Editor from '@monaco-editor/react';
-import { Button, LoadingSpinner } from '../common';
+import { Button, CardSkeleton } from '../common';
 import { projectService } from '../../services/projectService';
 import { showSuccess, showError } from '../common/Toast';
 import { useTheme } from '../../hooks/useTheme';
@@ -185,11 +185,15 @@ export function SpecViewer({ projectId, fileName, onGenerateClick }: SpecViewerP
     );
   };
 
-  // Show loading state
+  // Show loading state with skeleton
+  // Requirement 4.1.3: Consistent loading UI across features
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <LoadingSpinner size="lg" />
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <CardSkeleton lines={1} />
+        </div>
+        <CardSkeleton lines={15} />
       </div>
     );
   }

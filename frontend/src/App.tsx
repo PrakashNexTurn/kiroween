@@ -8,6 +8,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Layout } from './components/layout';
 import { ToastContainer, ErrorBoundary } from './components/common';
 import { ProjectBoardPage, ProjectDetailPage, NotFoundPage } from './pages';
+import { FileTreeProvider } from './contexts/FileTreeContext';
 import './App.css';
 
 /**
@@ -33,10 +34,12 @@ function AnimatedRoutes() {
 function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        <ToastContainer />
-        <AnimatedRoutes />
-      </BrowserRouter>
+      <FileTreeProvider>
+        <BrowserRouter>
+          <ToastContainer />
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </FileTreeProvider>
     </ErrorBoundary>
   );
 }

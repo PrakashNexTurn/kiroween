@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { Save, AlertCircle, FileText } from 'lucide-react';
-import { Button, LoadingSpinner } from '../common';
+import { Button, EditorSkeleton } from '../common';
 import toast from 'react-hot-toast';
 import { steeringService } from '../../services';
 
@@ -147,13 +147,10 @@ export function SteeringFileViewer({
     }
   };
 
-  // Loading state
+  // Loading state with skeleton
+  // Requirement 4.1.3: Loading states for steering files
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <EditorSkeleton />;
   }
 
   // Error state
@@ -269,11 +266,7 @@ export function SteeringFileViewer({
             tabSize: 2,
             insertSpaces: true,
           }}
-          loading={
-            <div className="flex items-center justify-center h-full">
-              <LoadingSpinner size="md" />
-            </div>
-          }
+          loading={<EditorSkeleton />}
         />
       </div>
 

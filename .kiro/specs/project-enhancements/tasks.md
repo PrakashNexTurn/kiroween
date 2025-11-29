@@ -9,6 +9,9 @@ This consolidated plan covers three major features: Steering Generation, Adhoc T
 ### Steering Generation Backend
 
 - [x] 1. Create SteeringGenerator service
+
+
+
   - Create `backend/src/steering_generator.py`
   - Implement template generation methods for product.md, tech.md, structure.md
   - Add content population logic based on project metadata
@@ -320,19 +323,34 @@ This consolidated plan covers three major features: Steering Generation, Adhoc T
 
 ### Performance Optimizations
 
-- [ ] 30. Optimize file tree performance
+- [x] 30. Optimize file tree performance
+
+
+
+
+
   - Add virtual scrolling for large trees (react-window)
   - Memoize tree nodes with React.memo
   - Lazy load Monaco editor
   - Cache tree state in Context
   - _Requirements: 3.4.5_
 
-- [ ] 31. Optimize adhoc task modal
+- [x] 31. Optimize adhoc task modal
+
+
+
+
+
   - Debounce character counter
   - Optimize re-renders
   - Cache templates in memory
 
-- [ ] 32. Add loading states and skeletons
+- [x] 32. Add loading states and skeletons
+
+
+
+
+
   - Loading skeletons for file tree
   - Loading indicators for file content
   - Loading states for steering files

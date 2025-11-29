@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { FileText, Plus, AlertCircle } from 'lucide-react';
-import { Button, Card, LoadingSpinner } from '../common';
+import { Button, Card, SteeringFileListSkeleton } from '../common';
 import { SteeringFileViewer } from './SteeringFileViewer';
 import { steeringService } from '../../services';
 
@@ -82,13 +82,14 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
   };
 
   /**
-   * Render loading state
+   * Render loading state with skeleton
+   * Requirement 4.1.3: Loading states for steering files
    */
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <LoadingSpinner size="lg" />
-      </div>
+      <Card>
+        <SteeringFileListSkeleton />
+      </Card>
     );
   }
 

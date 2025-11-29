@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useProjectDetail } from '../hooks/useProjectDetail';
 import { useKeyboard } from '../hooks/useKeyboard';
-import { LoadingSpinner, Badge, ProgressBar, Button } from '../components/common';
+import { Badge, ProgressBar, Button, CardSkeleton } from '../components/common';
 import { OverviewTab, SpecsTab, SteeringTab, GenerateSteeringModal, FilesTab } from '../components/project';
 import { TasksTab } from '../components/task';
 import { Phase } from '../types/project.types';
@@ -146,11 +146,27 @@ export function ProjectDetailPage() {
     },
   ]);
 
-  // Show loading state
+  // Show loading state with skeleton
+  // Requirement 4.1.3: Consistent loading UI across features
   if (loading && !project) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <LoadingSpinner size="lg" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center gap-4">
+            <CardSkeleton lines={1} />
+          </div>
+          
+          {/* Tab navigation skeleton */}
+          <div className="flex gap-2">
+            <CardSkeleton lines={1} />
+            <CardSkeleton lines={1} />
+            <CardSkeleton lines={1} />
+          </div>
+          
+          {/* Content skeleton */}
+          <CardSkeleton lines={10} />
+        </div>
       </div>
     );
   }

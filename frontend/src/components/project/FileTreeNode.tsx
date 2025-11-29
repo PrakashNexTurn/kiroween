@@ -187,8 +187,10 @@ const highlightMatch = (text: string, query: string, isSelected: boolean): React
  * - Context menu with "Copy Path" action (Requirement 3.4.1)
  * - Keyboard navigation support
  * - Accessibility features (ARIA labels, roles)
+ * 
+ * Optimization: Memoized with React.memo to prevent unnecessary re-renders
  */
-export const FileTreeNodeComponent: React.FC<FileTreeNodeProps> = ({
+const FileTreeNodeComponent: React.FC<FileTreeNodeProps> = ({
   node,
   level,
   onFileSelect,
@@ -394,5 +396,19 @@ export const FileTreeNodeComponent: React.FC<FileTreeNodeProps> = ({
   );
 };
 
+// Memoize component to prevent unnecessary re-renders (Optimization: Requirement 3.4.5)
+const MemoizedFileTreeNode = React.memo(FileTreeNodeComponent, (prevProps, nextProps) => {
+  // Custom comparison function for better performance
+  return (
+    prevProps.node.path === nextProps.node.path &&
+    prevProps.level === nextProps.level &&
+    prevProps.selectedFile === nextProps.selectedFile &&
+    prevProps.searchQuery === nextProps.searchQuery &&
+    prevProps.expandedFolders === nextProps.expandedFolders
+  );
+});
+
+MemoizedFileTreeNode.displayName = 'FileTreeNode';
+
 // Export as FileTreeNode for external use
-export const FileTreeNode = FileTreeNodeComponent;
+export const FileTreeNode = MemoizedFileTreeNode;

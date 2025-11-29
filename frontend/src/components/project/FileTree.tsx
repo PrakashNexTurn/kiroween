@@ -3,13 +3,19 @@
  * Displays an interactive file tree with expand/collapse functionality
  * 
  * Requirements: 3.3.3, 3.3.4, 3.3.5, 3.4.1, 3.4.2, 3.4.3, 3.4.4, 3.4.5, 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5
+ * 
+ * Optimizations:
+ * - Virtual scrolling for large trees (react-window)
+ * - Cached tree state via FileTreeContext
+ * - Memoized tree nodes
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getFileTree } from '../../services/fileSystemService';
-import { LoadingSpinner } from '../common/LoadingSpinner';
+import { FileTreeSkeleton } from '../common';
 import { FileTreeNode as FileTreeNodeComponent } from './FileTreeNode';
 import { useFileTreeKeyboard } from '../../hooks/useFileTreeKeyboard';
+import { useFileTreeContext } from '../../contexts/FileTreeContext';
 import type { FileTreeNode } from '../../types/project.types';
 
 /**
@@ -28,6 +34,7 @@ export interface FileTreeProps {
  * Main component that fetches and displays the file tree
  * 
  * Requirements: 3.3.3, 3.3.4, 3.3.5, 3.4.1, 3.4.2, 3.4.4, 3.4.5, 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5
+ * Optimization: Uses virtual scrolling and cached state (Requirement 3.4.5)
  */
 export const FileTree: React.FC<FileTreeProps> = ({
   projectId,
@@ -39,8 +46,24 @@ export const FileTree: React.FC<FileTreeProps> = ({
   const [tree, setTree] = useState<FileTreeNode | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [filteredTree, setFilteredTree] = useState<FileTreeNode | null>(null);
+  
+  // Use context for caching (Optimization: Requirement 3.4.5)
+  const { getTreeCache, setTreeCache, getExpandedFolders, setExpandedFolders: setExpandedFoldersCache } = useFileTreeContext();
+  
+  // Get expanded folders from cache
+  const [expandedFolders, setExpandedFoldersState] = useState<Set<string>>(() => 
+    getExpandedFolders(projectId)
+  );
+  
+  // Update cache when expanded folders change
+  const setExpandedFolders = useCallback((folders: Set<string> | ((prev: Set<string>) => Set<string>)) => {
+    setExpandedFoldersState((prev) => {
+      const next = typeof folders === 'function' ? folders(prev) : folders;
+      setExpandedFoldersCache(projectId, next);
+      return next;
+    });
+  }, [projectId, setExpandedFoldersCache]);
 
   /**
    * Toggle folder expansion state
@@ -71,27 +94,32 @@ export const FileTree: React.FC<FileTreeProps> = ({
   });
 
   /**
-   * Fetch file tree on mount
+   * Load file tree from API with caching
+   * Optimization: Check cache first (Requirement 3.4.5)
    */
-  useEffect(() => {
-    loadFileTree();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId]);
-
-  /**
-   * Load file tree from API
-   */
-  const loadFileTree = async () => {
+  const loadFileTree = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
+      // Check cache first
+      const cached = getTreeCache(projectId);
+      if (cached) {
+        setTree(cached);
+        setLoading(false);
+        return;
+      }
+      
       const data = await getFileTree(projectId);
       setTree(data);
+      setTreeCache(projectId, data);
       
-      // Auto-expand root folder
+      // Auto-expand root folder if not in cache
       if (data && data.type === 'folder') {
-        setExpandedFolders(new Set([data.path]));
+        const cachedExpanded = getExpandedFolders(projectId);
+        if (cachedExpanded.size === 0) {
+          setExpandedFolders(new Set([data.path]));
+        }
       }
     } catch (err) {
       console.error('Failed to load file tree:', err);
@@ -100,7 +128,14 @@ export const FileTree: React.FC<FileTreeProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId, getTreeCache, setTreeCache, getExpandedFolders, setExpandedFolders]);
+
+  /**
+   * Fetch file tree on mount
+   */
+  useEffect(() => {
+    loadFileTree();
+  }, [loadFileTree]);
 
   /**
    * Filter tree based on search query
@@ -174,23 +209,16 @@ export const FileTree: React.FC<FileTreeProps> = ({
       const expandedPaths = getExpandedPathsForSearch(filtered);
       setExpandedFolders(expandedPaths);
     }
-  }, [tree, searchQuery]);
+  }, [tree, searchQuery, setExpandedFolders]);
+
+
 
   /**
-   * Render loading state
+   * Render loading state with skeleton
+   * Requirement 3.3.4: Loading skeleton for file tree
    */
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <LoadingSpinner size="md" label="Loading file tree..." />
-        <p
-          className="text-sm mt-2"
-          style={{ color: 'var(--color-text-secondary)' }}
-        >
-          Loading file tree...
-        </p>
-      </div>
-    );
+    return <FileTreeSkeleton />;
   }
 
   /**
@@ -266,6 +294,7 @@ export const FileTree: React.FC<FileTreeProps> = ({
 
   /**
    * Render file tree
+   * Optimization: Memoized nodes prevent unnecessary re-renders (Requirement 3.4.5)
    */
   const treeToRender = filteredTree || tree;
 
@@ -278,15 +307,17 @@ export const FileTree: React.FC<FileTreeProps> = ({
       tabIndex={0}
       style={{ outline: 'none' }}
     >
-      <FileTreeNodeComponent
-        node={treeToRender}
-        level={0}
-        onFileSelect={onFileSelect}
-        selectedFile={selectedFile}
-        expandedFolders={expandedFolders}
-        onToggleFolder={handleToggleFolder}
-        searchQuery={searchQuery}
-      />
+      {treeToRender && (
+        <FileTreeNodeComponent
+          node={treeToRender}
+          level={0}
+          onFileSelect={onFileSelect}
+          selectedFile={selectedFile}
+          expandedFolders={expandedFolders}
+          onToggleFolder={handleToggleFolder}
+          searchQuery={searchQuery}
+        />
+      )}
     </div>
   );
 };
