@@ -54,15 +54,6 @@ class SteeringGenerator:
         metadata = project.metadata
         steering_dir = self._get_steering_dir(project.project_root)
         
-        # Build project context
-        context = f"""Project: {metadata.name}
-Project ID: {metadata.project_id}
-Description: {metadata.description}
-Phase: {metadata.phase.value}
-Language: {metadata.build_config.language or 'Not specified'}
-Build Command: {metadata.build_config.build_command or 'Not specified'}
-Test Command: {metadata.build_config.test_command or 'Not specified'}"""
-
         # Check if files exist
         existing_files = []
         for filename in ["product.md", "tech.md", "structure.md"]:
@@ -71,51 +62,29 @@ Test Command: {metadata.build_config.test_command or 'Not specified'}"""
         
         force_note = ""
         if existing_files and force:
-            force_note = f"\nNote: The following files already exist and should be OVERWRITTEN: {', '.join(existing_files)}"
+            force_note = f" Note: The following files already exist and should be OVERWRITTEN: {', '.join(existing_files)}."
         elif existing_files and not force:
-            force_note = f"\nNote: The following files already exist and should be SKIPPED: {', '.join(existing_files)}"
+            force_note = f" Note: The following files already exist and should be SKIPPED: {', '.join(existing_files)}."
 
-        instruction = f"""/tools trust-all
-
-You are generating steering files for a Kiro project. Steering files provide AI assistants with project-specific context and conventions.
-
-{context}
-
-Create THREE steering files in {steering_dir}:
-
-1. **product.md** - Product overview and purpose
-   - Include project name, description, and purpose
-   - Document project goals and objectives
-   - Define target audience and stakeholders
-   - Specify success criteria
-   - Include current status (phase, completion percentage, task statistics)
-   - Make it comprehensive and informative for AI assistants
-
-2. **tech.md** - Technology stack and common commands
-   - Document the technology stack and frameworks
-   - List major dependencies
-   - Include development tools, linters, formatters
-   - Document build and test commands (use the provided commands if available)
-   - Explain environment setup and configuration
-   - Document architecture patterns and conventions
-   - Describe testing strategy and frameworks
-
-3. **structure.md** - Project directory structure and naming conventions
-   - Show the directory organization (include .kiro/specs/ and .kiro/steering/ structure)
-   - Document naming conventions for files, directories, and code
-   - Explain code organization patterns
-   - List and explain configuration files
-   - Document where build artifacts are stored
-   - Include project-specific best practices
-{force_note}
-
-IMPORTANT: 
-- Generate comprehensive, detailed content based on the project information provided
-- Make the files useful for AI assistants working on this project
-- Use markdown formatting with clear sections and subsections
-- Include code blocks for commands and examples where appropriate
-- Be specific and actionable, not generic
-- Create the files in {steering_dir}"""
+        instruction = "/tools trust-all\n"
+        instruction += (
+            f"You are generating steering files for a Kiro project located at {steering_dir}. "
+            f"Steering files provide AI assistants with project-specific context and conventions. "
+            f"Project details: Name='{metadata.name}', ID='{metadata.project_id}', "
+            f"Description='{metadata.description}', Phase={metadata.phase.value}, "
+            f"Language={metadata.build_config.language or 'Not specified'}, "
+            f"Build Command={metadata.build_config.build_command or 'Not specified'}, "
+            f"Test Command={metadata.build_config.test_command or 'Not specified'}, "
+            f"Completion={metadata.completion_percentage}%, "
+            f"Tasks: {metadata.task_stats.completed}/{metadata.task_stats.total} completed. "
+            f"Create THREE steering files in {steering_dir}: "
+            f"1) product.md - Product overview including project name, description, purpose, goals, objectives, target audience, stakeholders, success criteria, and current status (phase, completion, task stats). "
+            f"2) tech.md - Technology stack including frameworks, dependencies, development tools, linters, formatters, build/test commands, environment setup, configuration, architecture patterns, and testing strategy. "
+            f"3) structure.md - Project structure including directory organization (.kiro/specs/ and .kiro/steering/), naming conventions for files/directories/code, code organization patterns, configuration files, build artifacts location, and project-specific best practices. "
+            f"Generate comprehensive, detailed, AI-assistant-friendly content based on the project information provided. "
+            f"Use markdown formatting with clear sections, subsections, and code blocks. "
+            f"Be specific and actionable, not generic.{force_note}"
+        )
 
         return instruction
 
