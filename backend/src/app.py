@@ -939,6 +939,100 @@ def _determine_next_action(phase: Phase) -> str:
     return action_map.get(phase, "Unknown phase")
 
 
+# File explorer endpoints (must come before /files/{file_name} to avoid route conflicts)
+@app.get(
+    "/projects/{project_id}/files/tree",
+    response_model=Dict[str, Any],
+    summary="Get project file tree",
+    description="Returns the complete directory structure for a project",
+)
+@log_api_request("/projects/{project_id}/files/tree", "GET")
+async def get_file_tree(project_id: str) -> Dict[str, Any]:
+    """
+    Get the file tree for a project.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dictionary with the complete directory tree
+        
+    Raises:
+        ProjectNotFoundError: If project not found
+        FileSystemError: If file system access fails
+    """
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Load the project to ensure it exists and get the project root
+    project = project_manager.load_project(project_id)
+    
+    # Get the directory tree
+    try:
+        tree = file_system_service.get_directory_tree(project.project_root, max_depth=10)
+        
+        return {
+            "projectId": project_id,
+            "projectRoot": project.project_root,
+            "tree": tree,
+        }
+    except FileSystemError as e:
+        logger.error(f"Failed to get file tree for project {project_id}: {str(e)}")
+        raise
+
+
+@app.get(
+    "/projects/{project_id}/files/content",
+    response_model=Dict[str, Any],
+    summary="Get file content",
+    description="Returns the content of a specific file in the project",
+)
+@log_api_request("/projects/{project_id}/files/content", "GET")
+async def get_file_content(project_id: str, file_path: str) -> Dict[str, Any]:
+    """
+    Get the content of a file in a project.
+    
+    Args:
+        project_id: The project identifier
+        file_path: Path to the file (relative to project root)
+        
+    Returns:
+        Dictionary with file content and metadata
+        
+    Raises:
+        ProjectNotFoundError: If project not found
+        PathValidationError: If file path is outside project root
+        FileSystemError: If file cannot be read
+    """
+    # Validate project_id
+    if not project_id or not project_id.strip():
+        raise ValidationError("project_id cannot be empty")
+    
+    # Validate file_path parameter
+    if not file_path or not file_path.strip():
+        raise ValidationError("file_path query parameter is required")
+    
+    # Load the project to ensure it exists and get the project root
+    project = project_manager.load_project(project_id)
+    
+    # Read the file content
+    try:
+        file_data = file_system_service.read_file_content(
+            project.project_root, 
+            file_path
+        )
+        
+        # Add project context to response
+        file_data["projectId"] = project_id
+        
+        return file_data
+    except (PathValidationError, FileSystemError) as e:
+        logger.error(f"Failed to read file {file_path} for project {project_id}: {str(e)}")
+        raise
+
+
+# Spec file endpoints
 @app.get(
     "/projects/{project_id}/files/{file_name}",
     response_model=Dict[str, Any],
@@ -2025,99 +2119,6 @@ async def update_steering_file(
             },
             logs=f"Failed to update steering file: {str(e)}"
         )
-
-
-# File explorer endpoints
-@app.get(
-    "/projects/{project_id}/files/tree",
-    response_model=Dict[str, Any],
-    summary="Get project file tree",
-    description="Returns the complete directory structure for a project",
-)
-@log_api_request("/projects/{project_id}/files/tree", "GET")
-async def get_file_tree(project_id: str) -> Dict[str, Any]:
-    """
-    Get the file tree for a project.
-    
-    Args:
-        project_id: The project identifier
-        
-    Returns:
-        Dictionary with the complete directory tree
-        
-    Raises:
-        ProjectNotFoundError: If project not found
-        FileSystemError: If file system access fails
-    """
-    # Validate project_id
-    if not project_id or not project_id.strip():
-        raise ValidationError("project_id cannot be empty")
-    
-    # Load the project to ensure it exists and get the project root
-    project = project_manager.load_project(project_id)
-    
-    # Get the directory tree
-    try:
-        tree = file_system_service.get_directory_tree(project.project_root, max_depth=10)
-        
-        return {
-            "projectId": project_id,
-            "projectRoot": project.project_root,
-            "tree": tree,
-        }
-    except FileSystemError as e:
-        logger.error(f"Failed to get file tree for project {project_id}: {str(e)}")
-        raise
-
-
-@app.get(
-    "/projects/{project_id}/files/content",
-    response_model=Dict[str, Any],
-    summary="Get file content",
-    description="Returns the content of a specific file in the project",
-)
-@log_api_request("/projects/{project_id}/files/content", "GET")
-async def get_file_content(project_id: str, file_path: str) -> Dict[str, Any]:
-    """
-    Get the content of a file in a project.
-    
-    Args:
-        project_id: The project identifier
-        file_path: Path to the file (relative to project root)
-        
-    Returns:
-        Dictionary with file content and metadata
-        
-    Raises:
-        ProjectNotFoundError: If project not found
-        PathValidationError: If file path is outside project root
-        FileSystemError: If file cannot be read
-    """
-    # Validate project_id
-    if not project_id or not project_id.strip():
-        raise ValidationError("project_id cannot be empty")
-    
-    # Validate file_path parameter
-    if not file_path or not file_path.strip():
-        raise ValidationError("file_path query parameter is required")
-    
-    # Load the project to ensure it exists and get the project root
-    project = project_manager.load_project(project_id)
-    
-    # Read the file content
-    try:
-        file_data = file_system_service.read_file_content(
-            project.project_root, 
-            file_path
-        )
-        
-        # Add project context to response
-        file_data["projectId"] = project_id
-        
-        return file_data
-    except (PathValidationError, FileSystemError) as e:
-        logger.error(f"Failed to read file {file_path} for project {project_id}: {str(e)}")
-        raise
 
 
 # Health check endpoint
