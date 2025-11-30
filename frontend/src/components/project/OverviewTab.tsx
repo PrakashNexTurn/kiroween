@@ -323,11 +323,11 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      {/* Phase and Progress Bar */}
-      <Row gutter={[16, 16]} align="middle">
+      {/* Phase and Progress Bar - Mobile Optimized */}
+      <Row gutter={[12, 12]} align="middle">
         <Col xs={24} sm={8}>
-          <Space>
-            <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+          <Space size="small">
+            <span style={{ fontSize: 'clamp(13px, 3vw, 14px)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
               Phase:
             </span>
             <Tag color={
@@ -342,15 +342,15 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
           </Space>
         </Col>
         <Col xs={24} sm={16}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-secondary)', whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: 'clamp(13px, 3vw, 14px)', fontWeight: 500, color: 'var(--color-text-secondary)', whiteSpace: 'nowrap' }}>
               Progress:
             </span>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ 
-                height: '8px', 
+                height: '10px', 
                 backgroundColor: 'var(--color-bg-tertiary)', 
-                borderRadius: '4px',
+                borderRadius: '5px',
                 overflow: 'hidden',
                 position: 'relative'
               }}>
@@ -359,41 +359,44 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
                   width: `${project.completionPercentage}%`,
                   background: 'linear-gradient(90deg, var(--color-brand-primary) 0%, var(--color-brand-secondary) 100%)',
                   transition: 'width 0.3s ease',
-                  borderRadius: '4px'
+                  borderRadius: '5px'
                 }} />
               </div>
             </div>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-brand-primary)', minWidth: '45px', textAlign: 'right' }}>
+            <span style={{ fontSize: 'clamp(13px, 3vw, 14px)', fontWeight: 600, color: 'var(--color-brand-primary)', minWidth: '40px', textAlign: 'right' }}>
               {Math.round(project.completionPercentage)}%
             </span>
           </div>
         </Col>
       </Row>
 
-      {/* Task Statistics - Compact Cards */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={8}>
+      {/* Task Statistics - Mobile Optimized */}
+      <Row gutter={[12, 12]}>
+        <Col xs={8} sm={12} md={8}>
           <Statistic
             title="Total Tasks"
             value={project.taskStats.total}
-            prefix={<FileTextOutlined />}
-            valueStyle={{ color: 'var(--color-text-primary)', fontSize: '32px' }}
+            prefix={<FileTextOutlined style={{ fontSize: 'clamp(16px, 4vw, 20px)' }} />}
+            valueStyle={{ color: 'var(--color-text-primary)', fontSize: 'clamp(24px, 6vw, 32px)' }}
+            style={{ textAlign: 'center' }}
           />
         </Col>
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={8} sm={12} md={8}>
           <Statistic
             title="Completed"
             value={project.taskStats.completed}
-            prefix={<CheckCircleOutlined />}
-            valueStyle={{ color: 'var(--color-status-success)', fontSize: '32px' }}
+            prefix={<CheckCircleOutlined style={{ fontSize: 'clamp(16px, 4vw, 20px)' }} />}
+            valueStyle={{ color: 'var(--color-status-success)', fontSize: 'clamp(24px, 6vw, 32px)' }}
+            style={{ textAlign: 'center' }}
           />
         </Col>
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={8} sm={12} md={8}>
           <Statistic
             title="Progress"
             value={project.completionPercentage}
             suffix="%"
-            valueStyle={{ color: 'var(--color-brand-primary)', fontSize: '32px' }}
+            valueStyle={{ color: 'var(--color-brand-primary)', fontSize: 'clamp(24px, 6vw, 32px)' }}
+            style={{ textAlign: 'center' }}
           />
         </Col>
       </Row>

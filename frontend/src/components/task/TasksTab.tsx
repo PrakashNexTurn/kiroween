@@ -574,25 +574,26 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
       )}
 
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      {/* Header with controls */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <Title level={3} style={{ margin: 0 }}>Tasks</Title>
-          <Text type="secondary" style={{ fontSize: '12px' }}>
+      {/* Header with controls - Mobile Optimized */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ minWidth: 0 }}>
+          <Title level={3} style={{ margin: 0, fontSize: 'clamp(18px, 4vw, 24px)' }}>Tasks</Title>
+          <Text type="secondary" style={{ fontSize: 'clamp(11px, 2.5vw, 12px)' }}>
             {completedCount}/{totalCount} ({progress.toFixed(0)}%)
           </Text>
         </div>
 
-        <Space size="small">
+        <Space size="small" wrap style={{ flexShrink: 0 }}>
           {onEditClick && (
             <Button
               onClick={onEditClick}
               variant="primary"
               size="sm"
               disabled={executing}
+              style={{ minWidth: '44px' }}
             >
-              <Edit style={{ width: '16px', height: '16px', marginRight: '4px' }} />
-              <span>Edit</span>
+              <Edit style={{ width: '16px', height: '16px' }} />
+              <span className="hidden sm:inline" style={{ marginLeft: '4px' }}>Edit</span>
             </Button>
           )}
 
@@ -601,16 +602,17 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
             disabled={!nextTask || executing}
             variant="secondary"
             size="sm"
+            style={{ minWidth: '44px' }}
           >
             {executing ? (
               <>
-                <Spin size="small" style={{ marginRight: '8px' }} />
-                <span>Executing...</span>
+                <Spin size="small" />
+                <span className="hidden sm:inline" style={{ marginLeft: '8px' }}>Executing...</span>
               </>
             ) : (
               <>
-                <Play style={{ width: '16px', height: '16px', marginRight: '4px' }} />
-                <span>Execute Next</span>
+                <Play style={{ width: '16px', height: '16px' }} />
+                <span className="hidden sm:inline" style={{ marginLeft: '4px' }}>Next</span>
               </>
             )}
           </Button>
@@ -620,22 +622,25 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
             disabled={!nextTask || executing}
             variant="secondary"
             size="sm"
+            style={{ minWidth: '44px' }}
           >
-            <PlayCircle style={{ width: '16px', height: '16px', marginRight: '4px' }} />
-            <span>Execute All</span>
+            <PlayCircle style={{ width: '16px', height: '16px' }} />
+            <span className="hidden sm:inline" style={{ marginLeft: '4px' }}>All</span>
           </Button>
 
-          {/* Execute Adhoc Task Button - Requirement 2.1.1, 2.1.3, 2.1.4, 2.1.5 */}
+          {/* Execute Adhoc Task Button - Mobile Optimized */}
           <Button
             onClick={handleOpenAdhocModal}
             disabled={loading || executing || isAdhocExecuting}
             variant="secondary"
             size="sm"
             title="Execute Adhoc Task (Ctrl+K or Cmd+K)"
+            style={{ minWidth: '44px' }}
           >
-            <Zap style={{ width: '16px', height: '16px', marginRight: '4px' }} />
-            <span>Adhoc Task</span>
+            <Zap style={{ width: '16px', height: '16px' }} />
+            <span className="hidden md:inline" style={{ marginLeft: '4px' }}>Adhoc</span>
             <kbd 
+              className="hidden lg:inline-block"
               style={{
                 marginLeft: '8px',
                 padding: '2px 6px',
@@ -656,7 +661,7 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
               variant="ghost" 
               size="sm" 
               disabled={executing}
-              style={{ padding: '4px 8px' }}
+              style={{ padding: '4px 8px', minWidth: '44px' }}
             >
               <RefreshCw style={{ width: '16px', height: '16px' }} />
             </Button>

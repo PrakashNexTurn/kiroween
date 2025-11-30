@@ -88,13 +88,14 @@ export function Header() {
         transition: 'background-color 0.3s, border-color 0.3s',
       }}
     >
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 12px' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 16px' }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            height: '40px',
+            height: '56px', // Increased for better mobile touch targets
+            gap: '8px',
           }}
         >
           {/* Logo and Title */}
@@ -115,29 +116,32 @@ export function Header() {
                 src="/kiro.svg"
                 alt="Kiro Logo"
                 className="dark:invert"
-                style={{ height: '32px', width: 'auto' }}
+                style={{ height: '28px', width: 'auto', flexShrink: 0 }}
               />
               <h1
-                className="hidden sm:block"
                 style={{
-                  fontSize: '20px',
+                  fontSize: '18px',
                   fontWeight: 'bold',
                   color: 'var(--color-text-primary)',
                   margin: 0,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
-                👻 Kiro's Ghost
+                <span className="hidden sm:inline">👻 Kiro's Ghost</span>
+                <span className="sm:hidden">👻 Kiro</span>
               </h1>
               <span
-                className="hidden lg:block"
+                className="hidden lg:inline-block"
                 style={{
-                  fontSize: '12px',
+                  fontSize: '11px',
                   color: 'var(--color-text-tertiary)',
                   backgroundColor: 'var(--color-bg-tertiary)',
-                  padding: '4px 8px',
+                  padding: '3px 6px',
                   borderRadius: '4px',
                   marginLeft: '8px',
-                  marginRight: '8px',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 The Phantom IDE

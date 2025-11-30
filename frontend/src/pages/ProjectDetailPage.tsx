@@ -195,13 +195,24 @@ export function ProjectDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      style={{ maxWidth: '1280px', margin: '0 auto', padding: '4px 12px' }}
+      style={{ 
+        maxWidth: '1280px', 
+        margin: '0 auto', 
+        padding: '8px 12px',
+      }}
     >
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Mobile Optimized */}
       <Tabs
         activeKey={activeTab}
         onChange={(key) => handleTabChange(key as TabType)}
         size="small"
+        tabBarStyle={{
+          marginBottom: '16px',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          whiteSpace: 'nowrap',
+          WebkitOverflowScrolling: 'touch',
+        }}
         items={[
           {
             key: 'overview',

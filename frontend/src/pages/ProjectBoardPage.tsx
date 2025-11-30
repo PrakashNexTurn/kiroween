@@ -163,58 +163,72 @@ export function ProjectBoardPage() {
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Header Section */}
         <div>
-          <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
+          <h1 style={{ 
+            fontSize: 'clamp(24px, 5vw, 32px)', 
+            fontWeight: 'bold', 
+            marginBottom: '8px', 
+            color: 'var(--color-text-primary)',
+            lineHeight: 1.2
+          }}>
             👻 Your Haunted Projects
           </h1>
-          <p style={{ marginBottom: '24px', color: 'var(--color-text-secondary)' }}>
+          <p style={{ 
+            marginBottom: '16px', 
+            color: 'var(--color-text-secondary)',
+            fontSize: 'clamp(14px, 3vw, 16px)',
+            lineHeight: 1.5
+          }}>
             The ghost follows you everywhere - manage your projects from any device, anywhere
           </p>
         
-        {/* Search, Filter, and Create Project in one line */}
-        <Row gutter={[16, 16]}>
-          {/* Search Input */}
-          <Col xs={24} lg={12}>
+        {/* Search, Filter, and Create Project - Mobile Optimized */}
+        <Row gutter={[12, 12]}>
+          {/* Search Input - Full width on mobile */}
+          <Col xs={24} md={12}>
             <Search
               ref={searchInputRef}
-              placeholder="Search projects... (Press '/' to focus)"
+              placeholder="Search projects..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               prefix={<SearchOutlined />}
               allowClear
               size="large"
+              style={{ fontSize: '16px' }}
             />
           </Col>
 
-          {/* Phase Filter Dropdown */}
-          <Col xs={24} sm={12} lg={6}>
+          {/* Phase Filter Dropdown - Half width on mobile */}
+          <Col xs={12} md={6}>
             <AntSelect
               value={filterPhase}
               onChange={(value) => setFilterPhase(value as Phase | 'all')}
               style={{ width: '100%' }}
               size="large"
               options={[
-                { value: 'all', label: 'All Phases' },
+                { value: 'all', label: 'All' },
                 { value: Phase.INIT, label: 'INIT' },
                 { value: Phase.SPEC, label: 'SPEC' },
                 { value: Phase.BUILD, label: 'BUILD' },
                 { value: Phase.TEST, label: 'TEST' },
                 { value: Phase.FIX, label: 'FIX' },
-                { value: Phase.COMPLETE, label: 'COMPLETE' },
+                { value: Phase.COMPLETE, label: 'DONE' },
               ]}
               aria-label="Filter projects by phase"
             />
           </Col>
 
-          {/* Create Project Button */}
-          <Col xs={24} sm={12} lg={6}>
+          {/* Create Project Button - Half width on mobile */}
+          <Col xs={12} md={6}>
             <AntButton 
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => setShowCreateModal(true)}
               size="large"
               block
+              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
-              Create Project
+              <span className="hidden sm:inline">Create Project</span>
+              <span className="sm:hidden">Create</span>
             </AntButton>
           </Col>
         </Row>
@@ -227,7 +241,7 @@ export function ProjectBoardPage() {
           style={{ padding: '48px 0' }}
         />
       ) : (
-        <Row gutter={[16, 16]}>
+        <Row gutter={[12, 12]}>
   {filteredProjects.map((project) => (
     <Col
       key={project.projectId}
@@ -236,7 +250,7 @@ export function ProjectBoardPage() {
       md={8}
       lg={6}
       xl={6}
-      style={{ display: "flex" }} // ⭐ allows children to stretch
+      style={{ display: "flex" }}
     >
       <div style={{ width: "100%", height: "100%" }}> 
         <ProjectCard project={project} />

@@ -49,8 +49,11 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
         borderColor: theme.colors.border,
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         height: '100%',
-        padding: '8px',
-        borderRadius: '12px'
+        padding: '12px',
+        borderRadius: '12px',
+        minHeight: '160px',
+        display: 'flex',
+        flexDirection: 'column',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 10px 15px rgba(0,0,0,0.1)';
@@ -68,61 +71,79 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
       }}
       aria-label={`View project ${project.name}`}
     >
-      {/* Card Content - Reduced padding for compact size */}
-      <div className="p-4">
+      {/* Card Content - Mobile Optimized */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '4px 0' }}>
         {/* Header with Title and Phase Badge */}
-        <div className="flex justify-between items-start mb-2">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '8px' }}>
           <h3
-            className="text-base font-semibold line-clamp-1 flex-1"
             style={{
+              fontSize: 'clamp(15px, 3.5vw, 16px)',
+              fontWeight: 600,
+              lineHeight: 1.3,
               color: isEarlyPhase ? theme.colors.text.inverse : theme.colors.text.primary,
+              flex: 1,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              wordBreak: 'break-word',
             }}
           >
             {project.name}
           </h3>
-          <Badge variant={project.phase} size="sm" className="ml-2 flex-shrink-0">
+          <Badge variant={project.phase} size="sm" style={{ flexShrink: 0 }}>
             {project.phase}
           </Badge>
         </div>
 
-        {/* Description - Smaller text and reduced spacing */}
+        {/* Description - Mobile Optimized */}
         <p
-          className="text-xs mb-3 line-clamp-2"
           style={{
+            fontSize: 'clamp(12px, 2.8vw, 13px)',
+            lineHeight: 1.4,
             color: isEarlyPhase ? theme.colors.text.inverse : theme.colors.text.secondary,
-            minHeight: '2rem',
+            marginBottom: '12px',
+            flex: 1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            wordBreak: 'break-word',
           }}
         >
-          {project.description ? truncateDescription(project.description, 80) : 'No description provided'}
+          {project.description ? truncateDescription(project.description, 100) : 'No description provided'}
         </p>
 
         {/* Completion Percentage */}
-        <div className="mb-2">
+        <div style={{ marginBottom: '8px' }}>
           <span
-            className="text-xs font-medium"
             style={{
+              fontSize: 'clamp(11px, 2.5vw, 12px)',
+              fontWeight: 500,
               color: isEarlyPhase ? theme.colors.text.inverse : theme.colors.text.secondary,
             }}
           >
             {project.completionPercentage}% Complete
           </span>
         </div>
-      </div>
 
-      {/* Progress Bar at Bottom - Reduced padding */}
-      <div className="px-4 pb-3">
-        <ProgressBar
-          percentage={project.completionPercentage}
-          variant={
-            project.completionPercentage === 100
-              ? 'success'
-              : project.completionPercentage >= 50
-              ? 'primary'
-              : 'warning'
-          }
-          showLabel={false}
-          height="sm"
-        />
+        {/* Progress Bar at Bottom */}
+        <div style={{ marginTop: 'auto' }}>
+          <ProgressBar
+            percentage={project.completionPercentage}
+            variant={
+              project.completionPercentage === 100
+                ? 'success'
+                : project.completionPercentage >= 50
+                ? 'primary'
+                : 'warning'
+            }
+            showLabel={false}
+            height="sm"
+          />
+        </div>
       </div>
     </div>
   );
