@@ -6,10 +6,24 @@
  */
 
 import { useState } from 'react';
-import { Calendar, FileText, CheckCircle, Clock, AlertCircle, XCircle, Hammer, TestTube, Wrench } from 'lucide-react';
+import { Hammer, TestTube, Wrench } from 'lucide-react';
+import { Row, Col, Statistic, Space, Table, Tag } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import { 
+  FileTextOutlined, 
+  CheckCircleOutlined,
+  FileSearchOutlined,
+  LayoutOutlined,
+  CheckSquareOutlined,
+  RocketOutlined,
+  FileProtectOutlined,
+  BuildOutlined,
+  BugOutlined,
+  ToolOutlined,
+  CheckOutlined
+} from '@ant-design/icons';
 import type { ProjectMetadata } from '../../types/project.types';
-import { Card, Button, Modal } from '../common';
-import { PhaseTimeline } from './PhaseTimeline';
+import { Button, Modal } from '../common';
 import { projectService } from '../../services/projectService';
 import { showSuccess, showError, showLongRunning } from '../common';
 import { Phase } from '../../types/project.types';
@@ -180,325 +194,243 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
       setIsFixing(false);
     }
   };
+  // Phase configuration
+  const PHASES: Phase[] = ['INIT', 'SPEC', 'BUILD', 'TEST', 'FIX', 'COMPLETE'];
+  const PHASE_NAMES: Record<Phase, string> = {
+    INIT: 'Initialize',
+    SPEC: 'Specification',
+    BUILD: 'Build',
+    TEST: 'Test',
+    FIX: 'Fix',
+    COMPLETE: 'Complete',
+  };
+  const PHASE_ICONS: Record<Phase, React.ReactNode> = {
+    INIT: <RocketOutlined />,
+    SPEC: <FileProtectOutlined />,
+    BUILD: <BuildOutlined />,
+    TEST: <BugOutlined />,
+    FIX: <ToolOutlined />,
+    COMPLETE: <CheckOutlined />,
+  };
+
+  // Prepare spec files table data
+  const specFilesData = project.specGenerated ? [
+    {
+      key: 'requirements',
+      file: 'Requirements',
+      icon: <FileSearchOutlined />,
+      status: project.specGenerated.requirements ? 'Generated' : 'Not generated',
+      date: project.specGenerated.requirements ? formatDate(project.specGenerated.requirements) : '-',
+    },
+    {
+      key: 'design',
+      file: 'Design',
+      icon: <LayoutOutlined />,
+      status: project.specGenerated.design ? 'Generated' : 'Not generated',
+      date: project.specGenerated.design ? formatDate(project.specGenerated.design) : '-',
+    },
+    {
+      key: 'tasks',
+      file: 'Tasks',
+      icon: <CheckSquareOutlined />,
+      status: project.specGenerated.tasks ? 'Generated' : 'Not generated',
+      date: project.specGenerated.tasks ? formatDate(project.specGenerated.tasks) : '-',
+    },
+  ] : [];
+
+  const specColumns: ColumnsType<typeof specFilesData[0]> = [
+    {
+      title: 'File',
+      dataIndex: 'file',
+      key: 'file',
+      render: (text: string, record) => (
+        <Space>
+          {record.icon}
+          <span>{text}</span>
+        </Space>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: 'Generated',
+      dataIndex: 'date',
+      key: 'date',
+    },
+  ];
+
+  // Prepare phase timeline table data
+  const currentPhaseIndex = PHASES.indexOf(project.phase);
+  const phaseTimelineData = PHASES.map((phase, index) => {
+    const isCompleted = index < currentPhaseIndex;
+    const isCurrent = phase === project.phase;
+
+    return {
+      key: phase,
+      phase: phase,
+      name: PHASE_NAMES[phase],
+      icon: PHASE_ICONS[phase],
+      status: isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Pending',
+      order: index + 1,
+    };
+  });
+
+  const phaseColumns: ColumnsType<typeof phaseTimelineData[0]> = [
+    {
+      title: '#',
+      dataIndex: 'order',
+      key: 'order',
+      width: 50,
+      align: 'center',
+    },
+    {
+      title: 'Phase',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text: string, record) => (
+        <Space>
+          {record.icon}
+          <span style={{ 
+            fontWeight: record.phase === project.phase ? 600 : 400,
+            color: record.phase === project.phase ? 'var(--color-brand-primary)' : 'inherit'
+          }}>
+            {text}
+          </span>
+        </Space>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: string) => {
+        let color = 'default';
+        if (status === 'Completed') color = 'success';
+        else if (status === 'In Progress') color = 'processing';
+        else if (status === 'Pending') color = 'default';
+
+        return (
+          <Tag color={color} icon={status === 'Completed' ? <CheckCircleOutlined /> : undefined}>
+            {status}
+          </Tag>
+        );
+      },
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Project Metadata Section */}
-      <Card>
-        <h2
-          className="text-xl font-semibold mb-4"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
-          Project Information
-        </h2>
-        
-        <div className="space-y-4">
-          {/* Project Name */}
-          <div>
-            <label
-              className="text-sm font-medium block mb-1"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              Name
-            </label>
-            <p
-              className="text-base"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              {project.name}
-            </p>
+    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      {/* Phase and Progress Bar */}
+      <Row gutter={[16, 16]} align="middle">
+        <Col xs={24} sm={8}>
+          <Space>
+            <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+              Phase:
+            </span>
+            <Tag color={
+              project.phase === 'INIT' || project.phase === 'SPEC' ? 'blue' :
+              project.phase === 'BUILD' ? 'default' :
+              project.phase === 'TEST' ? 'cyan' :
+              project.phase === 'FIX' ? 'red' :
+              project.phase === 'COMPLETE' ? 'green' : 'default'
+            }>
+              {project.phase}
+            </Tag>
+          </Space>
+        </Col>
+        <Col xs={24} sm={16}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-secondary)', whiteSpace: 'nowrap' }}>
+              Progress:
+            </span>
+            <div style={{ flex: 1 }}>
+              <div style={{ 
+                height: '8px', 
+                backgroundColor: 'var(--color-bg-tertiary)', 
+                borderRadius: '4px',
+                overflow: 'hidden',
+                position: 'relative'
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${project.completionPercentage}%`,
+                  background: 'linear-gradient(90deg, var(--color-brand-primary) 0%, var(--color-brand-secondary) 100%)',
+                  transition: 'width 0.3s ease',
+                  borderRadius: '4px'
+                }} />
+              </div>
+            </div>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-brand-primary)', minWidth: '45px', textAlign: 'right' }}>
+              {Math.round(project.completionPercentage)}%
+            </span>
           </div>
+        </Col>
+      </Row>
 
-          {/* Project Description */}
-          {project.description && (
-            <div>
-              <label
-                className="text-sm font-medium block mb-1"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                Description
-              </label>
-              <p
-                className="text-base"
-                style={{ color: 'var(--color-text-primary)' }}
-              >
-                {project.description}
-              </p>
-            </div>
-          )}
+      {/* Task Statistics - Compact Cards */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={8}>
+          <Statistic
+            title="Total Tasks"
+            value={project.taskStats.total}
+            prefix={<FileTextOutlined />}
+            valueStyle={{ color: 'var(--color-text-primary)', fontSize: '32px' }}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Statistic
+            title="Completed"
+            value={project.taskStats.completed}
+            prefix={<CheckCircleOutlined />}
+            valueStyle={{ color: 'var(--color-status-success)', fontSize: '32px' }}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Statistic
+            title="Progress"
+            value={project.completionPercentage}
+            suffix="%"
+            valueStyle={{ color: 'var(--color-brand-primary)', fontSize: '32px' }}
+          />
+        </Col>
+      </Row>
 
-          {/* Dates */}
-          {(project.createdAt || project.updatedAt) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {project.createdAt && (
-                <div>
-                  <label
-                    className="text-sm font-medium flex items-center gap-2 mb-1"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
-                    <Calendar size={16} />
-                    Created
-                  </label>
-                  <p
-                    className="text-base"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    {formatDate(project.createdAt)}
-                  </p>
-                </div>
-              )}
-
-              {project.updatedAt && (
-                <div>
-                  <label
-                    className="text-sm font-medium flex items-center gap-2 mb-1"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
-                    <Calendar size={16} />
-                    Last Updated
-                  </label>
-                  <p
-                    className="text-base"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    {formatDate(project.updatedAt)}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+      {/* Specification Files - Compact Table */}
+      {project.specGenerated && specFilesData.length > 0 && (
+        <div>
+          <h3 style={{ marginBottom: 8, fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Specification Files</h3>
+          <Table
+            dataSource={specFilesData}
+            columns={specColumns}
+            pagination={false}
+            size="small"
+            showHeader={false}
+          />
         </div>
-      </Card>
-
-      {/* Task Statistics Section */}
-      <Card>
-        <h2
-          className="text-xl font-semibold mb-4"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
-          Task Statistics
-        </h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {/* Total Tasks */}
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <FileText
-                size={20}
-                style={{ color: 'var(--color-text-secondary)' }}
-              />
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                Total
-              </span>
-            </div>
-            <p
-              className="text-2xl font-bold"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              {project.taskStats.total}
-            </p>
-          </div>
-
-          {/* Completed Tasks */}
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle
-                size={20}
-                style={{ color: 'var(--color-status-success)' }}
-              />
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                Completed
-              </span>
-            </div>
-            <p
-              className="text-2xl font-bold"
-              style={{ color: 'var(--color-status-success)' }}
-            >
-              {project.taskStats.completed}
-            </p>
-          </div>
-
-          {/* In Progress Tasks */}
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <Clock
-                size={20}
-                style={{ color: 'var(--color-brand-primary)' }}
-              />
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                In Progress
-              </span>
-            </div>
-            <p
-              className="text-2xl font-bold"
-              style={{ color: 'var(--color-brand-primary)' }}
-            >
-              {project.taskStats.inProgress}
-            </p>
-          </div>
-
-          {/* Pending Tasks */}
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <AlertCircle
-                size={20}
-                style={{ color: 'var(--color-text-secondary)' }}
-              />
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                Pending
-              </span>
-            </div>
-            <p
-              className="text-2xl font-bold"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              {project.taskStats.pending}
-            </p>
-          </div>
-
-          {/* Failed Tasks */}
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <XCircle
-                size={20}
-                style={{ color: 'var(--color-status-error)' }}
-              />
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                Failed
-              </span>
-            </div>
-            <p
-              className="text-2xl font-bold"
-              style={{ color: 'var(--color-status-error)' }}
-            >
-              {project.taskStats.failed}
-            </p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Spec Generation Timestamps Section */}
-      {project.specGenerated && (
-        <Card>
-          <h2
-            className="text-xl font-semibold mb-4"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            Specification Files
-          </h2>
-          
-          <div className="space-y-3">
-            {/* Requirements */}
-            <div className="flex items-center justify-between">
-              <span
-                className="text-base font-medium"
-                style={{ color: 'var(--color-text-primary)' }}
-              >
-                Requirements
-              </span>
-              <span
-                className="text-sm"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                {project.specGenerated.requirements
-                  ? `Generated ${formatDate(project.specGenerated.requirements)}`
-                  : 'Not generated'}
-              </span>
-            </div>
-
-            {/* Design */}
-            <div className="flex items-center justify-between">
-              <span
-                className="text-base font-medium"
-                style={{ color: 'var(--color-text-primary)' }}
-              >
-                Design
-              </span>
-              <span
-                className="text-sm"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                {project.specGenerated.design
-                  ? `Generated ${formatDate(project.specGenerated.design)}`
-                  : 'Not generated'}
-              </span>
-            </div>
-
-            {/* Tasks */}
-            <div className="flex items-center justify-between">
-              <span
-                className="text-base font-medium"
-                style={{ color: 'var(--color-text-primary)' }}
-              >
-                Tasks
-              </span>
-              <span
-                className="text-sm"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                {project.specGenerated.tasks
-                  ? `Generated ${formatDate(project.specGenerated.tasks)}`
-                  : 'Not generated'}
-              </span>
-            </div>
-          </div>
-        </Card>
       )}
 
-      {/* Phase Timeline */}
-      <Card>
-        <h2
-          className="text-xl font-semibold mb-6"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
-          Phase Timeline
-        </h2>
-        <PhaseTimeline currentPhase={project.phase} />
-      </Card>
+      {/* Phase Timeline - Compact Table */}
+      <div>
+        <h3 style={{ marginBottom: 8, fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Phase Timeline</h3>
+        <Table
+          dataSource={phaseTimelineData}
+          columns={phaseColumns}
+          pagination={false}
+          size="small"
+          rowClassName={(record) => record.phase === project.phase ? 'ant-table-row-selected' : ''}
+        />
+      </div>
 
       {/* Quick Actions */}
       {(shouldShowBuildButton(project.phase) ||
         shouldShowTestButton(project.phase) ||
         shouldShowFixButton(project)) && (
-        <Card>
-          <h2
-            className="text-xl font-semibold mb-4"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            Quick Actions
-          </h2>
-          
-          <div className="flex flex-wrap gap-3">
-            {/* Build Project Button */}
+        <div>
+          <h3 style={{ marginBottom: 8, fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Quick Actions</h3>
+          <Space wrap>
             {shouldShowBuildButton(project.phase) && (
               <Button
                 onClick={handleBuildProject}
@@ -510,8 +442,6 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
                 {isBuilding ? 'Building...' : 'Build Project'}
               </Button>
             )}
-
-            {/* Run Tests Button */}
             {shouldShowTestButton(project.phase) && (
               <Button
                 onClick={handleTestProject}
@@ -523,8 +453,6 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
                 {isTesting ? 'Testing...' : 'Run Tests'}
               </Button>
             )}
-
-            {/* Fix Issues Button */}
             {shouldShowFixButton(project) && (
               <Button
                 onClick={handleFixIssues}
@@ -536,8 +464,8 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
                 {isFixing ? 'Fixing...' : 'Fix Issues'}
               </Button>
             )}
-          </div>
-        </Card>
+          </Space>
+        </div>
       )}
 
       {/* Result Modal */}
@@ -585,6 +513,6 @@ export function OverviewTab({ project, onProjectUpdate }: OverviewTabProps) {
           </div>
         </div>
       </Modal>
-    </div>
+    </Space>
   );
 }

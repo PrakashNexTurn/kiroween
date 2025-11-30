@@ -6,11 +6,10 @@
  */
 
 import { useEffect } from 'react';
-import { Modal, Input, Textarea, Button } from '../common';
+import { Form, Input } from 'antd';
+import { Modal, Button } from '../common';
 import { showSuccess } from '../common/Toast';
 import { projectService } from '../../services/projectService';
-import { useForm } from '../../hooks';
-import { required, minLength, combine, notOnlyWhitespace } from '../../utils';
 import { handleApiError } from '../../utils/errorHandler';
 
 export interface CreateProjectModalProps {
@@ -25,113 +24,103 @@ interface FormData {
 }
 
 export function CreateProjectModal({ isOpen, onClose, onSuccess }: CreateProjectModalProps) {
-  // Use form hook with validation
-  const form = useForm<FormData>({
-    initialValues: {
-      name: '',
-      description: '',
-    },
-    validationSchema: {
-      name: combine(
-        (value) => required(value, 'Project name'),
-        (value) => notOnlyWhitespace('Project name')(value),
-        minLength(3, 'Project name')
-      ),
-      description: combine(
-        (value) => required(value, 'Project description'),
-        (value) => notOnlyWhitespace('Project description')(value),
-        minLength(10, 'Project description')
-      ),
-    },
-    onSubmit: async (values) => {
-      try {
-        // Call API to create project
-        await projectService.createProject(values.name.trim(), values.description.trim());
-
-        // Show success message
-        showSuccess('Project created successfully!');
-
-        // Reset form
-        form.resetForm();
-
-        // Close modal
-        onClose();
-
-        // Trigger success callback to refresh project list
-        onSuccess();
-      } catch (error) {
-        // Handle API error with user-friendly message
-        handleApiError(error, { customMessage: 'Failed to create project. Please try again.' });
-      }
-    },
-    validateOnBlur: true,
-  });
+  const [form] = Form.useForm<FormData>();
 
   // Reset form when modal closes
   useEffect(() => {
     if (!isOpen) {
-      form.resetForm();
+      form.resetFields();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, form]);
+
+  // Handle form submission
+  const handleSubmit = async (values: FormData) => {
+    try {
+      // Call API to create project
+      await projectService.createProject(values.name.trim(), values.description.trim());
+
+      // Show success message
+      showSuccess('Project created successfully!');
+
+      // Reset form
+      form.resetFields();
+
+      // Close modal
+      onClose();
+
+      // Trigger success callback to refresh project list
+      onSuccess();
+    } catch (error) {
+      // Handle API error with user-friendly message
+      handleApiError(error, { customMessage: 'Failed to create project. Please try again.' });
+    }
+  };
 
   // Handle modal close
   const handleClose = () => {
-    if (!form.isSubmitting) {
-      form.resetForm();
-      onClose();
-    }
+    form.resetFields();
+    onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="👻 Summon a New Project" size="md">
-      <form onSubmit={form.handleSubmit} className="space-y-6">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        autoComplete="off"
+      >
         {/* Project Name Input */}
-        <Input
+        <Form.Item
           label="Project Name"
-          placeholder="e.g., My Haunted App"
-          value={form.values.name}
-          onChange={(e) => form.handleChange('name')(e.target.value)}
-          onBlur={form.handleBlur('name')}
-          error={form.touched.name ? form.errors.name : undefined}
-          disabled={form.isSubmitting}
-          required
-          autoFocus
-        />
+          name="name"
+          rules={[
+            { required: true, message: 'Project name is required' },
+            { min: 3, message: 'Project name must be at least 3 characters' },
+            { whitespace: true, message: 'Project name cannot be only whitespace' },
+          ]}
+        >
+          <Input
+            placeholder="e.g., My Haunted App"
+            autoFocus
+          />
+        </Form.Item>
 
         {/* Project Description Textarea */}
-        <Textarea
+        <Form.Item
           label="Project Description"
-          placeholder="Describe what you want to build... The ghost will help bring it to life! ✨"
-          value={form.values.description}
-          onChange={(e) => form.handleChange('description')(e.target.value)}
-          onBlur={form.handleBlur('description')}
-          error={form.touched.description ? form.errors.description : undefined}
-          disabled={form.isSubmitting}
-          rows={4}
-          required
-        />
+          name="description"
+          rules={[
+            { required: true, message: 'Project description is required' },
+            { min: 10, message: 'Project description must be at least 10 characters' },
+            { whitespace: true, message: 'Project description cannot be only whitespace' },
+          ]}
+        >
+          <Input.TextArea
+            placeholder="Describe what you want to build... The ghost will help bring it to life! ✨"
+            rows={4}
+          />
+        </Form.Item>
 
         {/* Form Actions */}
-        <div className="flex justify-end gap-3 pt-4">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={form.isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={form.isSubmitting}
-            loading={form.isSubmitting}
-          >
-            {form.isSubmitting ? 'Summoning...' : 'Summon Project'}
-          </Button>
-        </div>
-      </form>
+        <Form.Item className="mb-0">
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              htmlType="submit"
+              variant="primary"
+            >
+              Summon Project
+            </Button>
+          </div>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 }

@@ -1,29 +1,34 @@
 import React from 'react';
+import { Card as AntCard } from 'antd';
+import type { CardProps as AntCardProps } from 'antd';
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends AntCardProps {
   children: React.ReactNode;
   hover?: boolean;
   backgroundColor?: string;
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ children, hover = false, backgroundColor, className = '', style, ...props }, ref) => {
-    const baseStyles = 'rounded-lg border border-border p-6 transition-all duration-slow ease-out shadow-sm';
-    const hoverStyles = hover ? 'hover:shadow-lg hover:scale-[1.02] hover:-translate-y-1 cursor-pointer' : '';
-    const bgStyles = backgroundColor ? '' : 'bg-background-primary';
-    
-    const combinedClassName = `${baseStyles} ${hoverStyles} ${bgStyles} ${className}`;
-    const combinedStyle = backgroundColor ? { backgroundColor, ...style } : style;
-    
+  ({ children, hover = false, backgroundColor, style, ...props }, ref) => {
+    const combinedStyle: React.CSSProperties = {
+      ...(backgroundColor && { backgroundColor }),
+      ...(hover && {
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+      }),
+      ...style,
+    };
+
+    const cardProps = {
+      ...props,
+      style: combinedStyle,
+      hoverable: hover,
+    };
+
     return (
-      <div
-        ref={ref}
-        className={combinedClassName}
-        style={combinedStyle}
-        {...props}
-      >
+      <AntCard ref={ref} {...cardProps}>
         {children}
-      </div>
+      </AntCard>
     );
   }
 );

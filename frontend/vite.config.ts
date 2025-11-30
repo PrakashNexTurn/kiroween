@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -7,7 +8,9 @@ import path from 'path'
  * - Path aliases (@/) for cleaner imports
  * - React plugin with compiler optimization
  * - Build optimization settings
- * Requirements: 13.1
+ * - Ant Design import optimization
+ * - Vitest configuration for testing
+ * Requirements: 13.1, 9.1, 9.5
  */
 export default defineConfig({
   plugins: [
@@ -33,14 +36,31 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['framer-motion', 'lucide-react'],
           'editor-vendor': ['@monaco-editor/react'],
+          'antd-vendor': ['antd'],
         },
       },
     },
     cssCodeSplit: true,
     assetsInlineLimit: 4096,
   },
+  css: {
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true,
+      },
+    },
+  },
+  optimizeDeps: {
+    include: ['antd'],
+  },
   server: {
     port: 5173,
     open: false,
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: [],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
 })

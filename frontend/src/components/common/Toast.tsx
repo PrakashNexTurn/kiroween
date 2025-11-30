@@ -1,156 +1,97 @@
-import toast, { Toaster, type ToastOptions } from 'react-hot-toast';
-import { CheckCircle, XCircle, Info, AlertTriangle, X, RotateCw } from 'lucide-react';
-
-// Custom toast component with dismiss button and optional retry
-const CustomToast = ({ 
-  message, 
-  type, 
-  onDismiss,
-  onRetry
-}: { 
-  message: string; 
-  type: 'success' | 'error' | 'info' | 'warning';
-  onDismiss: () => void;
-  onRetry?: () => void;
-}) => {
-  const icons = {
-    success: <CheckCircle className="h-5 w-5" />,
-    error: <XCircle className="h-5 w-5" />,
-    info: <Info className="h-5 w-5" />,
-    warning: <AlertTriangle className="h-5 w-5" />,
-  };
-
-  const colors = {
-    success: 'bg-status-success',
-    error: 'bg-status-error',
-    info: 'bg-status-info',
-    warning: 'bg-status-warning',
-  };
-
-  return (
-    <div className={`${colors[type]} text-text-inverse px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px] max-w-[500px] animate-slideInRight`}>
-      <div className="flex-shrink-0">{icons[type]}</div>
-      <div className="flex-1 text-sm font-medium">{message}</div>
-      {onRetry && (
-        <button
-          onClick={() => {
-            onDismiss();
-            onRetry();
-          }}
-          className="flex-shrink-0 hover:opacity-80 hover:scale-110 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white rounded px-2 py-1 bg-white/20 flex items-center gap-1"
-          aria-label="Retry operation"
-        >
-          <RotateCw className="h-3 w-3" />
-          <span className="text-xs font-semibold">Retry</span>
-        </button>
-      )}
-      <button
-        onClick={onDismiss}
-        className="flex-shrink-0 hover:opacity-80 hover:scale-110 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white rounded"
-        aria-label="Dismiss notification"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  );
-};
-
-// Default toast options
-const defaultOptions: ToastOptions = {
-  duration: 5000,
-  position: 'top-right',
-};
+import { notification } from 'antd';
+import type { ArgsProps } from 'antd/es/notification';
+import { CheckCircle, XCircle, Info, AlertTriangle, RotateCw } from 'lucide-react';
 
 // Extended options with retry callback
-export interface ToastOptionsWithRetry extends ToastOptions {
+export interface ToastOptionsWithRetry {
   onRetry?: () => void;
+  duration?: number;
 }
 
+// Configure notification globally
+notification.config({
+  placement: 'topRight',
+  top: 20,
+  duration: 5,
+  maxCount: 3,
+});
+
+// Helper to create notification with retry button
+const createNotificationConfig = (
+  type: 'success' | 'error' | 'info' | 'warning',
+  message: string,
+  options?: ToastOptionsWithRetry
+): ArgsProps => {
+  const icons = {
+    success: <CheckCircle style={{ color: '#52c41a' }} />,
+    error: <XCircle style={{ color: '#ff4d4f' }} />,
+    info: <Info style={{ color: '#1890ff' }} />,
+    warning: <AlertTriangle style={{ color: '#faad14' }} />,
+  };
+
+  const config: ArgsProps = {
+    message,
+    icon: icons[type],
+    duration: options?.duration || (type === 'error' ? 7 : 5),
+    closeIcon: true,
+  };
+
+  // Add retry button if onRetry is provided
+  if (options?.onRetry) {
+    config.btn = (
+      <button
+        onClick={() => {
+          notification.destroy();
+          options.onRetry!();
+        }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 12px',
+          background: 'rgba(255, 255, 255, 0.2)',
+          border: 'none',
+          borderRadius: '4px',
+          color: 'inherit',
+          cursor: 'pointer',
+          fontSize: '12px',
+          fontWeight: 600,
+        }}
+        aria-label="Retry operation"
+      >
+        <RotateCw style={{ width: '12px', height: '12px' }} />
+        <span>Retry</span>
+      </button>
+    );
+  }
+
+  return config;
+};
+
 // Helper functions
-export const showSuccess = (message: string, options?: ToastOptions) => {
-  return toast.custom(
-    (t) => (
-      <CustomToast
-        message={message}
-        type="success"
-        onDismiss={() => toast.dismiss(t.id)}
-      />
-    ),
-    { ...defaultOptions, ...options }
-  );
+export const showSuccess = (message: string, options?: ToastOptionsWithRetry) => {
+  notification.success(createNotificationConfig('success', message, options));
 };
 
 export const showError = (message: string, options?: ToastOptionsWithRetry) => {
-  return toast.custom(
-    (t) => (
-      <CustomToast
-        message={message}
-        type="error"
-        onDismiss={() => toast.dismiss(t.id)}
-        onRetry={options?.onRetry}
-      />
-    ),
-    { ...defaultOptions, duration: 7000, ...options } // Longer duration for errors with retry
+  notification.error(createNotificationConfig('error', message, options));
+};
+
+export const showInfo = (message: string, options?: ToastOptionsWithRetry) => {
+  notification.info(createNotificationConfig('info', message, options));
+};
+
+export const showWarning = (message: string, options?: ToastOptionsWithRetry) => {
+  notification.warning(createNotificationConfig('warning', message, options));
+};
+
+// Long-running operation notification (stays visible longer)
+export const showLongRunning = (message: string, options?: ToastOptionsWithRetry) => {
+  notification.info(
+    createNotificationConfig('info', message, { ...options, duration: 10 })
   );
 };
 
-export const showInfo = (message: string, options?: ToastOptions) => {
-  return toast.custom(
-    (t) => (
-      <CustomToast
-        message={message}
-        type="info"
-        onDismiss={() => toast.dismiss(t.id)}
-      />
-    ),
-    { ...defaultOptions, ...options }
-  );
-};
-
-export const showWarning = (message: string, options?: ToastOptions) => {
-  return toast.custom(
-    (t) => (
-      <CustomToast
-        message={message}
-        type="warning"
-        onDismiss={() => toast.dismiss(t.id)}
-      />
-    ),
-    { ...defaultOptions, ...options }
-  );
-};
-
-// Long-running operation toast (stays visible longer)
-export const showLongRunning = (message: string, options?: ToastOptions) => {
-  return toast.custom(
-    (t) => (
-      <CustomToast
-        message={message}
-        type="info"
-        onDismiss={() => toast.dismiss(t.id)}
-      />
-    ),
-    { ...defaultOptions, duration: 10000, ...options } // 10 seconds for long operations
-  );
-};
-
-// Toaster component to be added to the app root
-export const ToastContainer = () => {
-  return (
-    <Toaster
-      position="top-right"
-      toastOptions={{
-        // Prevent overlapping
-        style: {
-          background: 'transparent',
-          boxShadow: 'none',
-        },
-      }}
-      containerStyle={{
-        top: 20,
-        right: 20,
-      }}
-      gutter={12}
-    />
-  );
-};
+// ToastContainer is no longer needed with Ant Design
+// Ant Design notifications are rendered automatically
+export const ToastContainer = () => null;

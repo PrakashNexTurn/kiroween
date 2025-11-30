@@ -1,19 +1,22 @@
 /**
  * Header Component
  * Main application header with logo, breadcrumbs, and theme toggle
+ * Migrated to use Ant Design Layout.Header and Breadcrumb
  */
 
 import { useLocation, Link } from 'react-router-dom';
-import { ChevronRight, Home } from 'lucide-react';
+import { Layout, Breadcrumb } from 'antd';
+import { Home } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+
+const { Header: AntHeader } = Layout;
 
 /**
  * Breadcrumb item type
  */
 type BreadcrumbItem = {
-  label: string;
-  path: string;
-  icon?: React.ComponentType<{ size?: number }>;
+  title: string | React.ReactNode;
+  path?: string;
 };
 
 /**
@@ -24,21 +27,37 @@ function useBreadcrumbs(): BreadcrumbItem[] {
   const pathSegments = location.pathname.split('/').filter(Boolean);
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Home', path: '/', icon: Home },
+    {
+      title: (
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <Home size={16} />
+          <span>Home</span>
+        </Link>
+      ),
+      path: '/',
+    },
   ];
 
   let currentPath = '';
-  pathSegments.forEach((segment) => {
+  pathSegments.forEach((segment, index) => {
     currentPath += `/${segment}`;
-    
+
     // Format segment for display (capitalize, replace hyphens with spaces)
     const label = segment
       .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
 
+    const isLast = index === pathSegments.length - 1;
+
     breadcrumbs.push({
-      label,
+      title: isLast ? (
+        <span style={{ color: 'var(--color-text-primary)' }}>{label}</span>
+      ) : (
+        <Link to={currentPath} style={{ color: 'var(--color-text-secondary)' }}>
+          {label}
+        </Link>
+      ),
       path: currentPath,
     });
   });
@@ -50,43 +69,74 @@ function useBreadcrumbs(): BreadcrumbItem[] {
  * Header component
  * Displays app logo/title, navigation breadcrumbs, and theme toggle
  * Responsive design with mobile-friendly layout
+ * Uses Ant Design Layout.Header and Breadcrumb components
  */
 export function Header() {
   const breadcrumbs = useBreadcrumbs();
 
   return (
-    <header
-      className="sticky top-0 z-50 border-b transition-colors duration-300"
+    <AntHeader
       style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
         backgroundColor: 'var(--color-bg-primary)',
-        borderColor: 'var(--color-border)',
+        borderBottom: '1px solid var(--color-border)',
+        padding: 0,
+        height: 'auto',
+        lineHeight: 'normal',
+        transition: 'background-color 0.3s, border-color 0.3s',
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 12px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: '40px',
+          }}
+        >
           {/* Logo and Title */}
-          <div className="flex items-center gap-4">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Link
               to="/"
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                textDecoration: 'none',
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
             >
               <img
                 src="/kiro.svg"
                 alt="Kiro Logo"
                 className="dark:invert"
-                style={{ height: '50px', width: 'auto' }}
+                style={{ height: '32px', width: 'auto' }}
               />
               <h1
-                className="text-xl font-bold hidden sm:block"
-                style={{ color: 'var(--color-text-primary)' }}
+                className="hidden sm:block"
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  color: 'var(--color-text-primary)',
+                  margin: 0,
+                }}
               >
                 👻 Kiro's Ghost
               </h1>
               <span
-                className="text-xs hidden lg:block ml-2 px-2 py-1 rounded"
-                style={{ 
+                className="hidden lg:block"
+                style={{
+                  fontSize: '12px',
                   color: 'var(--color-text-tertiary)',
-                  backgroundColor: 'var(--color-bg-tertiary)'
+                  backgroundColor: 'var(--color-bg-tertiary)',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  marginLeft: '8px',
                 }}
               >
                 The Phantom IDE
@@ -95,55 +145,21 @@ export function Header() {
           </div>
 
           {/* Breadcrumbs - Hidden on mobile */}
-          <nav
-            className="hidden md:flex items-center gap-2"
-            aria-label="Breadcrumb"
-          >
-            <ol className="flex items-center gap-2">
-              {breadcrumbs.map((crumb, index) => {
-                const isLast = index === breadcrumbs.length - 1;
-                const Icon = crumb.icon;
-
-                return (
-                  <li key={crumb.path} className="flex items-center gap-2">
-                    {index > 0 && (
-                      <ChevronRight
-                        size={16}
-                        style={{ color: 'var(--color-text-tertiary)' }}
-                        aria-hidden="true"
-                      />
-                    )}
-                    {isLast ? (
-                      <span
-                        className="text-sm font-medium flex items-center gap-1"
-                        style={{ color: 'var(--color-text-primary)' }}
-                        aria-current="page"
-                      >
-                        {Icon && <Icon size={16} />}
-                        {crumb.label}
-                      </span>
-                    ) : (
-                      <Link
-                        to={crumb.path}
-                        className="text-sm font-medium hover:underline flex items-center gap-1 transition-colors"
-                        style={{ color: 'var(--color-text-secondary)' }}
-                      >
-                        {Icon && <Icon size={16} />}
-                        {crumb.label}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
+          <nav className="hidden md:flex" style={{ flex: 1, justifyContent: 'center' }}>
+            <Breadcrumb
+              items={breadcrumbs}
+              style={{
+                fontSize: '14px',
+              }}
+            />
           </nav>
 
           {/* Theme Toggle */}
-          <div className="flex items-center">
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <ThemeToggle />
           </div>
         </div>
       </div>
-    </header>
+    </AntHeader>
   );
 }

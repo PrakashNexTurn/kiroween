@@ -5,7 +5,8 @@
  * Requirements: 1.3.2, 1.3.3, 1.3.4, 1.3.5
  */
 
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { Form, Checkbox } from 'antd';
 import { Modal, Button } from '../common';
 import { FileText, AlertCircle } from 'lucide-react';
 
@@ -31,7 +32,14 @@ export function GenerateSteeringModal({
   isGenerating = false,
   hasExistingFiles = false,
 }: GenerateSteeringModalProps) {
-  const [forceRegenerate, setForceRegenerate] = useState(false);
+  const [form] = Form.useForm<{ forceRegenerate: boolean }>();
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      form.setFieldsValue({ forceRegenerate: false });
+    }
+  }, [isOpen, form]);
 
   /**
    * Handle generate button click
@@ -41,7 +49,8 @@ export function GenerateSteeringModal({
     if (isGenerating) return;
 
     try {
-      await onGenerate(forceRegenerate);
+      const values = form.getFieldsValue();
+      await onGenerate(values.forceRegenerate || false);
       // Modal will be closed by parent component on success
     } catch (error) {
       // Error handling is done by parent component
@@ -55,7 +64,7 @@ export function GenerateSteeringModal({
    */
   const handleClose = () => {
     if (!isGenerating) {
-      setForceRegenerate(false);
+      form.resetFields();
       onClose();
     }
   };
@@ -67,146 +76,144 @@ export function GenerateSteeringModal({
       title="Generate Steering Files"
       size="lg"
     >
-      <div className="space-y-6">
-        {/* Explanation Section */}
-        {/* Requirement 1.3.2: Add explanation of steering files */}
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <FileText className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-accent-primary)' }} />
-            <div>
-              <h3 className="text-base font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                What are Steering Files?
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-                Steering files provide AI assistants with project-specific context and conventions. 
-                They help guide code generation, maintain consistency, and ensure the AI understands 
-                your project's structure and requirements.
-              </p>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{ forceRegenerate: false }}
+      >
+        <div className="space-y-6">
+          {/* Explanation Section */}
+          {/* Requirement 1.3.2: Add explanation of steering files */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <FileText className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-accent-primary)' }} />
+              <div>
+                <h3 className="text-base font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  What are Steering Files?
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+                  Steering files provide AI assistants with project-specific context and conventions. 
+                  They help guide code generation, maintain consistency, and ensure the AI understands 
+                  your project's structure and requirements.
+                </p>
+              </div>
+            </div>
+
+            <div className="pl-8 space-y-2">
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                  📝 product.md
+                </p>
+                <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                  Project overview, purpose, and key features
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                  🔧 tech.md
+                </p>
+                <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                  Technology stack, dependencies, and common commands
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                  📁 structure.md
+                </p>
+                <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                  Project structure, file organization, and naming conventions
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="pl-8 space-y-2">
-            <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                📝 product.md
-              </p>
-              <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                Project overview, purpose, and key features
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                🔧 tech.md
-              </p>
-              <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                Technology stack, dependencies, and common commands
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                📁 structure.md
-              </p>
-              <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                Project structure, file organization, and naming conventions
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Warning for existing files */}
-        {/* Requirement 1.3.3: Show warning that existing files will be overwritten */}
-        {hasExistingFiles && (
-          <div 
-            className="flex items-start gap-3 p-4 rounded-lg border-2"
-            style={{ 
-              backgroundColor: 'var(--color-bg-secondary)',
-              borderColor: 'var(--color-status-warning)'
-            }}
-          >
-            <AlertCircle 
-              className="h-5 w-5 mt-0.5 flex-shrink-0" 
-              style={{ color: 'var(--color-status-warning)' }} 
-            />
-            <div>
-              <p className="text-sm font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
-                Existing Steering Files Detected
-              </p>
-              <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                Some or all steering files already exist in this project. 
-                Enable "Force Regeneration" below to overwrite them with fresh templates.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Force Regeneration Checkbox */}
-        {/* Requirement 1.3.3: Add force regeneration checkbox */}
-        {hasExistingFiles && (
-          <div className="flex items-start gap-3 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-            <input
-              type="checkbox"
-              id="force-regenerate"
-              checked={forceRegenerate}
-              onChange={(e) => setForceRegenerate(e.target.checked)}
-              disabled={isGenerating}
-              className="mt-1 h-4 w-4 rounded border-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              style={{
-                borderColor: 'var(--color-accent-primary)',
-                accentColor: 'var(--color-accent-primary)',
+          {/* Warning for existing files */}
+          {/* Requirement 1.3.3: Show warning that existing files will be overwritten */}
+          {hasExistingFiles && (
+            <div 
+              className="flex items-start gap-3 p-4 rounded-lg border-2"
+              style={{ 
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderColor: 'var(--color-status-warning)'
               }}
-            />
-            <label
-              htmlFor="force-regenerate"
-              className="text-sm cursor-pointer select-none"
-              style={{ color: 'var(--color-text-primary)' }}
             >
-              <span className="font-medium">Force Regeneration</span>
-              <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>
-                Overwrite existing steering files with fresh templates. 
-                Any manual edits will be lost.
+              <AlertCircle 
+                className="h-5 w-5 mt-0.5 flex-shrink-0" 
+                style={{ color: 'var(--color-status-warning)' }} 
+              />
+              <div>
+                <p className="text-sm font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                  Existing Steering Files Detected
+                </p>
+                <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                  Some or all steering files already exist in this project. 
+                  Enable "Force Regeneration" below to overwrite them with fresh templates.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Force Regeneration Checkbox */}
+          {/* Requirement 1.3.3: Add force regeneration checkbox */}
+          {hasExistingFiles && (
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+              <Form.Item
+                name="forceRegenerate"
+                valuePropName="checked"
+                className="mb-0"
+              >
+                <Checkbox disabled={isGenerating}>
+                  <div className="text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                    <span className="font-medium">Force Regeneration</span>
+                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>
+                      Overwrite existing steering files with fresh templates. 
+                      Any manual edits will be lost.
+                    </p>
+                  </div>
+                </Checkbox>
+              </Form.Item>
+            </div>
+          )}
+
+          {/* Info for new generation */}
+          {!hasExistingFiles && (
+            <div 
+              className="p-4 rounded-lg border-2"
+              style={{ 
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderColor: 'var(--color-accent-primary)'
+              }}
+            >
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                Three steering files will be created in your project's <code className="px-1.5 py-0.5 rounded text-xs font-mono" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>.kiro/steering/</code> directory. 
+                You can edit them later to customize the AI context for your project.
               </p>
-            </label>
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Info for new generation */}
-        {!hasExistingFiles && (
-          <div 
-            className="p-4 rounded-lg border-2"
-            style={{ 
-              backgroundColor: 'var(--color-bg-secondary)',
-              borderColor: 'var(--color-accent-primary)'
-            }}
-          >
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              Three steering files will be created in your project's <code className="px-1.5 py-0.5 rounded text-xs font-mono" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>.kiro/steering/</code> directory. 
-              You can edit them later to customize the AI context for your project.
-            </p>
+          {/* Action Buttons */}
+          {/* Requirement 1.3.5: Handle API calls */}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              onClick={handleClose}
+              variant="secondary"
+              disabled={isGenerating}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleGenerate}
+              variant="primary"
+              loading={isGenerating}
+              disabled={isGenerating}
+            >
+              {isGenerating ? 'Generating...' : 'Generate Steering Files'}
+            </Button>
           </div>
-        )}
-
-        {/* Action Buttons */}
-        {/* Requirement 1.3.5: Handle API calls */}
-        <div className="flex justify-end gap-3 pt-2">
-          <Button
-            type="button"
-            onClick={handleClose}
-            variant="secondary"
-            disabled={isGenerating}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            onClick={handleGenerate}
-            variant="primary"
-            loading={isGenerating}
-            disabled={isGenerating}
-          >
-            {isGenerating ? 'Generating...' : 'Generate Steering Files'}
-          </Button>
         </div>
-      </div>
+      </Form>
     </Modal>
   );
 }

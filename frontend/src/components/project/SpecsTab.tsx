@@ -6,8 +6,11 @@
  */
 
 import { useState } from 'react';
+import { Tabs } from 'antd';
+import { FileSearchOutlined, LayoutOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { SpecViewer } from './SpecViewer';
 import { GenerateSpecModal } from './GenerateSpecModal';
+import { TasksTab } from '../task/TasksTab';
 
 /**
  * Spec file type
@@ -20,23 +23,19 @@ type SpecType = 'requirements' | 'design' | 'tasks';
 interface SpecsTabProps {
   projectId: string;
   onGenerationStateChange?: (isGenerating: boolean) => void;
+  onTaskComplete?: () => void;
+  onExecutionStateChange?: (isExecuting: boolean) => void;
 }
 
 /**
  * SpecsTab component
  * Provides sub-tab navigation for requirements, design, and tasks specs
  */
-export function SpecsTab({ projectId, onGenerationStateChange }: SpecsTabProps) {
+export function SpecsTab({ projectId, onGenerationStateChange, onTaskComplete, onExecutionStateChange }: SpecsTabProps) {
   const [activeSpec, setActiveSpec] = useState<SpecType>('requirements');
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-
-  /**
-   * Get the file name for the active spec
-   */
-  const getFileName = (): 'requirements.md' | 'design.md' | 'tasks.md' => {
-    return `${activeSpec}.md` as 'requirements.md' | 'design.md' | 'tasks.md';
-  };
+  const [showTasksEditor, setShowTasksEditor] = useState(false);
 
   /**
    * Handle generate button click
@@ -53,73 +52,87 @@ export function SpecsTab({ projectId, onGenerationStateChange }: SpecsTabProps) 
     setRefreshKey((prev) => prev + 1);
   };
 
-  return (
-    <div>
-      {/* Sub-tab Navigation */}
-      <div
-        className="border-b mb-6"
-        style={{ borderColor: 'var(--color-border)' }}
-      >
-        <nav className="flex gap-6" aria-label="Specification files">
-          <button
-            onClick={() => setActiveSpec('requirements')}
-            className={`pb-3 px-2 font-medium text-sm transition-colors border-b-2 ${
-              activeSpec === 'requirements' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeSpec === 'requirements'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeSpec === 'requirements' ? 'page' : undefined}
-          >
-            Requirements
-          </button>
+  /**
+   * Handle edit tasks button click
+   */
+  const handleEditTasksClick = () => {
+    setShowTasksEditor(true);
+  };
 
-          <button
-            onClick={() => setActiveSpec('design')}
-            className={`pb-3 px-2 font-medium text-sm transition-colors border-b-2 ${
-              activeSpec === 'design' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeSpec === 'design'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeSpec === 'design' ? 'page' : undefined}
-          >
-            Design
-          </button>
-
-          <button
-            onClick={() => setActiveSpec('tasks')}
-            className={`pb-3 px-2 font-medium text-sm transition-colors border-b-2 ${
-              activeSpec === 'tasks' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeSpec === 'tasks'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeSpec === 'tasks' ? 'page' : undefined}
-          >
-            Tasks
-          </button>
-        </nav>
-      </div>
-
-      {/* Spec Content */}
-      <div>
+  const tabItems = [
+    {
+      key: 'requirements',
+      label: (
+        <span>
+          <FileSearchOutlined /> Requirements
+        </span>
+      ),
+      children: (
         <SpecViewer
-          key={`${activeSpec}-${refreshKey}`}
+          key={`requirements-${refreshKey}`}
           projectId={projectId}
-          fileName={getFileName()}
+          fileName="requirements.md"
           onGenerateClick={handleGenerateClick}
         />
-      </div>
+      ),
+    },
+    {
+      key: 'design',
+      label: (
+        <span>
+          <LayoutOutlined /> Design
+        </span>
+      ),
+      children: (
+        <SpecViewer
+          key={`design-${refreshKey}`}
+          projectId={projectId}
+          fileName="design.md"
+          onGenerateClick={handleGenerateClick}
+        />
+      ),
+    },
+    {
+      key: 'tasks',
+      label: (
+        <span>
+          <CheckSquareOutlined /> Tasks
+        </span>
+      ),
+      children: showTasksEditor ? (
+        <SpecViewer
+          key={`tasks-editor-${refreshKey}`}
+          projectId={projectId}
+          fileName="tasks.md"
+          onGenerateClick={handleGenerateClick}
+          startInEditMode={true}
+          onClose={() => {
+            setShowTasksEditor(false);
+            setRefreshKey((prev) => prev + 1);
+          }}
+        />
+      ) : (
+        <TasksTab
+          key={`tasks-${refreshKey}`}
+          projectId={projectId}
+          onTaskComplete={() => {
+            onTaskComplete?.();
+            setRefreshKey((prev) => prev + 1);
+          }}
+          onExecutionStateChange={onExecutionStateChange}
+          onEditClick={handleEditTasksClick}
+        />
+      ),
+    },
+  ];
+
+  return (
+    <div>
+      <Tabs
+        activeKey={activeSpec}
+        onChange={(key) => setActiveSpec(key as SpecType)}
+        items={tabItems}
+      />
 
       {/* Generate Modal */}
       <GenerateSpecModal

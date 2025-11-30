@@ -5,13 +5,12 @@
  * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Modal, Button, Textarea, LoadingSpinner } from '../common';
+import { Form, Input } from 'antd';
+import { Modal, Button, LoadingSpinner } from '../common';
 import { projectService } from '../../services/projectService';
 import { showSuccess } from '../common/Toast';
-import { useForm } from '../../hooks';
-import { required, minLength, combine, notOnlyWhitespace } from '../../utils';
 import { handleApiError } from '../../utils/errorHandler';
 
 /**
@@ -38,69 +37,65 @@ export function GenerateSpecModal({
   onSuccess,
   onGenerationStateChange,
 }: GenerateSpecModalProps) {
-  // Use form hook with validation
-  const form = useForm<{ description: string }>({
-    initialValues: {
-      description: '',
-    },
-    validationSchema: {
-      description: combine(
-        (value) => required(value, 'Description'),
-        (value) => notOnlyWhitespace('Description')(value),
-        minLength(10, 'Description')
-      ),
-    },
-    onSubmit: async (values) => {
-      try {
-        // Notify parent that generation is starting
-        if (onGenerationStateChange) {
-          onGenerationStateChange(true);
-        }
-
-        // Call API to generate spec
-        await projectService.generateSpec(projectId, specType, values.description.trim());
-
-        // Show success message
-        showSuccess(
-          `${specType.charAt(0).toUpperCase() + specType.slice(1)} spec generated successfully`
-        );
-
-        // Reset form
-        form.resetForm();
-
-        // Call success callback
-        if (onSuccess) {
-          onSuccess();
-        }
-
-        // Close modal
-        onClose();
-      } catch (err) {
-        // Handle API error with user-friendly message
-        handleApiError(err, { customMessage: 'Failed to generate spec' });
-      } finally {
-        // Notify parent that generation is complete
-        if (onGenerationStateChange) {
-          onGenerationStateChange(false);
-        }
-      }
-    },
-    validateOnBlur: true,
-  });
+  const [form] = Form.useForm<{ description: string }>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Reset form when modal closes
   useEffect(() => {
     if (!isOpen) {
-      form.resetForm();
+      form.resetFields();
     }
-  }, [isOpen]);
+  }, [isOpen, form]);
+
+  /**
+   * Handle form submission
+   */
+  const handleSubmit = async (values: { description: string }) => {
+    try {
+      setIsSubmitting(true);
+      
+      // Notify parent that generation is starting
+      if (onGenerationStateChange) {
+        onGenerationStateChange(true);
+      }
+
+      // Call API to generate spec
+      await projectService.generateSpec(projectId, specType, values.description.trim());
+
+      // Show success message
+      showSuccess(
+        `${specType.charAt(0).toUpperCase() + specType.slice(1)} spec generated successfully`
+      );
+
+      // Reset form
+      form.resetFields();
+
+      // Call success callback
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Close modal
+      onClose();
+    } catch (err) {
+      // Handle API error with user-friendly message
+      handleApiError(err, { customMessage: 'Failed to generate spec' });
+    } finally {
+      setIsSubmitting(false);
+      
+      // Notify parent that generation is complete
+      if (onGenerationStateChange) {
+        onGenerationStateChange(false);
+      }
+    }
+  };
 
   /**
    * Handle modal close
    */
   const handleClose = () => {
-    if (!form.isSubmitting) {
-      form.resetForm();
+    if (!isSubmitting) {
+      form.resetFields();
       onClose();
     }
   };
@@ -115,7 +110,7 @@ export function GenerateSpecModal({
   return (
     <>
       {/* Full-screen loading overlay during generation - rendered at body level */}
-      {form.isSubmitting && createPortal(
+      {isSubmitting && createPortal(
         <div 
           className="fixed inset-0 flex items-center justify-center"
           style={{ 
@@ -159,24 +154,32 @@ export function GenerateSpecModal({
         title={`Generate ${getSpecTypeDisplayName()} Spec`}
         size="md"
       >
-        <form onSubmit={form.handleSubmit}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          autoComplete="off"
+        >
           <div className="mb-6">
             <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
               Provide a description of what you want to build. The AI will generate a {specType}{' '}
               specification based on your input.
             </p>
 
-            <Textarea
+            <Form.Item
               label="Description"
-              value={form.values.description}
-              onChange={(e) => form.handleChange('description')(e.target.value)}
-              onBlur={form.handleBlur('description')}
-              placeholder={`Describe the ${specType} for your project...`}
-              rows={6}
-              error={form.touched.description ? form.errors.description : undefined}
-              disabled={form.isSubmitting}
-              required
-            />
+              name="description"
+              rules={[
+                { required: true, message: 'Description is required' },
+                { min: 10, message: 'Description must be at least 10 characters' },
+                { whitespace: true, message: 'Description cannot be only whitespace' },
+              ]}
+            >
+              <Input.TextArea
+                placeholder={`Describe the ${specType} for your project...`}
+                rows={6}
+              />
+            </Form.Item>
 
             <p className="text-xs mt-2" style={{ color: 'var(--color-text-tertiary)' }}>
               Minimum 10 characters. Be as detailed as possible for better results.
@@ -188,20 +191,20 @@ export function GenerateSpecModal({
               type="button"
               onClick={handleClose}
               variant="secondary"
-              disabled={form.isSubmitting}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
-              type="submit"
+              htmlType="submit"
               variant="primary"
-              loading={form.isSubmitting}
-              disabled={form.isSubmitting || !form.values.description.trim()}
+              loading={isSubmitting}
+              disabled={isSubmitting}
             >
-              {form.isSubmitting ? 'Generating...' : 'Generate'}
+              {isSubmitting ? 'Generating...' : 'Generate'}
             </Button>
           </div>
-        </form>
+        </Form>
       </Modal>
     </>
   );

@@ -1,0 +1,230 @@
+/**
+ * Markdown Styles for Ant Design Integration
+ * Ensures markdown content complements Ant Design typography
+ * Requirements: 8.2, 8.4
+ */
+
+/* Base markdown container */
+.markdown-content {
+  line-height: 1.7;
+  word-wrap: break-word;
+  text-align: left; /* Ensure left alignment */
+}
+
+/* Override any center alignment from parent */
+.markdown-content * {
+  text-align: left;
+}
+
+/* Ensure proper spacing for markdown elements within Ant Design Typography */
+.markdown-content .ant-typography {
+  margin-bottom: 0;
+}
+
+.markdown-content .ant-typography-paragraph {
+  margin-bottom: 1em;
+}
+
+.markdown-content .ant-typography-title {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content .ant-typography-title:first-child {
+  margin-top: 0;
+}
+
+/* List styling to match Ant Design */
+.markdown-content ul,
+.markdown-content ol {
+  margin: 1em 0 !important;
+  padding-left: 16px !important; /* Very minimal indentation */
+}
+
+.markdown-content li {
+  margin: 0.5em 0 !important;
+  line-height: 1.7 !important;
+  padding-left: 0 !important; /* No extra padding */
+}
+
+.markdown-content li > p {
+  margin: 0 !important;
+  display: inline !important; /* Keep text inline with list marker */
+}
+
+/* Nested lists - very minimal indentation */
+.markdown-content ul ul,
+.markdown-content ol ol,
+.markdown-content ul ol,
+.markdown-content ol ul {
+  margin: 0.5em 0 !important;
+  padding-left: 12px !important; /* Very minimal nested list indentation */
+}
+
+/* Fix for task numbers - prevent wrapping */
+.markdown-content ol {
+  list-style-position: outside; /* Ensure numbers stay outside */
+}
+
+.markdown-content ol li {
+  text-indent: 0; /* Reset text indent */
+}
+
+/* Ensure task list items with checkboxes align properly */
+.markdown-content li.task-list-item {
+  list-style: none;
+  margin-left: -16px; /* Match the padding-left of ol/ul */
+  padding-left: 16px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.markdown-content li.task-list-item input[type="checkbox"] {
+  margin-right: 8px;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+/* Code blocks with syntax highlighting */
+.markdown-content pre {
+  margin: 16px 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.markdown-content pre code {
+  display: block;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+/* Inline code using Ant Design Text code style */
+.markdown-content .ant-typography-code {
+  margin: 0 0.2em;
+}
+
+/* Blockquote styling */
+.markdown-content blockquote {
+  margin: 1.5em 0;
+  padding-left: 16px;
+  border-left: 4px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.markdown-content blockquote p {
+  margin: 0.5em 0;
+}
+
+/* Table styling */
+.markdown-content table {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+  border: 1px solid var(--color-border);
+  font-size: 0.9em;
+}
+
+.markdown-content thead {
+  background-color: var(--color-bg-tertiary);
+}
+
+.markdown-content th {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.markdown-content td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.markdown-content tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-content tbody tr:hover {
+  background-color: var(--color-hover);
+}
+
+/* Horizontal rule */
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 24px 0;
+}
+
+/* Images */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+  border-radius: 4px;
+}
+
+/* Task lists (GitHub Flavored Markdown) - handled above with better alignment */
+
+/* Links */
+.markdown-content .ant-typography-link {
+  word-break: break-word;
+}
+
+/* Ensure proper text color inheritance */
+.markdown-content {
+  color: var(--color-text-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .markdown-content {
+    font-size: 0.95em;
+  }
+  
+  .markdown-content table {
+    font-size: 0.85em;
+  }
+  
+  .markdown-content th,
+  .markdown-content td {
+    padding: 8px;
+  }
+  
+  .markdown-content pre {
+    font-size: 0.85em;
+  }
+}
+
+/* Dark theme adjustments for syntax highlighting */
+.markdown-content pre code {
+  background: transparent !important;
+}
+
+/* Ensure code blocks don't overflow on mobile */
+.markdown-content pre {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth scrolling for code blocks */
+.markdown-content pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.markdown-content pre::-webkit-scrollbar-track {
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+}
+
+.markdown-content pre::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.markdown-content pre::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}

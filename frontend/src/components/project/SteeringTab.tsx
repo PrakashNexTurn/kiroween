@@ -7,9 +7,13 @@
 
 import { useState, useEffect } from 'react';
 import { FileText, Plus, AlertCircle } from 'lucide-react';
-import { Button, Card, SteeringFileListSkeleton, showError } from '../common';
+import { Layout, List, Typography, Space, Spin, Alert } from 'antd';
+import { Button, showError } from '../common';
 import { SteeringFileViewer } from './SteeringFileViewer';
 import { steeringService } from '../../services';
+
+const { Sider, Content } = Layout;
+const { Text } = Typography;
 
 /**
  * Steering file information
@@ -94,9 +98,9 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
    */
   if (isLoading) {
     return (
-      <Card>
-        <SteeringFileListSkeleton />
-      </Card>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
+        <Spin size="large" />
+      </div>
     );
   }
 
@@ -106,60 +110,16 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
    */
   if (error) {
     return (
-      <Card>
-        <div className="flex flex-col items-center justify-center py-12 px-6 gap-4">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'var(--color-status-error-bg)' }}
-          >
-            <AlertCircle
-              size={32}
-              style={{ color: 'var(--color-status-error)' }}
-            />
-          </div>
-          <div className="text-center max-w-md">
-            <p
-              className="text-lg font-semibold mb-2"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              Failed to load steering files
-            </p>
-            <p
-              className="text-sm mb-4"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              {error}
-            </p>
-            <p
-              className="text-xs mb-6"
-              style={{ color: 'var(--color-text-tertiary)' }}
-            >
-              💡 Make sure the backend server is running and the project exists
-            </p>
-          </div>
-          <Button 
-            onClick={loadSteeringFiles} 
-            variant="primary" 
-            size="md"
-            className="flex items-center gap-2"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            Retry
-          </Button>
-        </div>
-      </Card>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', gap: '16px' }}>
+        <Alert
+          message="Error Loading Steering Files"
+          description={error}
+          type="error"
+          showIcon
+          icon={<AlertCircle style={{ width: '20px', height: '20px' }} />}
+        />
+        <Button onClick={loadSteeringFiles}>Retry</Button>
+      </div>
     );
   }
 
@@ -168,127 +128,205 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
    */
   if (steeringFiles.length === 0) {
     return (
-      <Card>
-        <div className="text-center py-12">
-          <FileText
-            size={48}
-            className="mx-auto mb-4"
-            style={{ color: 'var(--color-text-secondary)' }}
-          />
-          <h3
-            className="text-lg font-semibold mb-2"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            No Steering Files
-          </h3>
-          <p
-            className="text-sm mb-6 max-w-md mx-auto"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            Steering files provide AI assistants with project-specific context and conventions.
-            Generate them to help guide development.
-          </p>
-          <Button
-            onClick={handleGenerateClick}
-            variant="primary"
-            className="flex items-center gap-2 mx-auto"
-          >
-            <Plus size={18} />
-            Generate Steering Files
-          </Button>
-        </div>
-      </Card>
+      <div style={{ textAlign: 'center', padding: '48px 0' }}>
+        <FileText
+          size={48}
+          style={{ color: 'var(--color-text-secondary)', margin: '0 auto 16px' }}
+        />
+        <h3
+          style={{
+            fontSize: '18px',
+            fontWeight: 600,
+            color: 'var(--color-text-primary)',
+            marginBottom: '8px',
+          }}
+        >
+          No Steering Files
+        </h3>
+        <p
+          style={{
+            fontSize: '14px',
+            color: 'var(--color-text-secondary)',
+            marginBottom: '24px',
+            maxWidth: '400px',
+            margin: '0 auto 24px',
+          }}
+        >
+          Steering files provide AI assistants with project-specific context and conventions.
+          Generate them to help guide development.
+        </p>
+        <Button onClick={handleGenerateClick} variant="primary">
+          <Plus size={18} style={{ marginRight: '8px' }} />
+          Generate Steering Files
+        </Button>
+      </div>
     );
   }
 
   /**
-   * Render file list
+   * Render file list with Files tab style layout
    */
   return (
-    <div className="space-y-6">
-      {/* Header with generate button */}
-      <div className="flex items-center justify-between">
-        <h2
-          className="text-xl font-semibold"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
-          Steering Files
-        </h2>
-        <Button
-          onClick={handleGenerateClick}
-          variant="secondary"
-          size="sm"
-          className="flex items-center gap-2"
-        >
-          <Plus size={16} />
-          Regenerate
-        </Button>
-      </div>
+    <Layout style={{ height: 'calc(100vh - 250px)', minHeight: '500px', backgroundColor: 'var(--color-bg-primary)' }}>
+      {/* File List Sidebar */}
+      <Sider
+        width={250}
+        theme="light"
+        style={{
+          backgroundColor: 'var(--color-bg-secondary)',
+          borderRight: '1px solid var(--color-border)',
+        }}
+      >
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          {/* Header */}
+          <div style={{ padding: '12px', borderBottom: '1px solid var(--color-border)' }}>
+            <Space direction="vertical" size={8} style={{ width: '100%' }}>
+              <Text strong style={{ fontSize: '14px' }}>Steering Files</Text>
+              <Button
+                onClick={handleGenerateClick}
+                variant="secondary"
+                size="sm"
+                style={{ width: '100%' }}
+              >
+                <Plus size={14} style={{ marginRight: '4px' }} />
+                Regenerate
+              </Button>
+            </Space>
+          </div>
 
-      {/* File list */}
-      <Card>
-        <div className="space-y-2">
-          {steeringFiles.map((file) => (
-            <button
-              key={file.fileName}
-              onClick={() => handleFileSelect(file.fileName)}
-              className={`w-full text-left p-4 rounded-lg transition-colors ${
-                selectedFile === file.fileName
-                  ? 'ring-2 ring-[var(--color-brand-primary)]'
-                  : ''
-              }`}
+          {/* File List */}
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            <List
+              size="small"
+              dataSource={steeringFiles}
+              renderItem={(file) => (
+                <List.Item
+                  onClick={() => handleFileSelect(file.fileName)}
+                  style={{
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                    backgroundColor: selectedFile === file.fileName ? 'var(--color-brand-primary)' : 'transparent',
+                    color: selectedFile === file.fileName ? 'var(--color-bg-primary)' : 'var(--color-text-primary)',
+                    borderLeft: selectedFile === file.fileName ? '3px solid var(--color-brand-primary)' : '3px solid transparent',
+                  }}
+                >
+                  <List.Item.Meta
+                    avatar={
+                      <FileText
+                        size={14}
+                        style={{ 
+                          color: selectedFile === file.fileName ? 'var(--color-bg-primary)' : 'var(--color-brand-primary)',
+                          flexShrink: 0,
+                        }}
+                      />
+                    }
+                    title={
+                      <Text
+                        style={{
+                          fontSize: '12px',
+                          color: selectedFile === file.fileName ? 'var(--color-bg-primary)' : 'var(--color-text-primary)',
+                          fontWeight: selectedFile === file.fileName ? 500 : 400,
+                        }}
+                      >
+                        {file.fileName}
+                      </Text>
+                    }
+                    description={
+                      file.size && (
+                        <Text
+                          style={{
+                            fontSize: '10px',
+                            color: selectedFile === file.fileName ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)',
+                          }}
+                        >
+                          {(file.size / 1024).toFixed(1)} KB
+                        </Text>
+                      )
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          </div>
+        </div>
+      </Sider>
+
+      {/* File Content Area */}
+      <Content
+        style={{
+          backgroundColor: 'var(--color-bg-primary)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          height: '100%',
+        }}
+      >
+        {selectedFile ? (
+          <>
+            {/* File Header */}
+            <div
               style={{
-                backgroundColor:
-                  selectedFile === file.fileName
-                    ? 'var(--color-bg-tertiary)'
-                    : 'var(--color-bg-secondary)',
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-bg-secondary)',
+                flexShrink: 0,
               }}
             >
-              <div className="flex items-center gap-3">
-                <FileText
-                  size={20}
-                  style={{ color: 'var(--color-brand-primary)' }}
-                />
-                <div className="flex-1">
-                  <p
-                    className="font-medium"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    {file.fileName}
-                  </p>
-                  {file.modifiedAt && (
-                    <p
-                      className="text-xs mt-1"
-                      style={{ color: 'var(--color-text-secondary)' }}
-                    >
-                      Modified {new Date(file.modifiedAt).toLocaleDateString()}
-                    </p>
-                  )}
-                </div>
-                {file.size && (
-                  <span
-                    className="text-xs"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
-                    {(file.size / 1024).toFixed(1)} KB
-                  </span>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </Card>
+              <Text
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                {selectedFile}
+              </Text>
+            </div>
 
-      {/* File viewer */}
-      {selectedFile && (
-        <Card className="h-[600px]">
-          <SteeringFileViewer
-            projectId={projectId}
-            fileName={selectedFile}
-            onSaveSuccess={loadSteeringFiles}
-          />
-        </Card>
-      )}
-    </div>
+            {/* File Content */}
+            <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <SteeringFileViewer
+                projectId={projectId}
+                fileName={selectedFile}
+                onSaveSuccess={loadSteeringFiles}
+              />
+            </div>
+          </>
+        ) : (
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              <FileText
+                size={48}
+                style={{ color: 'var(--color-text-secondary)', marginBottom: '16px' }}
+              />
+              <p
+                style={{
+                  fontSize: '14px',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: '8px',
+                }}
+              >
+                No file selected
+              </p>
+              <p
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--color-text-tertiary)',
+                }}
+              >
+                Select a steering file to view and edit
+              </p>
+            </div>
+          </div>
+        )}
+      </Content>
+    </Layout>
   );
 }

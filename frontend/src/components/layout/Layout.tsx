@@ -1,26 +1,31 @@
 /**
  * Layout Component
  * Main application layout structure with header and content area
+ * Migrated to use Ant Design Layout components
  */
 
 import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Layout as AntLayout } from 'antd';
 import { Header } from './Header';
+
+const { Content: AntContent, Footer: AntFooter } = AntLayout;
 
 /**
  * Layout component
  * Provides the main application structure with Header and content area
  * Uses React Router's Outlet for rendering page content
- * Applies theme background colors and ensures responsive design
+ * Uses Ant Design Layout components for structure
  * Includes smooth page transition animations
  */
 export function Layout() {
   return (
-    <div
-      className="min-h-screen flex flex-col transition-colors duration-300"
+    <AntLayout
       style={{
+        minHeight: '100vh',
         backgroundColor: 'var(--color-bg-primary)',
         color: 'var(--color-text-primary)',
+        transition: 'background-color 0.3s, color 0.3s',
       }}
     >
       {/* Skip to main content link for accessibility */}
@@ -39,8 +44,14 @@ export function Layout() {
       <Header />
 
       {/* Main Content Area with Page Transitions */}
-      <main id="main-content" className="flex-1 w-full" tabIndex={-1}>
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <AntContent
+        id="main-content"
+        tabIndex={-1}
+        style={{
+          backgroundColor: 'var(--color-bg-primary)',
+        }}
+      >
+        <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '32px 16px' }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -50,21 +61,53 @@ export function Layout() {
             <Outlet />
           </motion.div>
         </div>
-      </main>
+      </AntContent>
 
       {/* Footer */}
-      <footer className="border-t mt-auto" style={{ borderColor: 'var(--color-border)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-sm text-center sm:text-left" style={{ color: 'var(--color-text-tertiary)' }}>
+      <AntFooter
+        style={{
+          borderTop: '1px solid var(--color-border)',
+          backgroundColor: 'var(--color-bg-primary)',
+          marginTop: 'auto',
+        }}
+      >
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '16px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px',
+            }}
+            className="sm:flex-row"
+          >
+            <p
+              style={{
+                fontSize: '14px',
+                color: 'var(--color-text-tertiary)',
+                textAlign: 'center',
+                margin: 0,
+              }}
+              className="sm:text-left"
+            >
               Built with 💀 for the Kiroween Hackathon
             </p>
-            <p className="text-xs italic text-center sm:text-right" style={{ color: 'var(--color-text-tertiary)' }}>
+            <p
+              style={{
+                fontSize: '12px',
+                fontStyle: 'italic',
+                color: 'var(--color-text-tertiary)',
+                textAlign: 'center',
+                margin: 0,
+              }}
+              className="sm:text-right"
+            >
               "Why install an IDE when the IDE can haunt you instead?"
             </p>
           </div>
         </div>
-      </footer>
-    </div>
+      </AntFooter>
+    </AntLayout>
   );
 }

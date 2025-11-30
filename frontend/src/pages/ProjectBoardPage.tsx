@@ -7,19 +7,22 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Row, Col, Input, Select as AntSelect, Button as AntButton, Spin, Alert, Empty, Space, Flex } from 'antd';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import type { InputRef } from 'antd';
 import { useProjects } from '../hooks/useProjects';
 import { useKeyboard } from '../hooks/useKeyboard';
-import { Button, LoadingSpinner, Select } from '../components/common';
 import { ProjectCard, CreateProjectModal } from '../components/project';
 import { Phase } from '../types/project.types';
-import { Plus, Search } from 'lucide-react';
+
+const { Search } = Input;
 
 export function ProjectBoardPage() {
   const { projects, loading, error, refetch } = useProjects(true, 30000);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPhase, setFilterPhase] = useState<Phase | 'all'>('all');
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchInputRef = useRef<InputRef>(null);
 
   // Global keyboard shortcuts
   // Requirements: 15.1, 15.2, 15.3
@@ -55,94 +58,98 @@ export function ProjectBoardPage() {
   // Loading state with skeleton cards
   if (loading && projects.length === 0) {
     return (
-      <div className="space-y-6">
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+        <Flex justify="space-between" align="flex-start" gap="middle" wrap="wrap">
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold', margin: 0, color: 'var(--color-text-primary)' }}>
             Projects
           </h1>
-        </div>
+        </Flex>
 
         {/* Loading Spinner */}
-        <div className="flex justify-center items-center py-20">
-          <LoadingSpinner size="lg" label="Loading projects..." />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '80px 0' }}>
+          <Spin size="large" tip="Loading projects..." />
         </div>
-      </div>
+      </Space>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <div className="space-y-6">
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+        <Flex justify="space-between" align="flex-start" gap="middle" wrap="wrap">
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold', margin: 0, color: 'var(--color-text-primary)' }}>
             Projects
           </h1>
-        </div>
+        </Flex>
 
         {/* Error Message */}
-        <div
-          className="p-6 rounded-lg border"
-          style={{
-            backgroundColor: 'var(--color-bg-secondary)',
-            borderColor: 'var(--color-status-error)',
-          }}
-        >
-          <h2
-            className="text-xl font-semibold mb-2"
-            style={{ color: 'var(--color-status-error)' }}
-          >
-            Error Loading Projects
-          </h2>
-          <p style={{ color: 'var(--color-text-secondary)' }}>{error}</p>
-          <Button onClick={refetch} variant="primary" className="mt-4">
-            Retry
-          </Button>
-        </div>
-      </div>
+        <Alert
+          message="Error Loading Projects"
+          description={error}
+          type="error"
+          showIcon
+          action={
+            <AntButton type="primary" onClick={refetch}>
+              Retry
+            </AntButton>
+          }
+        />
+      </Space>
     );
   }
 
   // Empty state when no projects exist
   if (projects.length === 0 && false) {
     return (
-      <div className="space-y-6">
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+        <Flex justify="space-between" align="flex-start" gap="middle" wrap="wrap">
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold', margin: 0, color: 'var(--color-text-primary)' }}>
             Projects
           </h1>
-          <Button onClick={() => setShowCreateModal(true)} variant="primary">
-            <Plus className="h-4 w-4 mr-2" />
+          <AntButton 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={() => setShowCreateModal(true)}
+          >
             Create Project
-          </Button>
-        </div>
+          </AntButton>
+        </Flex>
 
         {/* Empty State */}
-        <div
-          className="flex flex-col items-center justify-center py-20 px-4 rounded-lg border-2 border-dashed"
-          style={{ borderColor: 'var(--color-border)' }}
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={
+            <div style={{ textAlign: 'center', maxWidth: '448px', margin: '0 auto' }}>
+              <h2
+                style={{
+                  fontSize: '24px',
+                  fontWeight: 600,
+                  marginBottom: '8px',
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                👻 The Ghost Awaits...
+              </h2>
+              <p style={{ marginBottom: '24px', color: 'var(--color-text-secondary)' }}>
+                Summon your first project and let Kiro's spirit guide you from idea to production. 
+                No IDE installation required - just pure AI-powered development magic! ✨
+              </p>
+            </div>
+          }
         >
-          <div className="text-center max-w-md">
-            <h2
-              className="text-2xl font-semibold mb-2"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              👻 The Ghost Awaits...
-            </h2>
-            <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
-              Summon your first project and let Kiro's spirit guide you from idea to production. 
-              No IDE installation required - just pure AI-powered development magic! ✨
-            </p>
-            <Button onClick={() => setShowCreateModal(true)} variant="primary">
-              <Plus className="h-4 w-4 mr-2" />
-              Summon Your First Project
-            </Button>
-          </div>
-        </div>
-      </div>
+          <AntButton 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={() => setShowCreateModal(true)}
+          >
+            Summon Your First Project
+          </AntButton>
+        </Empty>
+      </Space>
     );
   }
 
@@ -152,45 +159,39 @@ export function ProjectBoardPage() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6"
     >
-      {/* Header Section */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-          👻 Your Haunted Projects
-        </h1>
-        <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
-          The ghost follows you everywhere - manage your projects from any device, anywhere
-        </p>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {/* Header Section */}
+        <div>
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
+            👻 Your Haunted Projects
+          </h1>
+          <p style={{ marginBottom: '24px', color: 'var(--color-text-secondary)' }}>
+            The ghost follows you everywhere - manage your projects from any device, anywhere
+          </p>
         
         {/* Search, Filter, and Create Project in one line */}
-        <div className="flex flex-col lg:flex-row gap-4">
+        <Row gutter={[16, 16]}>
           {/* Search Input */}
-          <div className="flex-1 relative">
+          <Col xs={24} lg={12}>
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5"
-              style={{ color: 'var(--color-text-tertiary)' }}
-            />
-            <input
               ref={searchInputRef}
-              type="text"
               placeholder="Search projects... (Press '/' to focus)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md border transition-colors duration-200 focus:outline-none focus:ring-2"
-              style={{
-                backgroundColor: 'var(--color-bg-primary)',
-                borderColor: 'var(--color-border)',
-                color: 'var(--color-text-primary)',
-              }}
+              prefix={<SearchOutlined />}
+              allowClear
+              size="large"
             />
-          </div>
+          </Col>
 
           {/* Phase Filter Dropdown */}
-          <div className="w-full lg:w-64">
-            <Select
+          <Col xs={24} sm={12} lg={6}>
+            <AntSelect
               value={filterPhase}
-              onChange={(e) => setFilterPhase(e.target.value as Phase | 'all')}
+              onChange={(value) => setFilterPhase(value as Phase | 'all')}
+              style={{ width: '100%' }}
+              size="large"
               options={[
                 { value: 'all', label: 'All Phases' },
                 { value: Phase.INIT, label: 'INIT' },
@@ -202,36 +203,37 @@ export function ProjectBoardPage() {
               ]}
               aria-label="Filter projects by phase"
             />
-          </div>
+          </Col>
 
           {/* Create Project Button */}
-          <Button 
-            onClick={() => setShowCreateModal(true)}
-            variant="primary" 
-            className="lg:w-auto"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Project
-          </Button>
-        </div>
+          <Col xs={24} sm={12} lg={6}>
+            <AntButton 
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setShowCreateModal(true)}
+              size="large"
+              block
+            >
+              Create Project
+            </AntButton>
+          </Col>
+        </Row>
       </div>
 
       {/* Project Cards Grid */}
       {filteredProjects.length === 0 ? (
-        <div
-          className="text-center py-12 rounded-lg"
-          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-        >
-          <p style={{ color: 'var(--color-text-secondary)' }}>
-            No projects match your search criteria.
-          </p>
-        </div>
+        <Empty
+          description="No projects match your search criteria."
+          style={{ padding: '48px 0' }}
+        />
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
+        <Row gutter={[16, 16]}>
           {filteredProjects.map((project) => (
-            <ProjectCard key={project.projectId} project={project} />
+            <Col key={project.projectId} xs={24} sm={12} md={8} lg={6} xl={6}>
+              <ProjectCard project={project} />
+            </Col>
           ))}
-        </div>
+        </Row>
       )}
 
       {/* Create Project Modal */}
@@ -242,6 +244,7 @@ export function ProjectBoardPage() {
           onSuccess={refetch}
         />
       )}
+      </Space>
     </motion.div>
   );
 }

@@ -4,8 +4,8 @@
  */
 
 import { motion } from 'framer-motion';
-import { Home, ArrowLeft } from 'lucide-react';
-import { Button } from '../components/common';
+import { Button, Result } from 'antd';
+import { HomeOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigation } from '../utils';
 
 /**
@@ -16,78 +16,73 @@ import { useNavigation } from '../utils';
 export function NotFoundPage() {
   const { goToHome, goBack } = useNavigation();
 
-  const handleGoHome = () => {
-    goToHome();
-  };
-
-  const handleGoBack = () => {
-    goBack();
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+      }}
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center max-w-md"
+        style={{ width: '100%', maxWidth: '672px' }}
       >
-        {/* 404 Number */}
-        <motion.h1
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-9xl font-bold mb-4"
-          style={{ color: 'var(--color-brand-primary)' }}
-        >
-          404
-        </motion.h1>
-
-        {/* Error Message */}
-        <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="text-3xl font-semibold mb-4"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
-          👻 The Ghost Got Lost
-        </motion.h2>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-lg mb-8"
-          style={{ color: 'var(--color-text-secondary)' }}
-        >
-          Even spirits get confused sometimes. This page has vanished into the void!
-        </motion.p>
-
-        {/* Action Buttons */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
-        >
-          <Button
-            onClick={handleGoBack}
-            variant="secondary"
-            className="flex items-center justify-center gap-2"
-          >
-            <ArrowLeft size={20} />
-            Go Back
-          </Button>
-          <Button
-            onClick={handleGoHome}
-            variant="primary"
-            className="flex items-center justify-center gap-2"
-          >
-            <Home size={20} />
-            Go Home
-          </Button>
-        </motion.div>
+        <Result
+          status="404"
+          title={
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <h1 style={{ fontSize: '32px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                👻 The Ghost Got Lost
+              </h1>
+            </motion.div>
+          }
+          subTitle={
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              style={{ fontSize: '18px', color: 'var(--color-text-secondary)' }}
+            >
+              Even spirits get confused sometimes. This page has vanished into the void!
+            </motion.p>
+          }
+          extra={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                justifyContent: 'center',
+              }}
+            >
+              <Button
+                icon={<ArrowLeftOutlined />}
+                onClick={goBack}
+              >
+                Go Back
+              </Button>
+              <Button
+                type="primary"
+                icon={<HomeOutlined />}
+                onClick={goToHome}
+              >
+                Go Home
+              </Button>
+            </motion.div>
+          }
+        />
       </motion.div>
     </div>
   );

@@ -151,16 +151,18 @@ User Request → Frontend → Backend API → kiro-cli → Kiro AI
 
 ```
 .
-├── backend/              # Backend orchestrator service
-│   ├── src/             # Python source code
-│   ├── tests/           # Test suite
+├── backend/              # Python FastAPI backend service
+│   ├── src/             # Application source code
+│   ├── tests/           # Test suite (unit, property, integration)
 │   ├── main.py          # Application entry point
 │   └── README.md        # Backend documentation
-├── frontend/            # Frontend React application
+├── frontend/            # React TypeScript frontend
 │   ├── src/             # React source code
 │   ├── public/          # Static assets
 │   └── README.md        # Frontend documentation
-├── .kiro/               # Kiro specs and project data
+├── .kiro/               # Kiro specs and steering rules
+│   ├── specs/           # Feature specifications
+│   └── steering/        # AI context files
 └── README.md            # This file
 ```
 
@@ -502,7 +504,7 @@ Want to help the ghost grow stronger? When contributing:
 
 ## 📜 License
 
-[Add your license here]
+MIT License - Built for the Kiroween Hackathon
 
 ---
 

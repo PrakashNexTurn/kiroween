@@ -87,3 +87,5 @@ export {
   getAnimationDuration,
   trapFocus,
 } from './accessibility';
+
+export { themeToAntdConfig } from './themeToAntdConfig';

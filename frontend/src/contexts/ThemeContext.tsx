@@ -7,6 +7,7 @@ import { createContext, useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { Theme, ThemeContextValue } from '../types/theme.types';
 import { themes, getTheme, getAvailableThemes } from '../styles/themes';
+import { themeToAntdConfig } from '../utils/themeToAntdConfig';
 
 /**
  * Theme context - provides theme state to all components
@@ -92,14 +93,6 @@ function applyTheme(theme: Theme): void {
   root.style.setProperty('--color-active', theme.colors.active);
   root.style.setProperty('--color-disabled', theme.colors.disabled);
 
-  // Apply dark mode class for Tailwind
-  // Both dark and halloween themes use dark mode styling
-  if (theme.name === 'dark' || theme.name === 'halloween') {
-    root.classList.add('dark');
-  } else {
-    root.classList.remove('dark');
-  }
-
   // Add smooth transition for theme switching
   // This ensures all color changes animate smoothly
   root.style.setProperty(
@@ -153,6 +146,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Get the actual theme object - memoize to ensure proper re-renders
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme]);
 
+  // Generate Ant Design theme configuration - memoize to avoid unnecessary recalculations
+  const antdTheme = useMemo(() => themeToAntdConfig(theme), [theme]);
+
   // Apply theme on mount and when theme changes
   useEffect(() => {
     applyTheme(theme);
@@ -177,10 +173,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     () => ({
       currentTheme,
       theme,
+      antdTheme,
       setTheme,
       availableThemes: getAvailableThemes(),
     }),
-    [currentTheme, theme]
+    [currentTheme, theme, antdTheme]
   );
 
   return (

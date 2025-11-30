@@ -1,5 +1,8 @@
 import React from 'react';
+import { Tag } from 'antd';
+import type { TagProps } from 'antd';
 import { Phase } from '../../types/project.types';
+import { useTheme } from '../../hooks/useTheme';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
@@ -16,42 +19,45 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-full';
-  
-  const sizeStyles = {
-    sm: 'px-2 py-0.5 text-xs',
-    md: 'px-3 py-1 text-sm',
-    lg: 'px-4 py-1.5 text-base',
+  const { theme } = useTheme();
+
+  // Map variant to Ant Design color
+  const getColor = (): string | undefined => {
+    if (customColor) return customColor;
+
+    const colorMap: Record<string, string> = {
+      // Phase variants - use theme colors
+      INIT: theme.colors.phase.init,
+      SPEC: theme.colors.phase.spec,
+      BUILD: theme.colors.phase.build,
+      TEST: theme.colors.phase.test,
+      FIX: theme.colors.phase.fix,
+      COMPLETE: theme.colors.phase.complete,
+      
+      // Status variants
+      success: theme.colors.status.success,
+      warning: theme.colors.status.warning,
+      error: theme.colors.status.error,
+      info: theme.colors.status.info,
+      default: theme.colors.background.tertiary,
+    };
+
+    return colorMap[variant];
   };
-  
-  const variantStyles = {
-    // Phase variants
-    INIT: 'bg-phase-init text-text-inverse',
-    SPEC: 'bg-phase-spec text-text-inverse',
-    BUILD: 'bg-phase-build text-text-inverse',
-    TEST: 'bg-phase-test text-text-inverse',
-    FIX: 'bg-phase-fix text-text-inverse',
-    COMPLETE: 'bg-phase-complete text-text-inverse',
-    
-    // Status variants
-    success: 'bg-status-success text-text-inverse',
-    warning: 'bg-status-warning text-text-primary',
-    error: 'bg-status-error text-text-inverse',
-    info: 'bg-status-info text-text-inverse',
-    default: 'bg-background-tertiary text-text-primary',
+
+  const tagProps: TagProps = {
+    color: getColor(),
+    className,
+    style: {
+      fontSize: size === 'sm' ? '12px' : size === 'lg' ? '16px' : '14px',
+      padding: size === 'sm' ? '2px 8px' : size === 'lg' ? '6px 16px' : '4px 12px',
+      borderRadius: '9999px', // Full rounded
+    },
   };
-  
-  const combinedClassName = customColor
-    ? `${baseStyles} ${sizeStyles[size]} ${className}`
-    : `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`;
-  
+
   return (
-    <span
-      className={combinedClassName}
-      style={customColor ? { backgroundColor: customColor, color: '#fff' } : undefined}
-      {...props}
-    >
+    <Tag {...tagProps} {...props}>
       {children}
-    </span>
+    </Tag>
   );
 };

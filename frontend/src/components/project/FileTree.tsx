@@ -2,7 +2,7 @@
  * FileTree Component
  * Displays an interactive file tree with expand/collapse functionality
  * 
- * Requirements: 3.3.3, 3.3.4, 3.3.5, 3.4.1, 3.4.2, 3.4.3, 3.4.4, 3.4.5, 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5
+ * Requirements: 3.3.3, 3.3.4, 3.3.5, 3.4.1, 3.4.2, 3.4.3, 3.4.4, 3.4.5, 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5, 10.1, 10.4
  * 
  * Optimizations:
  * - Virtual scrolling for large trees (react-window)
@@ -10,13 +10,29 @@
  * - Memoized tree nodes
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { Tree } from 'antd';
+import type { TreeProps, DataNode } from 'antd/es/tree';
+import {
+  ChevronRight,
+  ChevronDown,
+  Folder,
+  FolderOpen,
+  File,
+  FileText,
+  FileCode,
+  FileJson,
+  Image,
+  FileArchive,
+  Copy,
+} from 'lucide-react';
 import { getFileTree } from '../../services/fileSystemService';
-import { FileTreeSkeleton, showError } from '../common';
-import { FileTreeNode as FileTreeNodeComponent } from './FileTreeNode';
+import { FileTreeSkeleton, showError, showSuccess } from '../common';
 import { useFileTreeKeyboard } from '../../hooks/useFileTreeKeyboard';
 import { useFileTreeContext } from '../../contexts/FileTreeContext';
 import type { FileTreeNode } from '../../types/project.types';
+import { ContextMenu, type ContextMenuItem } from '../common/ContextMenu';
+import './FileTree.css';
 
 /**
  * Props for FileTree component
@@ -30,10 +46,150 @@ export interface FileTreeProps {
 }
 
 /**
+ * Get icon component based on file type/extension
+ * Requirement 3.4.3: Add file type icons
+ */
+const getFileIcon = (node: FileTreeNode, isExpanded: boolean) => {
+  const iconProps = {
+    size: 14,
+    className: 'flex-shrink-0',
+    style: { minWidth: '14px', minHeight: '14px', width: '14px', height: '14px' },
+    'aria-hidden': true as const,
+  };
+
+  // Folder icons
+  if (node.type === 'folder') {
+    return isExpanded ? (
+      <FolderOpen
+        {...iconProps}
+        style={{ color: 'var(--color-brand-primary)' }}
+      />
+    ) : (
+      <Folder
+        {...iconProps}
+        style={{ color: 'var(--color-text-secondary)' }}
+      />
+    );
+  }
+
+  // File icons based on extension
+  const ext = node.extension?.toLowerCase();
+  const iconStyle = { color: 'var(--color-text-secondary)' };
+
+  switch (ext) {
+    // Code files
+    case '.ts':
+    case '.tsx':
+    case '.js':
+    case '.jsx':
+    case '.py':
+    case '.java':
+    case '.cpp':
+    case '.c':
+    case '.cs':
+    case '.go':
+    case '.rs':
+    case '.rb':
+    case '.php':
+      return <FileCode {...iconProps} style={iconStyle} />;
+
+    // JSON/Config files
+    case '.json':
+    case '.yaml':
+    case '.yml':
+    case '.toml':
+    case '.xml':
+      return <FileJson {...iconProps} style={iconStyle} />;
+
+    // Text/Markdown files
+    case '.md':
+    case '.txt':
+    case '.log':
+    case '.csv':
+      return <FileText {...iconProps} style={iconStyle} />;
+
+    // Image files
+    case '.png':
+    case '.jpg':
+    case '.jpeg':
+    case '.gif':
+    case '.svg':
+    case '.ico':
+    case '.webp':
+      return <Image {...iconProps} style={iconStyle} />;
+
+    // Archive files
+    case '.zip':
+    case '.tar':
+    case '.gz':
+    case '.rar':
+    case '.7z':
+      return <FileArchive {...iconProps} style={iconStyle} />;
+
+    // Default file icon
+    default:
+      return <File {...iconProps} style={iconStyle} />;
+  }
+};
+
+/**
+ * Format file size in human-readable format
+ */
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 B';
+
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const k = 1024;
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${units[i]}`;
+};
+
+/**
+ * Highlight matching text in file/folder names
+ * Requirement 3.6.3: Highlight matching text in file names
+ */
+const highlightMatch = (text: string, query: string): React.ReactNode => {
+  if (!query.trim()) {
+    return text;
+  }
+
+  const lowerText = text.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const index = lowerText.indexOf(lowerQuery);
+
+  if (index === -1) {
+    return text;
+  }
+
+  const before = text.slice(0, index);
+  const match = text.slice(index, index + query.length);
+  const after = text.slice(index + query.length);
+
+  return (
+    <>
+      {before}
+      <span
+        style={{
+          backgroundColor: 'var(--color-brand-primary)',
+          color: 'var(--color-bg-primary)',
+          fontWeight: 600,
+          padding: '0 2px',
+          borderRadius: '2px',
+        }}
+      >
+        {match}
+      </span>
+      {after}
+    </>
+  );
+};
+
+/**
  * FileTree Component
  * Main component that fetches and displays the file tree
  * 
- * Requirements: 3.3.3, 3.3.4, 3.3.5, 3.4.1, 3.4.2, 3.4.4, 3.4.5, 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5
+ * Requirements: 3.3.3, 3.3.4, 3.3.5, 3.4.1, 3.4.2, 3.4.4, 3.4.5, 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5, 10.1, 10.4
  * Optimization: Uses virtual scrolling and cached state (Requirement 3.4.5)
  */
 export const FileTree: React.FC<FileTreeProps> = ({
@@ -47,6 +203,7 @@ export const FileTree: React.FC<FileTreeProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filteredTree, setFilteredTree] = useState<FileTreeNode | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; node: FileTreeNode } | null>(null);
   
   // Use context for caching (Optimization: Requirement 3.4.5)
   const { getTreeCache, setTreeCache, getExpandedFolders, setExpandedFolders: setExpandedFoldersCache } = useFileTreeContext();
@@ -82,7 +239,7 @@ export const FileTree: React.FC<FileTreeProps> = ({
 
   /**
    * Initialize keyboard navigation
-   * Requirements: 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5
+   * Requirements: 3.7.1, 3.7.2, 3.7.3, 3.7.4, 3.7.5, 10.4
    */
   const { treeRef } = useFileTreeKeyboard({
     tree: filteredTree || tree,
@@ -218,6 +375,163 @@ export const FileTree: React.FC<FileTreeProps> = ({
     }
   }, [tree, searchQuery, setExpandedFolders]);
 
+  /**
+   * Convert FileTreeNode to Ant Design DataNode format
+   * Requirement 10.1: Use Ant Design Tree component
+   */
+  const convertToDataNode = useCallback((node: FileTreeNode, isExpanded: boolean): DataNode => {
+    const isFolder = node.type === 'folder';
+    const icon = getFileIcon(node, isExpanded);
+    
+    // Create title with icon, name, and file size (size shows on hover)
+    const title = (
+      <span 
+        className="file-tree-item"
+        style={{ 
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          width: '100%',
+          minHeight: '20px',
+        }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setContextMenu({
+            x: e.clientX,
+            y: e.clientY,
+            node,
+          });
+        }}
+      >
+        <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+          {icon}
+        </span>
+        <span 
+          style={{ 
+            fontSize: '12px',
+            lineHeight: '20px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            flex: 1,
+            minWidth: 0,
+            textAlign: 'left',
+          }}
+          title={`${node.name}${!isFolder && node.size !== undefined ? ` (${formatFileSize(node.size)})` : ''}`}
+        >
+          {highlightMatch(node.name, searchQuery)}
+        </span>
+        {!isFolder && node.size !== undefined && (
+          <span
+            className="file-size-badge"
+            style={{ 
+              color: 'var(--color-text-tertiary)',
+              opacity: 0,
+              transition: 'opacity 0.2s',
+              fontSize: '10px',
+              lineHeight: '20px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            {formatFileSize(node.size)}
+          </span>
+        )}
+      </span>
+    );
+
+    const dataNode: DataNode = {
+      key: node.path,
+      title,
+      isLeaf: !isFolder,
+      children: isFolder && node.children 
+        ? node.children.map((child) => convertToDataNode(child, expandedFolders.has(child.path)))
+        : undefined,
+    };
+
+    return dataNode;
+  }, [searchQuery, expandedFolders]);
+
+  /**
+   * Convert tree to Ant Design format
+   */
+  const treeData = useMemo(() => {
+    const treeToRender = filteredTree || tree;
+    if (!treeToRender) return [];
+    return [convertToDataNode(treeToRender, expandedFolders.has(treeToRender.path))];
+  }, [filteredTree, tree, convertToDataNode, expandedFolders]);
+
+  /**
+   * Handle node selection
+   * Requirement 10.1: Maintain file selection
+   */
+  const handleSelect: TreeProps['onSelect'] = (selectedKeys) => {
+    if (selectedKeys.length > 0) {
+      const key = selectedKeys[0] as string;
+      onFileSelect(key);
+    }
+  };
+
+  /**
+   * Handle node expansion
+   * Requirement 10.1: Implement expand/collapse functionality
+   */
+  const handleExpand: TreeProps['onExpand'] = (expandedKeys) => {
+    const expandedSet = new Set(expandedKeys as string[]);
+    setExpandedFolders(expandedSet);
+  };
+
+  /**
+   * Handle context menu close
+   */
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  /**
+   * Copy path to clipboard
+   * Requirement 10.3: Maintain context menu integration
+   */
+  const handleCopyPath = async (path: string) => {
+    try {
+      await navigator.clipboard.writeText(path);
+      showSuccess(`Copied path: ${path}`);
+    } catch (error) {
+      console.error('Failed to copy path:', error);
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = path;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showSuccess(`Copied path: ${path}`);
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  /**
+   * Get context menu items
+   */
+  const getContextMenuItems = (): ContextMenuItem[] => {
+    if (!contextMenu) return [];
+    
+    return [
+      {
+        id: 'copy-path',
+        label: 'Copy Path',
+        icon: <Copy className="w-4 h-4" />,
+        onClick: () => handleCopyPath(contextMenu.node.path),
+      },
+    ];
+  };
+
 
 
   /**
@@ -341,31 +655,51 @@ export const FileTree: React.FC<FileTreeProps> = ({
   }
 
   /**
-   * Render file tree
+   * Render file tree using Ant Design Tree
+   * Requirements: 10.1, 10.4
    * Optimization: Memoized nodes prevent unnecessary re-renders (Requirement 3.4.5)
    */
-  const treeToRender = filteredTree || tree;
-
   return (
-    <div
-      ref={treeRef}
-      className="overflow-auto"
-      role="tree"
-      aria-label="Project file tree"
-      tabIndex={0}
-      style={{ outline: 'none' }}
-    >
-      {treeToRender && (
-        <FileTreeNodeComponent
-          node={treeToRender}
-          level={0}
-          onFileSelect={onFileSelect}
-          selectedFile={selectedFile}
-          expandedFolders={expandedFolders}
-          onToggleFolder={handleToggleFolder}
-          searchQuery={searchQuery}
+    <>
+      <div
+        ref={treeRef}
+        className="overflow-auto"
+        tabIndex={0}
+        style={{ outline: 'none' }}
+      >
+        <Tree
+          treeData={treeData}
+          selectedKeys={selectedFile ? [selectedFile] : []}
+          expandedKeys={Array.from(expandedFolders)}
+          onSelect={handleSelect}
+          onExpand={handleExpand}
+          showLine={false}
+          showIcon={false}
+          blockNode
+          switcherIcon={({ expanded }) => 
+            expanded ? (
+              <ChevronDown className="w-3 h-3" style={{ color: 'var(--color-text-secondary)' }} />
+            ) : (
+              <ChevronRight className="w-3 h-3" style={{ color: 'var(--color-text-secondary)' }} />
+            )
+          }
+          style={{
+            backgroundColor: 'transparent',
+            color: 'var(--color-text-primary)',
+          }}
+          className="custom-file-tree"
+        />
+      </div>
+      
+      {/* Context menu - Requirement 10.3 */}
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          items={getContextMenuItems()}
+          onClose={handleCloseContextMenu}
         />
       )}
-    </div>
+    </>
   );
 };

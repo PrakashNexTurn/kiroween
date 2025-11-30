@@ -6,10 +6,12 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
+import { ConfigProvider } from 'antd';
 import { Layout } from './components/layout';
 import { ToastContainer, ErrorBoundary } from './components/common';
 import { ProjectBoardPage, ProjectDetailPage, NotFoundPage } from './pages';
 import { FileTreeProvider } from './contexts/FileTreeContext';
+import { useTheme } from './hooks/useTheme';
 import { setupKeyboardUserDetection } from './utils/accessibility';
 import './App.css';
 
@@ -34,6 +36,9 @@ function AnimatedRoutes() {
 }
 
 function App() {
+  // Get Ant Design theme configuration from theme context
+  const { antdTheme } = useTheme();
+
   // Initialize accessibility features
   useEffect(() => {
     // Set up keyboard user detection for improved focus indicators
@@ -62,14 +67,16 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <FileTreeProvider>
-        <BrowserRouter>
-          <ToastContainer />
-          <AnimatedRoutes />
-        </BrowserRouter>
-      </FileTreeProvider>
-    </ErrorBoundary>
+    <ConfigProvider theme={antdTheme}>
+      <ErrorBoundary>
+        <FileTreeProvider>
+          <BrowserRouter>
+            <ToastContainer />
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </FileTreeProvider>
+      </ErrorBoundary>
+    </ConfigProvider>
   );
 }
 

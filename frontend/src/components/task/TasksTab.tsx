@@ -4,15 +4,16 @@
  * Displays task list with execution controls and log viewer
  * Implements task execution workflow
  * Enhanced with adhoc task execution functionality
+ * Migrated to use Ant Design List
  * 
- * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 2.1.1, 2.1.2, 2.1.3, 2.1.4, 2.1.5, 2.3.5
+ * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 2.1.1, 2.1.2, 2.1.3, 2.1.4, 2.1.5, 2.3.5, 3.4
  */
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Play, PlayCircle, AlertCircle, Zap } from 'lucide-react';
+import { List, Progress, Space, Typography, Card, Spin, Alert, Row, Col, Tooltip } from 'antd';
+import { Play, PlayCircle, AlertCircle, Zap, RefreshCw, Edit } from 'lucide-react';
 import { Button } from '../common/Button';
-import { LoadingSpinner } from '../common/LoadingSpinner';
 import { showSuccess, showError, showLongRunning } from '../common/Toast';
 import { TaskItem } from './TaskItem';
 import { LogViewer } from './LogViewer';
@@ -26,10 +27,13 @@ import { loadAdhocHistory, addAdhocTaskToHistory } from '../../utils/adhocTaskSt
 import { useKeyboard } from '../../hooks/useKeyboard';
 import type { Task } from '../../types';
 
+const { Title, Text } = Typography;
+
 export interface TasksTabProps {
   projectId: string;
   onTaskComplete?: () => void;
   onExecutionStateChange?: (isExecuting: boolean) => void;
+  onEditClick?: () => void;
 }
 
 /**
@@ -48,7 +52,7 @@ export interface TasksTabProps {
  * - 2.1.5: Disable button when adhoc task is executing
  * - 2.3.5: Refresh project status after adhoc task completion
  */
-export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: TasksTabProps) {
+export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, onEditClick }: TasksTabProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [executing, setExecuting] = useState(false);
@@ -475,17 +479,22 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <LoadingSpinner size="lg" />
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
+        <Spin size="large" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <AlertCircle className="w-12 h-12 text-status-error" />
-        <p className="text-text-secondary">{error}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', gap: '16px' }}>
+        <Alert
+          message="Error Loading Tasks"
+          description={error}
+          type="error"
+          showIcon
+          icon={<AlertCircle style={{ width: '20px', height: '20px' }} />}
+        />
         <Button onClick={fetchTasks}>Retry</Button>
       </div>
     );
@@ -493,8 +502,13 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
 
   if (tasks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <p className="text-text-secondary">No tasks found in tasks.md</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', gap: '16px' }}>
+        <Alert
+          message="No Tasks Found"
+          description="No tasks found in tasks.md"
+          type="info"
+          showIcon
+        />
         <Button onClick={fetchTasks}>Refresh</Button>
       </div>
     );
@@ -526,67 +540,76 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
       {/* Full-screen loading overlay during execution - rendered at body level */}
       {executing && createPortal(
         <div 
-          className="fixed inset-0 flex items-center justify-center"
           style={{ 
+            position: 'fixed',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
             backdropFilter: 'blur(4px)',
             zIndex: 9999,
-            margin: 0,
-            padding: 0,
-            left: 0,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            width: '100vw',
-            height: '100vh'
           }}
         >
-          <div 
-            className="rounded-lg p-8 shadow-2xl flex flex-col items-center gap-4"
+          <Card
             style={{
-              backgroundColor: 'var(--color-bg-primary)',
-              border: '2px solid var(--color-border)'
+              padding: '32px',
+              textAlign: 'center',
             }}
           >
-            <LoadingSpinner size="lg" />
-            <div className="text-center">
-              <p className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                Executing Task...
-              </p>
-              <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-                Please wait, this may take several minutes
-              </p>
-            </div>
-          </div>
+            <Space direction="vertical" size="large" align="center">
+              <Spin size="large" />
+              <div>
+                <Title level={4} style={{ margin: 0 }}>
+                  Executing Task...
+                </Title>
+                <Text type="secondary" style={{ fontSize: '14px' }}>
+                  Please wait, this may take several minutes
+                </Text>
+              </div>
+            </Space>
+          </Card>
         </div>,
         document.body
       )}
 
-    <div className="space-y-4">
-      {/* Compact Header with controls */}
-      <div className="flex items-center justify-between">
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      {/* Header with controls */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h2 className="text-lg font-semibold text-text-primary">Tasks</h2>
-          <p className="text-xs text-text-secondary mt-0.5">
+          <Title level={3} style={{ margin: 0 }}>Tasks</Title>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
             {completedCount}/{totalCount} ({progress.toFixed(0)}%)
-          </p>
+          </Text>
         </div>
 
-        <div className="flex items-center gap-2">
+        <Space size="small">
+          {onEditClick && (
+            <Button
+              onClick={onEditClick}
+              variant="primary"
+              size="sm"
+              disabled={executing}
+            >
+              <Edit style={{ width: '16px', height: '16px', marginRight: '4px' }} />
+              <span>Edit</span>
+            </Button>
+          )}
+
           <Button
             onClick={executeNextTask}
             disabled={!nextTask || executing}
-            variant="primary"
+            variant="secondary"
             size="sm"
           >
             {executing ? (
               <>
-                <LoadingSpinner size="sm" />
+                <Spin size="small" style={{ marginRight: '8px' }} />
                 <span>Executing...</span>
               </>
             ) : (
               <>
-                <Play className="w-4 h-4" />
+                <Play style={{ width: '16px', height: '16px', marginRight: '4px' }} />
                 <span>Execute Next</span>
               </>
             )}
@@ -598,114 +621,110 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
             variant="secondary"
             size="sm"
           >
-            <PlayCircle className="w-4 h-4" />
+            <PlayCircle style={{ width: '16px', height: '16px', marginRight: '4px' }} />
             <span>Execute All</span>
           </Button>
 
-          <Button onClick={fetchTasks} variant="ghost" size="sm" disabled={executing}>
-            Refresh
-          </Button>
-        </div>
-      </div>
-
-      {/* Execute Adhoc Task Button - Requirement 2.1.1, 2.1.3, 2.1.4, 2.1.5 */}
-      <div className="flex justify-center">
-        <Button
-          onClick={handleOpenAdhocModal}
-          disabled={loading || executing || isAdhocExecuting}
-          variant="primary"
-          size="md"
-          className="w-full max-w-md"
-          style={{
-            background: 'linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-accent-secondary) 100%)',
-            border: 'none',
-          }}
-          title="Execute Adhoc Task (Ctrl+K or Cmd+K)"
-        >
-          <Zap className="w-5 h-5" />
-          <span className="font-semibold">Execute Adhoc Task</span>
-          <kbd 
-            className="ml-2 px-2 py-0.5 text-xs rounded"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              fontFamily: 'monospace',
-            }}
+          {/* Execute Adhoc Task Button - Requirement 2.1.1, 2.1.3, 2.1.4, 2.1.5 */}
+          <Button
+            onClick={handleOpenAdhocModal}
+            disabled={loading || executing || isAdhocExecuting}
+            variant="secondary"
+            size="sm"
+            title="Execute Adhoc Task (Ctrl+K or Cmd+K)"
           >
-            {navigator.platform.includes('Mac') ? '⌘K' : 'Ctrl+K'}
-          </kbd>
-        </Button>
+            <Zap style={{ width: '16px', height: '16px', marginRight: '4px' }} />
+            <span>Adhoc Task</span>
+            <kbd 
+              style={{
+                marginLeft: '8px',
+                padding: '2px 6px',
+                fontSize: '11px',
+                borderRadius: '3px',
+                backgroundColor: 'var(--color-bg-tertiary)',
+                fontFamily: 'monospace',
+                color: 'var(--color-text-tertiary)',
+              }}
+            >
+              {navigator.platform.includes('Mac') ? '⌘K' : 'Ctrl+K'}
+            </kbd>
+          </Button>
+
+          <Tooltip title="Refresh tasks">
+            <Button 
+              onClick={fetchTasks} 
+              variant="ghost" 
+              size="sm" 
+              disabled={executing}
+              style={{ padding: '4px 8px' }}
+            >
+              <RefreshCw style={{ width: '16px', height: '16px' }} />
+            </Button>
+          </Tooltip>
+        </Space>
       </div>
 
-      {/* Compact Progress bar */}
-      <div 
-        className="w-full bg-background-tertiary rounded-full h-1.5"
-        role="progressbar"
-        aria-valuenow={Math.round(progress)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Task completion progress"
-      >
-        <div
-          className="bg-status-success h-1.5 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+      {/* Progress bar */}
+      <Progress
+        percent={Math.round(progress)}
+        strokeColor="var(--color-status-success)"
+        trailColor="var(--color-bg-tertiary)"
+        size="small"
+        showInfo={false}
+      />
 
-      {/* Task groups in columns (Requirement 7.2) */}
-      <div 
-        className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3"
-        role="list"
-        aria-label="Project tasks grouped by section"
-      >
+      {/* Task groups in columns (Requirement 7.2, 3.4) */}
+      <Row gutter={[12, 12]} role="list" aria-label="Project tasks grouped by section">
         {sortedGroups.map(([groupNumber, groupTasks]) => {
           const hasPendingTasks = groupTasks.some(t => t.status === 'pending' || t.status === 'in_progress');
           
           return (
-            <div 
-              key={groupNumber}
-              className="border rounded-lg p-3 space-y-1.5"
-              style={{
-                backgroundColor: 'var(--color-bg-secondary)',
-                borderColor: 'var(--color-border)',
-              }}
-            >
-              {/* Group header */}
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold text-text-primary">
-                  Section {groupNumber}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-text-secondary">
-                    {groupTasks.filter(t => t.status === 'completed').length}/{groupTasks.length}
-                  </span>
-                  <Button
-                    onClick={() => executeSectionTasks(groupNumber)}
-                    disabled={!hasPendingTasks || executing}
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                    title={`Execute all tasks in section ${groupNumber}`}
-                  >
-                    <Play className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Tasks in this group */}
-              <div className="space-y-1">
-                {groupTasks.map(task => (
-                  <TaskItem
-                    key={task.number}
-                    task={task}
-                    onClick={() => executeSpecificTask(task)}
-                    isNested={task.parent !== null}
-                  />
-                ))}
-              </div>
-            </div>
+            <Col key={groupNumber} xs={24} sm={24} md={12} lg={8} xl={6}>
+              <Card
+                size="small"
+                title={
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text strong style={{ fontSize: '14px' }}>
+                      Section {groupNumber}
+                    </Text>
+                    <Space size={8}>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        {groupTasks.filter(t => t.status === 'completed').length}/{groupTasks.length}
+                      </Text>
+                      <Button
+                        onClick={() => executeSectionTasks(groupNumber)}
+                        disabled={!hasPendingTasks || executing}
+                        variant="ghost"
+                        size="sm"
+                        style={{ height: '24px', padding: '0 8px' }}
+                        title={`Execute all tasks in section ${groupNumber}`}
+                      >
+                        <Play style={{ width: '12px', height: '12px' }} />
+                      </Button>
+                    </Space>
+                  </div>
+                }
+                style={{ height: '100%' }}
+              >
+                <List
+                  size="small"
+                  dataSource={groupTasks}
+                  renderItem={(task) => (
+                    <TaskItem
+                      key={task.number}
+                      task={task}
+                      onClick={() => executeSpecificTask(task)}
+                      isNested={task.parent !== null}
+                      allTasks={tasks}
+                    />
+                  )}
+                  split={false}
+                />
+              </Card>
+            </Col>
           );
         })}
-      </div>
+      </Row>
 
       {/* Log viewer (Requirement 7.5) */}
       <LogViewer
@@ -729,7 +748,7 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange }: 
         isExecuting={isAdhocExecuting}
         initialInstruction={adhocInitialInstruction}
       />
-    </div>
+    </Space>
     </>
   );
 }

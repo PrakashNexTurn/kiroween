@@ -2,6 +2,9 @@
  * FileTreeNode Component
  * Renders individual tree nodes recursively with proper indentation
  * 
+ * @deprecated This component is deprecated. FileTree now uses Ant Design Tree component.
+ * This file is kept for backward compatibility but is no longer used internally.
+ * 
  * Requirements: 3.4.1, 3.4.3
  */
 

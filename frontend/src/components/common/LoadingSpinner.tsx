@@ -1,35 +1,41 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Spin } from 'antd';
+import type { SpinProps } from 'antd';
 
 export interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'small' | 'default' | 'large';
   color?: string;
   className?: string;
   label?: string;
+  tip?: string;
 }
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  size = 'md',
+  size = 'default',
   color,
   className = '',
   label = 'Loading...',
+  tip,
 }) => {
-  const sizeStyles = {
-    sm: 'h-4 w-4',
-    md: 'h-8 w-8',
-    lg: 'h-12 w-12',
+  // Map old size format to Ant Design format
+  const mapSize = (s: typeof size): 'small' | 'default' | 'large' => {
+    if (s === 'sm' || s === 'small') return 'small';
+    if (s === 'lg' || s === 'large') return 'large';
+    return 'default';
   };
-  
-  const colorStyles = color ? '' : 'text-brand-primary';
-  
+
+  const spinProps: SpinProps = {
+    size: mapSize(size),
+    tip: tip || label,
+    className,
+  };
+
+  // Apply custom color if provided
+  const style = color ? { color } : undefined;
+
   return (
-    <div className={`flex flex-col items-center justify-center ${className}`} role="status">
-      <Loader2
-        className={`${sizeStyles[size]} ${colorStyles} animate-spin`}
-        style={color ? { color } : undefined}
-        aria-hidden="true"
-      />
-      <span className="sr-only">{label}</span>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Spin {...spinProps} style={style} />
     </div>
   );
 };

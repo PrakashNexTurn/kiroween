@@ -2,15 +2,17 @@
  * FileContentViewer Component
  * Displays file content using Monaco editor with syntax highlighting
  * 
- * Requirements: 3.5.1, 3.5.2, 3.5.3, 3.5.4, 3.5.5
+ * Requirements: 3.5.1, 3.5.2, 3.5.3, 3.5.4, 3.5.5, 8.1, 8.3
  * 
  * Optimization: Lazy load Monaco editor (Requirement 3.4.5)
  */
 
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { FileText, AlertCircle } from 'lucide-react';
+import { Alert } from 'antd';
 import { getFileContent, type FileContentResponse } from '../../services/fileSystemService';
 import { FileContentSkeleton, showError } from '../common';
+import { useTheme } from '../../hooks/useTheme';
 
 // Lazy load Monaco editor (Optimization: Requirement 3.4.5)
 const Editor = lazy(() => import('@monaco-editor/react'));
@@ -100,11 +102,20 @@ const getLanguageFromPath = (filePath: string): string => {
 /**
  * FileContentViewer component
  * Fetches and displays file content with Monaco editor
+ * Requirement 8.1: Display Monaco Editor within Ant Design layout components
+ * Requirement 8.3: Integrate Monaco Editor with Ant Design theme tokens
  */
 export function FileContentViewer({ projectId, filePath }: FileContentViewerProps) {
   const [fileData, setFileData] = useState<FileContentResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Get theme context to synchronize Monaco Editor theme (Requirement 8.3)
+  const { theme } = useTheme();
+  
+  // Determine Monaco theme based on application theme
+  // Both 'dark' and 'halloween' themes use Monaco's dark theme
+  const monacoTheme = theme.name === 'dark' || theme.name === 'halloween' ? 'vs-dark' : 'vs';
 
   useEffect(() => {
     let isMounted = true;
@@ -148,10 +159,15 @@ export function FileContentViewer({ projectId, filePath }: FileContentViewerProp
   // Loading state with skeleton
   // Requirement 3.3.4: Loading indicator for file content
   if (loading) {
-    return <FileContentSkeleton />;
+    return (
+      <div style={{ height: '100%' }}>
+        <FileContentSkeleton />
+      </div>
+    );
   }
 
   // Error state with graceful degradation (Requirement 3.3.5)
+  // Requirement 8.1: Use Ant Design components for layout
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 p-6">
@@ -230,28 +246,30 @@ export function FileContentViewer({ projectId, filePath }: FileContentViewerProp
   const language = fileData.language || getLanguageFromPath(filePath);
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Warning for truncated files */}
+    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Warning for truncated files - using Ant Design Alert */}
       {fileData.isTruncated && (
-        <div
-          className="px-3 py-2 text-xs border-b"
-          style={{
-            backgroundColor: 'var(--color-status-warning)',
-            color: 'var(--color-bg-primary)',
-            borderColor: 'var(--color-border)',
-          }}
-        >
-          ⚠️ File is too large ({(fileData.size / 1024 / 1024).toFixed(2)} MB). Showing truncated content.
-        </div>
+        <Alert
+          message={`File is too large (${(fileData.size / 1024 / 1024).toFixed(2)} MB). Showing truncated content.`}
+          type="warning"
+          showIcon
+          banner
+          closable={false}
+          style={{ borderRadius: 0, flexShrink: 0 }}
+        />
       )}
 
       {/* Monaco Editor with lazy loading (Optimization: Requirement 3.4.5) */}
-      <div className="flex-1">
+      {/* Requirement 8.1: Monaco Editor within Ant Design Card layout */}
+      {/* Requirement 8.3: Monaco theme synchronized with application theme */}
+      <div style={{ flex: 1, minHeight: 0, width: '100%', overflow: 'hidden' }}>
         <Suspense fallback={<FileContentSkeleton />}>
           <Editor
+            height="100%"
+            width="100%"
             value={fileData.content}
             language={language}
-            theme="vs-dark"
+            theme={monacoTheme}
             options={{
               readOnly: true,
               minimap: { enabled: true },

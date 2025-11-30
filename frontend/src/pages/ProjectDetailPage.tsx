@@ -8,13 +8,10 @@
 import { useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { Button as AntButton, Tabs, Skeleton, Alert, Space } from 'antd';
 import { useProjectDetail } from '../hooks/useProjectDetail';
 import { useKeyboard } from '../hooks/useKeyboard';
-import { Badge, ProgressBar, Button, CardSkeleton } from '../components/common';
 import { OverviewTab, SpecsTab, SteeringTab, GenerateSteeringModal, FilesTab } from '../components/project';
-import { TasksTab } from '../components/task';
-import { Phase } from '../types/project.types';
 import { useNavigation } from '../utils';
 import { steeringService } from '../services';
 import { showSuccess, showError, showLongRunning } from '../components/common';
@@ -23,27 +20,6 @@ import { showSuccess, showError, showLongRunning } from '../components/common';
  * Tab type for navigation
  */
 type TabType = 'overview' | 'specs' | 'tasks' | 'files' | 'steering';
-
-/**
- * Get phase color for badge
- */
-function getPhaseColor(phase: Phase): 'blue' | 'gray' | 'cyan' | 'red' | 'green' {
-  switch (phase) {
-    case Phase.INIT:
-    case Phase.SPEC:
-      return 'blue';
-    case Phase.BUILD:
-      return 'gray';
-    case Phase.TEST:
-      return 'cyan';
-    case Phase.FIX:
-      return 'red';
-    case Phase.COMPLETE:
-      return 'green';
-    default:
-      return 'gray';
-  }
-}
 
 /**
  * ProjectDetailPage component
@@ -155,23 +131,17 @@ export function ProjectDetailPage() {
   // Requirement 4.1.3: Consistent loading UI across features
   if (loading && !project) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 16px' }}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {/* Header skeleton */}
-          <div className="flex items-center gap-4">
-            <CardSkeleton lines={1} />
-          </div>
+          <Skeleton active paragraph={{ rows: 1 }} />
           
           {/* Tab navigation skeleton */}
-          <div className="flex gap-2">
-            <CardSkeleton lines={1} />
-            <CardSkeleton lines={1} />
-            <CardSkeleton lines={1} />
-          </div>
+          <Skeleton.Button active block />
           
           {/* Content skeleton */}
-          <CardSkeleton lines={10} />
-        </div>
+          <Skeleton active paragraph={{ rows: 10 }} />
+        </Space>
       </div>
     );
   }
@@ -179,32 +149,23 @@ export function ProjectDetailPage() {
   // Show error state
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div
-          className="rounded-lg p-6 text-center"
-          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-        >
-          <p
-            className="text-lg font-medium mb-4"
-            style={{ color: 'var(--color-status-error)' }}
-          >
-            Error loading project
-          </p>
-          <p
-            className="mb-6"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            {error}
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button onClick={handleBack} variant="secondary">
-              Back to Projects
-            </Button>
-            <Button onClick={refetch} variant="primary">
-              Try Again
-            </Button>
-          </div>
-        </div>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 16px' }}>
+        <Alert
+          message="Error loading project"
+          description={error}
+          type="error"
+          showIcon
+          action={
+            <Space>
+              <AntButton onClick={handleBack}>
+                Back to Projects
+              </AntButton>
+              <AntButton type="primary" onClick={refetch}>
+                Try Again
+              </AntButton>
+            </Space>
+          }
+        />
       </div>
     );
   }
@@ -212,27 +173,18 @@ export function ProjectDetailPage() {
   // Show not found state
   if (!project) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div
-          className="rounded-lg p-6 text-center"
-          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-        >
-          <p
-            className="text-lg font-medium mb-4"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            Project not found
-          </p>
-          <p
-            className="mb-6"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            The project you're looking for doesn't exist or has been deleted.
-          </p>
-          <Button onClick={handleBack} variant="primary">
-            Back to Projects
-          </Button>
-        </div>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 16px' }}>
+        <Alert
+          message="Project not found"
+          description="The project you're looking for doesn't exist or has been deleted."
+          type="warning"
+          showIcon
+          action={
+            <AntButton type="primary" onClick={handleBack}>
+              Back to Projects
+            </AntButton>
+          }
+        />
       </div>
     );
   }
@@ -243,191 +195,49 @@ export function ProjectDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      style={{ maxWidth: '1280px', margin: '0 auto', padding: '4px 12px' }}
     >
-      {/* Header Section */}
-      <div className="mb-6">
-        {/* Back Button and Project Name */}
-        <div className="flex items-center gap-4 mb-4">
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 px-3 py-2 rounded-md transition-colors hover:opacity-80"
-            style={{
-              color: 'var(--color-text-secondary)',
-              backgroundColor: 'var(--color-bg-secondary)',
-            }}
-            aria-label="Back to projects"
-          >
-            <ArrowLeft size={20} />
-            <span className="hidden sm:inline">Back</span>
-          </button>
-          
-          <h1
-            className="text-2xl sm:text-3xl font-bold flex-1"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            {project.name}
-          </h1>
-
-          {/* Generate Steering Button */}
-          {/* Requirement 1.3.1: Add button to project detail page header */}
-          <Button
-            onClick={handleGenerateSteeringClick}
-            variant="secondary"
-            size="sm"
-            className="hidden sm:flex"
-          >
-            Generate Steering
-          </Button>
-        </div>
-
-        {/* Phase Badge and Progress */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <span
-              className="text-sm font-medium"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              Phase:
-            </span>
-            <Badge color={getPhaseColor(project.phase)} size="md">
-              {project.phase}
-            </Badge>
-          </div>
-          
-          <div className="flex-1 max-w-md">
-            <ProgressBar
-              percentage={project.completionPercentage}
-              variant="primary"
-              showLabel
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Tab Navigation - Responsive with horizontal scroll on mobile */}
-      <div
-        className="border-b mb-6 -mx-4 sm:mx-0"
-        style={{ borderColor: 'var(--color-border)' }}
-      >
-        <nav className="flex gap-4 sm:gap-8 overflow-x-auto px-4 sm:px-0 scrollbar-hide" aria-label="Project sections">
-          <button
-            onClick={() => handleTabChange('overview')}
-            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
-              activeTab === 'overview' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeTab === 'overview'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeTab === 'overview' ? 'page' : undefined}
-          >
-            Overview
-          </button>
-          
-          <button
-            onClick={() => handleTabChange('specs')}
-            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
-              activeTab === 'specs' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeTab === 'specs'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeTab === 'specs' ? 'page' : undefined}
-          >
-            Specs
-          </button>
-          
-          <button
-            onClick={() => handleTabChange('tasks')}
-            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
-              activeTab === 'tasks' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeTab === 'tasks'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeTab === 'tasks' ? 'page' : undefined}
-          >
-            Tasks
-          </button>
-          
-          <button
-            onClick={() => handleTabChange('files')}
-            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
-              activeTab === 'files' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeTab === 'files'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeTab === 'files' ? 'page' : undefined}
-          >
-            Files
-          </button>
-          
-          <button
-            onClick={() => handleTabChange('steering')}
-            className={`pb-4 px-2 font-medium text-sm transition-all duration-base whitespace-nowrap border-b-2 hover:opacity-80 ${
-              activeTab === 'steering' ? 'border-current' : 'border-transparent'
-            }`}
-            style={{
-              color:
-                activeTab === 'steering'
-                  ? 'var(--color-brand-primary)'
-                  : 'var(--color-text-secondary)',
-            }}
-            aria-current={activeTab === 'steering' ? 'page' : undefined}
-          >
-            Steering
-          </button>
-        </nav>
-      </div>
-
-      {/* Tab Content */}
-      <div className="min-h-[400px]">
-        {activeTab === 'overview' && (
-          <OverviewTab project={project} onProjectUpdate={refetch} />
-        )}
-        
-        {activeTab === 'specs' && (
-          <SpecsTab 
-            projectId={projectId || ''} 
-            onGenerationStateChange={setIsGeneratingSpec}
-          />
-        )}
-        
-        {activeTab === 'tasks' && (
-          <TasksTab 
-            projectId={projectId || ''} 
-            onTaskComplete={refetch} 
-            onExecutionStateChange={setIsExecutingTask}
-          />
-        )}
-        
-        {activeTab === 'files' && (
-          <FilesTab 
-            projectId={projectId || ''} 
-          />
-        )}
-        
-        {activeTab === 'steering' && (
-          <SteeringTab 
-            projectId={projectId || ''} 
-            onGenerateClick={handleGenerateSteeringClick}
-            key={steeringRefreshTrigger}
-          />
-        )}
-      </div>
+      {/* Tab Navigation */}
+      <Tabs
+        activeKey={activeTab}
+        onChange={(key) => handleTabChange(key as TabType)}
+        size="small"
+        items={[
+          {
+            key: 'overview',
+            label: 'Overview',
+            children: <OverviewTab project={project} onProjectUpdate={refetch} />,
+          },
+          {
+            key: 'steering',
+            label: 'Steering',
+            children: (
+              <SteeringTab 
+                projectId={projectId || ''} 
+                onGenerateClick={handleGenerateSteeringClick}
+                key={steeringRefreshTrigger}
+              />
+            ),
+          },
+          {
+            key: 'specs',
+            label: 'Specs',
+            children: (
+              <SpecsTab 
+                projectId={projectId || ''} 
+                onGenerationStateChange={setIsGeneratingSpec}
+                onTaskComplete={refetch}
+                onExecutionStateChange={setIsExecutingTask}
+              />
+            ),
+          },
+          {
+            key: 'files',
+            label: 'Files',
+            children: <FilesTab projectId={projectId || ''} />,
+          },
+        ]}
+      />
 
       {/* Generate Steering Modal */}
       {/* Requirement 1.3.1: Open GenerateSteeringModal on click */}

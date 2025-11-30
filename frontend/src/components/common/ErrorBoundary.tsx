@@ -1,6 +1,9 @@
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { Button } from './Button';
+import { Alert, Button, Space, Typography, Collapse } from 'antd';
+import { WarningOutlined, ReloadOutlined, RollbackOutlined } from '@ant-design/icons';
+
+const { Title, Paragraph, Text } = Typography;
 
 interface Props {
   children: ReactNode;
@@ -64,75 +67,123 @@ export class ErrorBoundary extends Component<Props, State> {
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background-primary p-4">
-          <div className="max-w-2xl w-full bg-background-secondary rounded-lg shadow-lg p-8">
-            <div className="text-center">
-              <div className="mb-6">
-                <svg
-                  className="mx-auto h-16 w-16 text-red-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              
-              <h1 className="text-3xl font-bold text-text-primary mb-4">
-                Oops! Something went wrong
-              </h1>
-              
-              <p className="text-text-secondary mb-6">
-                We encountered an unexpected error. Please try reloading the page.
-              </p>
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            backgroundColor: 'var(--color-background-primary)',
+          }}
+        >
+          <div style={{ maxWidth: '800px', width: '100%' }}>
+            <Alert
+              message={
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <WarningOutlined
+                      style={{
+                        fontSize: '64px',
+                        color: 'var(--ant-color-error)',
+                        marginBottom: '16px',
+                      }}
+                    />
+                    <Title level={2} style={{ marginBottom: '8px' }}>
+                      Oops! Something went wrong
+                    </Title>
+                    <Paragraph style={{ fontSize: '16px', marginBottom: '24px' }}>
+                      We encountered an unexpected error. Please try reloading the page.
+                    </Paragraph>
+                  </div>
 
-              {this.state.error && (
-                <div className="mb-6 text-left">
-                  <details className="bg-background-tertiary rounded-lg p-4">
-                    <summary className="cursor-pointer text-text-primary font-medium mb-2">
-                      Error Details
-                    </summary>
-                    <div className="mt-2 text-sm text-text-secondary font-mono">
-                      <p className="font-semibold text-red-500 mb-2">
-                        {this.state.error.name}: {this.state.error.message}
-                      </p>
-                      {this.state.errorInfo && (
-                        <pre className="whitespace-pre-wrap overflow-auto max-h-64 text-xs">
-                          {this.state.errorInfo.componentStack}
-                        </pre>
-                      )}
-                    </div>
-                  </details>
-                </div>
-              )}
+                  {this.state.error && (
+                    <Collapse
+                      ghost
+                      items={[
+                        {
+                          key: '1',
+                          label: 'Error Details',
+                          children: (
+                            <div>
+                              <Text
+                                strong
+                                style={{
+                                  color: 'var(--ant-color-error)',
+                                  display: 'block',
+                                  marginBottom: '8px',
+                                }}
+                              >
+                                {this.state.error.name}: {this.state.error.message}
+                              </Text>
+                              {this.state.errorInfo && (
+                                <pre
+                                  style={{
+                                    whiteSpace: 'pre-wrap',
+                                    overflow: 'auto',
+                                    maxHeight: '256px',
+                                    fontSize: '12px',
+                                    backgroundColor: 'var(--color-background-tertiary)',
+                                    padding: '12px',
+                                    borderRadius: '4px',
+                                    fontFamily: 'monospace',
+                                  }}
+                                >
+                                  {this.state.errorInfo.componentStack}
+                                </pre>
+                              )}
+                            </div>
+                          ),
+                        },
+                      ]}
+                    />
+                  )}
 
-              <div className="flex gap-3 justify-center">
-                <Button
-                  onClick={this.handleReset}
-                  variant="secondary"
-                  size="lg"
-                >
-                  Try Again
-                </Button>
-                <Button
-                  onClick={this.handleReload}
-                  variant="primary"
-                  size="lg"
-                >
-                  Reload Page
-                </Button>
-              </div>
-              
-              <p className="text-xs text-text-tertiary mt-6">
-                💡 If this problem persists, try clearing your browser cache or checking the browser console for more details
-              </p>
-            </div>
+                  <Space
+                    style={{
+                      width: '100%',
+                      justifyContent: 'center',
+                      marginTop: '16px',
+                    }}
+                  >
+                    <Button
+                      icon={<RollbackOutlined />}
+                      onClick={this.handleReset}
+                      size="large"
+                    >
+                      Try Again
+                    </Button>
+                    <Button
+                      type="primary"
+                      icon={<ReloadOutlined />}
+                      onClick={this.handleReload}
+                      size="large"
+                    >
+                      Reload Page
+                    </Button>
+                  </Space>
+
+                  <Paragraph
+                    type="secondary"
+                    style={{
+                      textAlign: 'center',
+                      fontSize: '12px',
+                      marginTop: '16px',
+                      marginBottom: 0,
+                    }}
+                  >
+                    💡 If this problem persists, try clearing your browser cache or checking the
+                    browser console for more details
+                  </Paragraph>
+                </Space>
+              }
+              type="error"
+              showIcon={false}
+              style={{
+                padding: '32px',
+                backgroundColor: 'var(--color-background-secondary)',
+              }}
+            />
           </div>
         </div>
       );

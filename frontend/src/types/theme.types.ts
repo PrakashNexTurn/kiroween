@@ -209,6 +209,7 @@ export interface Theme {
 export interface ThemeContextValue {
   currentTheme: string;
   theme: Theme;
+  antdTheme: any; // ThemeConfig from antd - using any to avoid circular dependency
   setTheme: (themeName: string) => void;
   availableThemes: string[];
 }

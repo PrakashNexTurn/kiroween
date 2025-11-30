@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { Skeleton as AntSkeleton } from 'antd';
 
 /**
  * Props for Skeleton component
@@ -29,30 +30,32 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   variant = 'rectangular',
   animation = 'pulse',
 }) => {
-  const variantStyles = {
-    text: 'rounded',
-    circular: 'rounded-full',
-    rectangular: 'rounded-md',
-  };
+  const active = animation !== 'none';
 
-  const animationStyles = {
-    pulse: 'animate-pulse',
-    wave: 'animate-shimmer',
-    none: '',
-  };
+  // For circular variant, use Avatar skeleton
+  if (variant === 'circular') {
+    return (
+      <AntSkeleton.Avatar
+        active={active}
+        size={typeof width === 'number' ? width : 'default'}
+        className={className}
+      />
+    );
+  }
 
+  // For text and rectangular variants, use Button skeleton with custom styling
   const style: React.CSSProperties = {
     width: typeof width === 'number' ? `${width}px` : width,
     height: typeof height === 'number' ? `${height}px` : height,
-    backgroundColor: 'var(--color-bg-tertiary)',
   };
 
   return (
-    <div
-      className={`${variantStyles[variant]} ${animationStyles[animation]} ${className}`}
+    <AntSkeleton.Button
+      active={active}
       style={style}
-      role="status"
-      aria-label="Loading..."
+      className={className}
+      block={!width}
+      shape={variant === 'text' ? 'default' : 'default'}
     />
   );
 };
@@ -64,61 +67,8 @@ export const Skeleton: React.FC<SkeletonProps> = ({
  */
 export const FileTreeSkeleton: React.FC = () => {
   return (
-    <div className="space-y-2 p-4" role="status" aria-label="Loading file tree">
-      {/* Root folder */}
-      <div className="flex items-center gap-2">
-        <Skeleton width={16} height={16} variant="rectangular" />
-        <Skeleton width="60%" height={20} variant="text" />
-      </div>
-
-      {/* Nested items */}
-      <div className="ml-4 space-y-2">
-        <div className="flex items-center gap-2">
-          <Skeleton width={16} height={16} variant="rectangular" />
-          <Skeleton width="50%" height={18} variant="text" />
-        </div>
-        <div className="ml-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <Skeleton width={16} height={16} variant="rectangular" />
-            <Skeleton width="70%" height={18} variant="text" />
-          </div>
-          <div className="flex items-center gap-2">
-            <Skeleton width={16} height={16} variant="rectangular" />
-            <Skeleton width="55%" height={18} variant="text" />
-          </div>
-        </div>
-      </div>
-
-      {/* Another folder */}
-      <div className="flex items-center gap-2">
-        <Skeleton width={16} height={16} variant="rectangular" />
-        <Skeleton width="45%" height={20} variant="text" />
-      </div>
-
-      <div className="ml-4 space-y-2">
-        <div className="flex items-center gap-2">
-          <Skeleton width={16} height={16} variant="rectangular" />
-          <Skeleton width="65%" height={18} variant="text" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Skeleton width={16} height={16} variant="rectangular" />
-          <Skeleton width="50%" height={18} variant="text" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Skeleton width={16} height={16} variant="rectangular" />
-          <Skeleton width="60%" height={18} variant="text" />
-        </div>
-      </div>
-
-      {/* More items */}
-      <div className="flex items-center gap-2">
-        <Skeleton width={16} height={16} variant="rectangular" />
-        <Skeleton width="40%" height={18} variant="text" />
-      </div>
-      <div className="flex items-center gap-2">
-        <Skeleton width={16} height={16} variant="rectangular" />
-        <Skeleton width="55%" height={18} variant="text" />
-      </div>
+    <div style={{ padding: '16px' }} role="status" aria-label="Loading file tree">
+      <AntSkeleton active paragraph={{ rows: 8 }} />
     </div>
   );
 };
@@ -130,31 +80,8 @@ export const FileTreeSkeleton: React.FC = () => {
  */
 export const FileContentSkeleton: React.FC = () => {
   return (
-    <div className="h-full p-4 space-y-3" role="status" aria-label="Loading file content">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
-        <Skeleton width="30%" height={24} variant="text" />
-        <Skeleton width={80} height={32} variant="rectangular" />
-      </div>
-
-      {/* Code lines */}
-      <div className="space-y-2">
-        <Skeleton width="85%" height={16} variant="text" />
-        <Skeleton width="70%" height={16} variant="text" />
-        <Skeleton width="90%" height={16} variant="text" />
-        <Skeleton width="60%" height={16} variant="text" />
-        <Skeleton width="95%" height={16} variant="text" />
-        <Skeleton width="75%" height={16} variant="text" />
-        <Skeleton width="80%" height={16} variant="text" />
-        <Skeleton width="65%" height={16} variant="text" />
-        <Skeleton width="88%" height={16} variant="text" />
-        <Skeleton width="72%" height={16} variant="text" />
-        <Skeleton width="85%" height={16} variant="text" />
-        <Skeleton width="78%" height={16} variant="text" />
-        <Skeleton width="92%" height={16} variant="text" />
-        <Skeleton width="68%" height={16} variant="text" />
-        <Skeleton width="83%" height={16} variant="text" />
-      </div>
+    <div style={{ height: '100%', padding: '16px' }} role="status" aria-label="Loading file content">
+      <AntSkeleton active paragraph={{ rows: 15 }} />
     </div>
   );
 };
@@ -166,41 +93,13 @@ export const FileContentSkeleton: React.FC = () => {
  */
 export const SteeringFileListSkeleton: React.FC = () => {
   return (
-    <div className="space-y-3 p-4" role="status" aria-label="Loading steering files">
-      {/* File item 1 */}
-      <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-        <div className="flex items-center gap-3">
-          <Skeleton width={20} height={20} variant="rectangular" />
-          <div className="flex-1 space-y-2">
-            <Skeleton width="40%" height={18} variant="text" />
-            <Skeleton width="60%" height={14} variant="text" />
-          </div>
-          <Skeleton width={60} height={14} variant="text" />
-        </div>
+    <div style={{ padding: '16px' }} role="status" aria-label="Loading steering files">
+      <AntSkeleton active avatar paragraph={{ rows: 2 }} />
+      <div style={{ marginTop: '16px' }}>
+        <AntSkeleton active avatar paragraph={{ rows: 2 }} />
       </div>
-
-      {/* File item 2 */}
-      <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-        <div className="flex items-center gap-3">
-          <Skeleton width={20} height={20} variant="rectangular" />
-          <div className="flex-1 space-y-2">
-            <Skeleton width="35%" height={18} variant="text" />
-            <Skeleton width="55%" height={14} variant="text" />
-          </div>
-          <Skeleton width={60} height={14} variant="text" />
-        </div>
-      </div>
-
-      {/* File item 3 */}
-      <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-        <div className="flex items-center gap-3">
-          <Skeleton width={20} height={20} variant="rectangular" />
-          <div className="flex-1 space-y-2">
-            <Skeleton width="45%" height={18} variant="text" />
-            <Skeleton width="50%" height={14} variant="text" />
-          </div>
-          <Skeleton width={60} height={14} variant="text" />
-        </div>
+      <div style={{ marginTop: '16px' }}>
+        <AntSkeleton active avatar paragraph={{ rows: 2 }} />
       </div>
     </div>
   );
@@ -213,32 +112,8 @@ export const SteeringFileListSkeleton: React.FC = () => {
  */
 export const EditorSkeleton: React.FC = () => {
   return (
-    <div className="h-full flex flex-col" role="status" aria-label="Loading editor">
-      {/* Editor toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-secondary)' }}>
-        <div className="flex items-center gap-3">
-          <Skeleton width={20} height={20} variant="rectangular" />
-          <div className="space-y-1">
-            <Skeleton width={120} height={16} variant="text" />
-            <Skeleton width={80} height={12} variant="text" />
-          </div>
-        </div>
-        <Skeleton width={80} height={32} variant="rectangular" />
-      </div>
-
-      {/* Editor content */}
-      <div className="flex-1 p-4 space-y-2">
-        <Skeleton width="90%" height={16} variant="text" />
-        <Skeleton width="75%" height={16} variant="text" />
-        <Skeleton width="85%" height={16} variant="text" />
-        <Skeleton width="70%" height={16} variant="text" />
-        <Skeleton width="95%" height={16} variant="text" />
-        <Skeleton width="80%" height={16} variant="text" />
-        <Skeleton width="88%" height={16} variant="text" />
-        <Skeleton width="65%" height={16} variant="text" />
-        <Skeleton width="92%" height={16} variant="text" />
-        <Skeleton width="78%" height={16} variant="text" />
-      </div>
+    <div style={{ height: '100%', padding: '16px' }} role="status" aria-label="Loading editor">
+      <AntSkeleton active paragraph={{ rows: 10 }} />
     </div>
   );
 };
@@ -249,24 +124,9 @@ export const EditorSkeleton: React.FC = () => {
  * Requirement 4.1.3: Consistent loading UI across features
  */
 export const CardSkeleton: React.FC<{ lines?: number }> = ({ lines = 5 }) => {
-  // Pre-calculate widths to avoid calling Math.random during render
-  const widths = React.useMemo(() => {
-    return Array.from({ length: lines }, () => `${Math.random() * 30 + 60}%`);
-  }, [lines]);
-
   return (
-    <div className="p-6 rounded-lg space-y-3" style={{ backgroundColor: 'var(--color-bg-secondary)' }} role="status" aria-label="Loading content">
-      <Skeleton width="60%" height={24} variant="text" />
-      <div className="space-y-2">
-        {widths.map((width, i) => (
-          <Skeleton
-            key={i}
-            width={width}
-            height={16}
-            variant="text"
-          />
-        ))}
-      </div>
+    <div style={{ padding: '24px', borderRadius: '8px' }} role="status" aria-label="Loading content">
+      <AntSkeleton active paragraph={{ rows: lines }} />
     </div>
   );
 };

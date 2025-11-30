@@ -192,13 +192,14 @@ export function SteeringFileViewer({
   }
 
   return (
-    <div className="h-full flex flex-col" onKeyDown={handleKeyDown}>
+    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} onKeyDown={handleKeyDown}>
       {/* Header with file info and save button */}
       <div
         className="flex items-center justify-between px-4 py-3 border-b"
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           borderColor: 'var(--color-border)',
+          flexShrink: 0,
         }}
       >
         <div className="flex items-center gap-3">
@@ -246,8 +247,10 @@ export function SteeringFileViewer({
       </div>
 
       {/* Monaco Editor */}
-      <div className="flex-1">
+      <div style={{ flex: 1, minHeight: 0, width: '100%', overflow: 'hidden' }}>
         <Editor
+          height="100%"
+          width="100%"
           value={content}
           onChange={handleEditorChange}
           language="markdown"
@@ -279,6 +282,7 @@ export function SteeringFileViewer({
           backgroundColor: 'var(--color-bg-secondary)',
           borderColor: 'var(--color-border)',
           color: 'var(--color-text-tertiary)',
+          flexShrink: 0,
         }}
       >
         Press <kbd className="px-1.5 py-0.5 rounded text-xs font-mono" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>Ctrl+S</kbd> or{' '}

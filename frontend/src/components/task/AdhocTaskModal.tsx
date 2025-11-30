@@ -6,8 +6,8 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Modal, Button, Select, Textarea } from '../common';
-import type { SelectOption } from '../common';
+import { Form, Select, Input } from 'antd';
+import { Modal, Button } from '../common';
 import { useKeyboard } from '../../hooks/useKeyboard';
 
 /**
@@ -74,6 +74,11 @@ interface AdhocTaskModalProps {
   initialInstruction?: string;
 }
 
+interface FormData {
+  template: string;
+  instruction: string;
+}
+
 /**
  * AdhocTaskModal component
  * Allows users to enter and execute custom instructions
@@ -87,11 +92,13 @@ export function AdhocTaskModal({
 }: AdhocTaskModalProps) {
   const MAX_CHARACTERS = 50000;
   
-  const [instruction, setInstruction] = useState(initialInstruction);
-  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [form] = Form.useForm<FormData>();
   const [showOverwriteWarning, setShowOverwriteWarning] = useState(false);
   const [pendingTemplate, setPendingTemplate] = useState<InstructionTemplate | null>(null);
   const [characterCount, setCharacterCount] = useState(0);
+
+  // Watch instruction field for character count
+  const instruction = Form.useWatch('instruction', form) || '';
 
   // Debounce character count updates (Optimization: Task 31)
   useEffect(() => {
@@ -105,12 +112,14 @@ export function AdhocTaskModal({
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setInstruction(initialInstruction);
-      setSelectedTemplate('');
+      form.setFieldsValue({
+        template: '',
+        instruction: initialInstruction,
+      });
       setShowOverwriteWarning(false);
       setPendingTemplate(null);
     }
-  }, [isOpen, initialInstruction]);
+  }, [isOpen, initialInstruction, form]);
 
   // Keyboard shortcuts for modal (Requirement 2.1.2)
   useKeyboard([
@@ -118,8 +127,8 @@ export function AdhocTaskModal({
       key: 'Enter',
       ctrl: true,
       callback: () => {
-        if (isOpen && !showOverwriteWarning && !isExecuteDisabled) {
-          handleExecute();
+        if (isOpen && !showOverwriteWarning && instruction.trim() && !isExecuting) {
+          form.submit();
         }
       },
       description: 'Execute adhoc task',
@@ -145,15 +154,15 @@ export function AdhocTaskModal({
    * Requirement 2.4.5: Warn before overwriting custom text
    */
   const handleTemplateSelect = useCallback((templateId: string) => {
-    setSelectedTemplate(templateId);
-    
     if (!templateId) return;
 
     const template = DEFAULT_TEMPLATES.find(t => t.id === templateId);
     if (!template) return;
 
+    const currentInstruction = form.getFieldValue('instruction') || '';
+    
     // Check if user has typed custom text
-    const hasCustomText = instruction.trim().length > 0 && instruction !== initialInstruction;
+    const hasCustomText = currentInstruction.trim().length > 0 && currentInstruction !== initialInstruction;
     
     if (hasCustomText) {
       // Show warning before overwriting
@@ -161,47 +170,36 @@ export function AdhocTaskModal({
       setPendingTemplate(template);
     } else {
       // No custom text, apply template immediately
-      setInstruction(template.instruction);
+      form.setFieldsValue({ instruction: template.instruction });
     }
-  }, [instruction, initialInstruction]);
+  }, [form, initialInstruction]);
 
   /**
    * Confirm template overwrite (Optimization: Task 31 - useCallback)
    */
   const confirmTemplateOverwrite = useCallback(() => {
     if (pendingTemplate) {
-      setInstruction(pendingTemplate.instruction);
+      form.setFieldsValue({ instruction: pendingTemplate.instruction });
     }
     setShowOverwriteWarning(false);
     setPendingTemplate(null);
-  }, [pendingTemplate]);
+  }, [pendingTemplate, form]);
 
   /**
    * Cancel template overwrite (Optimization: Task 31 - useCallback)
    */
   const cancelTemplateOverwrite = useCallback(() => {
-    setSelectedTemplate('');
+    form.setFieldsValue({ template: '' });
     setShowOverwriteWarning(false);
     setPendingTemplate(null);
-  }, []);
-
-  /**
-   * Handle instruction change (Optimization: Task 31 - useCallback)
-   * Requirement 2.2.4: Real-time validation
-   */
-  const handleInstructionChange = useCallback((value: string) => {
-    // Enforce character limit
-    if (value.length <= MAX_CHARACTERS) {
-      setInstruction(value);
-    }
-  }, []);
+  }, [form]);
 
   /**
    * Handle execute button click (Optimization: Task 31 - useCallback)
    * Requirement 2.2.5: Disable execute button when instruction is empty
    */
-  const handleExecute = useCallback(async () => {
-    const trimmedInstruction = instruction.trim();
+  const handleSubmit = useCallback(async (values: FormData) => {
+    const trimmedInstruction = values.instruction.trim();
     if (!trimmedInstruction || isExecuting) return;
 
     try {
@@ -211,23 +209,17 @@ export function AdhocTaskModal({
       // Error handling is done by parent component
       console.error('Failed to execute adhoc task:', error);
     }
-  }, [instruction, isExecuting, onExecute]);
+  }, [isExecuting, onExecute]);
 
   /**
    * Handle modal close (Optimization: Task 31 - useCallback)
    */
   const handleClose = useCallback(() => {
     if (!isExecuting) {
+      form.resetFields();
       onClose();
     }
-  }, [isExecuting, onClose]);
-
-  /**
-   * Check if execute button should be disabled (Optimization: Task 31 - useMemo)
-   */
-  const isExecuteDisabled = useMemo(() => {
-    return !instruction.trim() || isExecuting;
-  }, [instruction, isExecuting]);
+  }, [isExecuting, onClose, form]);
 
   /**
    * Get character counter color based on usage (Optimization: Task 31 - useMemo)
@@ -242,7 +234,7 @@ export function AdhocTaskModal({
   /**
    * Prepare template options for Select component (Optimization: Task 31 - useMemo to cache)
    */
-  const templateOptions: SelectOption[] = useMemo(() => [
+  const templateOptions = useMemo(() => [
     { value: '', label: 'Select a template...' },
     ...DEFAULT_TEMPLATES.map(template => ({
       value: template.id,
@@ -258,109 +250,123 @@ export function AdhocTaskModal({
         title="Execute Adhoc Task"
         size="xl"
       >
-        <div className="space-y-4">
-          {/* Description */}
-          <div>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              Enter a custom instruction to execute a task that's not in your predefined task list.
-              You can use a template or write your own instruction.
-            </p>
-            <p className="text-xs mt-2" style={{ color: 'var(--color-text-tertiary)' }}>
-              💡 Tip: Press{' '}
-              <kbd 
-                className="px-1.5 py-0.5 rounded mx-1"
-                style={{
-                  backgroundColor: 'var(--color-bg-tertiary)',
-                  fontFamily: 'monospace',
-                  fontSize: '0.7rem',
-                }}
-              >
-                {navigator.platform.includes('Mac') ? '⌘↵' : 'Ctrl+Enter'}
-              </kbd>
-              {' '}to execute or{' '}
-              <kbd 
-                className="px-1.5 py-0.5 rounded mx-1"
-                style={{
-                  backgroundColor: 'var(--color-bg-tertiary)',
-                  fontFamily: 'monospace',
-                  fontSize: '0.7rem',
-                }}
-              >
-                Esc
-              </kbd>
-              {' '}to close
-            </p>
-          </div>
-
-          {/* Template Selector */}
-          <Select
-            label="Template (Optional)"
-            options={templateOptions}
-            value={selectedTemplate}
-            onChange={(e) => handleTemplateSelect(e.target.value)}
-            disabled={isExecuting}
-            helperText="Choose a common task template to get started quickly"
-          />
-
-          {/* Instruction Textarea */}
-          <div>
-            <Textarea
-              label="Instruction"
-              value={instruction}
-              onChange={(e) => handleInstructionChange(e.target.value)}
-              placeholder="Example: Add error handling to the user authentication module, including try-catch blocks and proper error messages..."
-              rows={12}
-              disabled={isExecuting}
-              helperText="Describe what you want the AI to do. Be as specific as possible for better results."
-            />
-            
-            {/* Character Counter */}
-            <div className="flex justify-between items-center mt-2">
-              <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                Minimum 1 character required
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          autoComplete="off"
+        >
+          <div className="space-y-4">
+            {/* Description */}
+            <div>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                Enter a custom instruction to execute a task that's not in your predefined task list.
+                You can use a template or write your own instruction.
               </p>
-              <p className={`text-xs font-mono ${characterCounterColor}`}>
-                {characterCount.toLocaleString()} / {MAX_CHARACTERS.toLocaleString()}
+              <p className="text-xs mt-2" style={{ color: 'var(--color-text-tertiary)' }}>
+                💡 Tip: Press{' '}
+                <kbd 
+                  className="px-1.5 py-0.5 rounded mx-1"
+                  style={{
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    fontFamily: 'monospace',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  {navigator.platform.includes('Mac') ? '⌘↵' : 'Ctrl+Enter'}
+                </kbd>
+                {' '}to execute or{' '}
+                <kbd 
+                  className="px-1.5 py-0.5 rounded mx-1"
+                  style={{
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    fontFamily: 'monospace',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  Esc
+                </kbd>
+                {' '}to close
               </p>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button
-              type="button"
-              onClick={handleClose}
-              variant="secondary"
-              disabled={isExecuting}
-              title="Close modal (Esc)"
+            {/* Template Selector */}
+            <Form.Item
+              label="Template (Optional)"
+              name="template"
+              extra="Choose a common task template to get started quickly"
             >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={handleExecute}
-              variant="primary"
-              loading={isExecuting}
-              disabled={isExecuteDisabled}
-              title="Execute adhoc task (Ctrl+Enter or Cmd+Enter)"
+              <Select
+                options={templateOptions}
+                onChange={handleTemplateSelect}
+                disabled={isExecuting}
+                placeholder="Select a template..."
+              />
+            </Form.Item>
+
+            {/* Instruction Textarea */}
+            <Form.Item
+              label="Instruction"
+              name="instruction"
+              rules={[
+                { required: true, message: 'Instruction is required' },
+                { max: MAX_CHARACTERS, message: `Instruction cannot exceed ${MAX_CHARACTERS} characters` },
+              ]}
+              extra="Describe what you want the AI to do. Be as specific as possible for better results."
             >
-              {isExecuting ? 'Executing...' : (
-                <span className="flex items-center gap-2">
-                  <span>Execute</span>
-                  <kbd 
-                    className="px-1.5 py-0.5 text-xs rounded"
-                    style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {navigator.platform.includes('Mac') ? '⌘↵' : 'Ctrl+↵'}
-                  </kbd>
-                </span>
-              )}
-            </Button>
+              <Input.TextArea
+                placeholder="Example: Add error handling to the user authentication module, including try-catch blocks and proper error messages..."
+                rows={12}
+                disabled={isExecuting}
+                maxLength={MAX_CHARACTERS}
+                showCount={{
+                  formatter: ({ count }) => (
+                    <span className={characterCounterColor}>
+                      {count.toLocaleString()} / {MAX_CHARACTERS.toLocaleString()}
+                    </span>
+                  ),
+                }}
+              />
+            </Form.Item>
+
+            {/* Action Buttons */}
+            <Form.Item className="mb-0">
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  onClick={handleClose}
+                  variant="secondary"
+                  disabled={isExecuting}
+                  title="Close modal (Esc)"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  htmlType="submit"
+                  variant="primary"
+                  loading={isExecuting}
+                  disabled={isExecuting || !instruction.trim()}
+                  title="Execute adhoc task (Ctrl+Enter or Cmd+Enter)"
+                >
+                  {isExecuting ? 'Executing...' : (
+                    <span className="flex items-center gap-2">
+                      <span>Execute</span>
+                      <kbd 
+                        className="px-1.5 py-0.5 text-xs rounded"
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {navigator.platform.includes('Mac') ? '⌘↵' : 'Ctrl+↵'}
+                      </kbd>
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </Form.Item>
           </div>
-        </div>
+        </Form>
       </Modal>
 
       {/* Overwrite Warning Modal */}

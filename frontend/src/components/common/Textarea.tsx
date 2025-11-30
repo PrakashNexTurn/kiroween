@@ -1,92 +1,70 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import { Input } from 'antd';
+import type { TextAreaProps as AntTextAreaProps } from 'antd/es/input';
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+const { TextArea: AntTextArea } = Input;
+
+export interface TextareaProps extends Omit<AntTextAreaProps, 'status'> {
   label?: string;
   error?: string;
   helperText?: string;
   autoResize?: boolean;
 }
 
-export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, error, helperText, autoResize = false, disabled, className = '', id, ...props }, ref) => {
+export const Textarea = React.forwardRef<any, TextareaProps>(
+  ({ label, error, helperText, autoResize = false, id, ...props }, ref) => {
     const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
     const errorId = `${textareaId}-error`;
     const helperId = `${textareaId}-helper`;
-    const internalRef = useRef<HTMLTextAreaElement | null>(null);
-    
-    // Use theme variables for consistent styling
-    const baseStyles = 'w-full px-4 py-3 text-base rounded-xl transition-all duration-base focus:outline-none shadow-sm resize-y';
-    const normalStyles = 'border-2 border-brand-primary bg-background-primary text-text-primary hover:border-brand-secondary hover:shadow-md focus:border-brand-secondary focus:ring-4 focus:ring-brand-primary focus:ring-opacity-15';
-    const errorStyles = 'border-2 border-status-error bg-background-primary text-text-primary focus:ring-4 focus:ring-status-error focus:ring-opacity-15';
-    const disabledStyles = 'bg-disabled cursor-not-allowed opacity-50 border-border';
-    
-    const textareaStyles = error
-      ? `${baseStyles} ${errorStyles}`
-      : `${baseStyles} ${normalStyles}`;
-    
-    // Auto-resize functionality
-    useEffect(() => {
-      if (autoResize && internalRef.current) {
-        const textarea = internalRef.current;
-        const adjustHeight = () => {
-          textarea.style.height = 'auto';
-          textarea.style.height = `${textarea.scrollHeight}px`;
-        };
-        
-        adjustHeight();
-        textarea.addEventListener('input', adjustHeight);
-        
-        return () => {
-          textarea.removeEventListener('input', adjustHeight);
-        };
-      }
-    }, [autoResize, props.value]);
-    
-    // Handle both internal and forwarded refs
-    const setRefs = (element: HTMLTextAreaElement | null) => {
-      internalRef.current = element;
-      if (typeof ref === 'function') {
-        ref(element);
-      } else if (ref) {
-        ref.current = element;
-      }
-    };
-    
+
     return (
-      <div className="w-full">
+      <div style={{ width: '100%' }}>
         {label && (
           <label
             htmlFor={textareaId}
-            className="block text-sm font-medium text-text-primary mb-2"
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: 500,
+              marginBottom: '8px',
+            }}
           >
             {label}
           </label>
         )}
-        <textarea
-          ref={setRefs}
+        <AntTextArea
+          ref={ref}
           id={textareaId}
-          disabled={disabled}
-          className={`${textareaStyles} ${disabled ? disabledStyles : ''} ${autoResize ? 'resize-none' : ''} ${className}`}
+          autoSize={autoResize ? { minRows: 3 } : false}
+          status={error ? 'error' : undefined}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? errorId : helperText ? helperId : undefined}
           {...props}
         />
         {error && (
-          <p
+          <div
             id={errorId}
-            className="mt-2 text-sm text-status-error"
             role="alert"
+            style={{
+              marginTop: '8px',
+              fontSize: '14px',
+              color: 'var(--ant-color-error)',
+            }}
           >
             {error}
-          </p>
+          </div>
         )}
         {helperText && !error && (
-          <p
+          <div
             id={helperId}
-            className="mt-2 text-sm text-text-secondary"
+            style={{
+              marginTop: '8px',
+              fontSize: '14px',
+              opacity: 0.65,
+            }}
           >
             {helperText}
-          </p>
+          </div>
         )}
       </div>
     );

@@ -2,17 +2,18 @@
 
 ## Overview
 
-The ContextMenu component provides a reusable context menu that appears on right-click. It's integrated with the file tree to provide quick actions like copying file paths.
+The ContextMenu component provides a reusable context menu that appears on right-click. It's integrated with the file tree to provide quick actions like copying file paths. This component has been migrated to use Ant Design's Dropdown and Menu components.
 
 ## Features
 
 - **Right-click activation**: Opens on right-click (contextmenu event)
-- **Outside click detection**: Automatically closes when clicking outside
+- **Outside click detection**: Automatically closes when clicking outside (handled by Ant Design)
 - **Escape key support**: Closes on Escape key press
-- **Viewport awareness**: Adjusts position to stay within viewport bounds
-- **Keyboard navigation**: Full keyboard support with Enter/Space
-- **Accessibility**: ARIA labels and roles for screen readers
+- **Viewport awareness**: Adjusts position to stay within viewport bounds (handled by Ant Design)
+- **Keyboard navigation**: Full keyboard support with Enter/Space (built-in with Ant Design)
+- **Accessibility**: ARIA labels and roles for screen readers (built-in with Ant Design)
 - **Customizable items**: Support for icons, dividers, and disabled states
+- **Theme integration**: Automatically styled with Ant Design theme tokens
 
 ## Usage
 
@@ -82,9 +83,23 @@ The context menu is integrated into the FileTreeNode component to provide file/f
 - Focus management
 - Disabled state support
 
+## Ant Design Migration
+
+This component has been migrated from a custom implementation to use Ant Design's Dropdown and Menu components:
+
+- **Dropdown**: Provides the positioning and visibility management
+- **Menu**: Provides the menu items with built-in keyboard navigation and accessibility
+- **Benefits**: 
+  - Automatic viewport awareness and positioning
+  - Built-in keyboard navigation (Arrow keys, Enter, Escape)
+  - WCAG 2.1 Level AA accessibility compliance
+  - Consistent styling with application theme
+  - Reduced custom code maintenance
+
 ## Requirements Satisfied
 
-- **3.4.1**: Context menu for files with "Copy Path" action
+- **10.3**: Context menu using Ant Design Dropdown or Menu components
 - Right-click event handling
-- Outside click detection
-- Proper positioning and viewport awareness
+- Outside click detection (handled by Ant Design)
+- Proper positioning and viewport awareness (handled by Ant Design)
+- Keyboard navigation and accessibility (built-in with Ant Design)

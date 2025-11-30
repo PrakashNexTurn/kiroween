@@ -25,8 +25,6 @@ export type { LoadingSpinnerProps } from './LoadingSpinner';
 export { ToastContainer, showSuccess, showError, showInfo, showWarning, showLongRunning } from './Toast';
 export type { ToastOptionsWithRetry } from './Toast';
 
-export { Breadcrumbs } from './Breadcrumbs';
-
 export { ErrorBoundary } from './ErrorBoundary';
 
 export { Select } from './Select';
