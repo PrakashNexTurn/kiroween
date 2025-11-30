@@ -48,6 +48,9 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
           : theme.colors.background.secondary,
         borderColor: theme.colors.border,
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        height: '100%',
+        padding: '8px',
+        borderRadius: '12px'
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 10px 15px rgba(0,0,0,0.1)';

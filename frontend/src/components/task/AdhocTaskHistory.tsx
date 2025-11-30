@@ -1,8 +1,5 @@
 /**
- * AdhocTaskHistory Component
- * Displays history of executed adhoc tasks with expandable logs
- * 
- * Requirements: 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.5.5
+ * Enhanced AdhocTaskHistory UI (Inline Styles Only)
  */
 
 import { useState } from 'react';
@@ -10,10 +7,6 @@ import { ChevronDown, ChevronRight, RotateCw, Clock, CheckCircle2, XCircle } fro
 import { Button, Badge } from '../common';
 import { parseLogsForRendering } from '../../utils/logFormatter';
 
-/**
- * Adhoc task history item
- * Represents a single executed adhoc task
- */
 export interface AdhocTaskHistoryItem {
   id: string;
   instruction: string;
@@ -24,18 +17,12 @@ export interface AdhocTaskHistoryItem {
   filesModified?: string[];
 }
 
-/**
- * Props for AdhocTaskHistory component
- */
 interface AdhocTaskHistoryProps {
   history: AdhocTaskHistoryItem[];
   onRerun: (instruction: string) => void;
   className?: string;
 }
 
-/**
- * Individual history item component
- */
 interface HistoryItemProps {
   item: AdhocTaskHistoryItem;
   onRerun: (instruction: string) => void;
@@ -44,9 +31,6 @@ interface HistoryItemProps {
 function HistoryItem({ item, onRerun }: HistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  /**
-   * Format timestamp for display
-   */
   const formatTimestamp = (date: Date): string => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -55,234 +39,260 @@ function HistoryItem({ item, onRerun }: HistoryItemProps) {
     const diffDays = Math.floor(diffMs / 86400000);
 
     if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    
+    if (diffMins < 60) return `${diffMins} minute(s) ago`;
+    if (diffHours < 24) return `${diffHours} hour(s) ago`;
+    if (diffDays < 7) return `${diffDays} day(s) ago`;
+
     return date.toLocaleDateString();
   };
 
-  /**
-   * Truncate instruction for display
-   */
-  const truncateInstruction = (instruction: string, maxLength: number = 80): string => {
-    if (instruction.length <= maxLength) return instruction;
-    return instruction.substring(0, maxLength) + '...';
-  };
-
-  /**
-   * Handle rerun button click
-   * Requirement 2.5.4: Add rerun button
-   */
   const handleRerun = (e: React.MouseEvent) => {
     e.stopPropagation();
     onRerun(item.instruction);
   };
 
-  /**
-   * Toggle expansion
-   * Requirement 2.5.3: Implement expandable items for logs
-   */
-  const toggleExpansion = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  /**
-   * Parse and format logs for rendering
-   */
   const formattedLogs = parseLogsForRendering(item.logs);
 
   return (
     <div
-      className="border rounded-lg overflow-hidden transition-all"
       style={{
-        borderColor: 'var(--color-border-primary)',
+        border: '1px solid var(--color-border-primary)',
+        borderRadius: 8,
+        overflow: 'hidden',
         backgroundColor: 'var(--color-bg-primary)',
+        transition: 'all 0.25s ease',
       }}
     >
-      {/* Header - Always visible */}
+      {/* Header */}
       <div
-        className="p-4 cursor-pointer hover:bg-opacity-50 transition-colors"
-        onClick={toggleExpansion}
+        onClick={() => setIsExpanded(!isExpanded)}
         style={{
-          backgroundColor: isExpanded ? 'var(--color-bg-secondary)' : 'transparent',
+          display: 'flex',
+          padding: 16,
+          cursor: 'pointer',
+          alignItems: 'flex-start',
+          gap: 12,
+          backgroundColor: isExpanded
+            ? 'var(--color-bg-secondary)'
+            : 'var(--color-bg-primary)',
         }}
       >
-        <div className="flex items-start gap-3">
-          {/* Expand/Collapse Icon */}
-          <button
-            className="mt-1 flex-shrink-0 transition-transform"
-            onClick={toggleExpansion}
-            aria-label={isExpanded ? 'Collapse' : 'Expand'}
-          >
-            {isExpanded ? (
-              <ChevronDown className="w-5 h-5" style={{ color: 'var(--color-text-secondary)' }} />
-            ) : (
-              <ChevronRight className="w-5 h-5" style={{ color: 'var(--color-text-secondary)' }} />
-            )}
-          </button>
-
-          {/* Status Icon */}
-          <div className="flex-shrink-0 mt-1">
-            {item.status === 'success' ? (
-              <CheckCircle2 className="w-5 h-5" style={{ color: 'var(--color-status-success)' }} />
-            ) : (
-              <XCircle className="w-5 h-5" style={{ color: 'var(--color-status-error)' }} />
-            )}
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            {/* Instruction */}
-            <p
-              className="text-sm font-medium mb-1 truncate"
-              style={{ color: 'var(--color-text-primary)' }}
-              title={item.instruction}
-            >
-              {truncateInstruction(item.instruction)}
-            </p>
-
-            {/* Metadata */}
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Timestamp */}
-              <div className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" style={{ color: 'var(--color-text-tertiary)' }} />
-                <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                  {formatTimestamp(item.executedAt)}
-                </span>
-              </div>
-
-              {/* Status Badge */}
-              <Badge variant={item.status === 'success' ? 'success' : 'error'} size="sm">
-                {item.status === 'success' ? 'Success' : 'Failed'}
-              </Badge>
-
-              {/* Files Modified Count */}
-              {item.filesModified && item.filesModified.length > 0 && (
-                <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                  {item.filesModified.length} file{item.filesModified.length > 1 ? 's' : ''} modified
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Rerun Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleRerun}
-            className="flex-shrink-0"
-            aria-label="Rerun task"
-          >
-            <RotateCw className="w-4 h-4" />
-          </Button>
+        {/* Expand/Collapse */}
+        <div style={{ marginTop: 4 }}>
+          {isExpanded ? (
+            <ChevronDown size={20} color="var(--color-text-secondary)" />
+          ) : (
+            <ChevronRight size={20} color="var(--color-text-secondary)" />
+          )}
         </div>
+
+        {/* Status Icon */}
+        <div style={{ marginTop: 3 }}>
+          {item.status === 'success' ? (
+            <CheckCircle2 size={20} color="var(--color-status-success)" />
+          ) : (
+            <XCircle size={20} color="var(--color-status-error)" />
+          )}
+        </div>
+
+        {/* Main Content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p
+            style={{
+              color: 'var(--color-text-primary)',
+              fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 6,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+            title={item.instruction}
+          >
+            {item.instruction}
+          </p>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+            {/* Timestamp */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Clock size={14} color="var(--color-text-tertiary)" />
+              <span style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>
+                {formatTimestamp(item.executedAt)}
+              </span>
+            </div>
+
+            {/* Status Badge */}
+            <Badge
+              variant={item.status === 'success' ? 'success' : 'error'}
+              size="sm"
+            >
+              {item.status === 'success' ? 'Success' : 'Failed'}
+            </Badge>
+
+            {/* Files Modified */}
+            {item.filesModified?.length ? (
+              <span style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>
+                {item.filesModified.length} file(s) modified
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Rerun Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleRerun}
+          style={{ marginLeft: 8 }}
+        >
+          <RotateCw size={16} />
+        </Button>
       </div>
 
-      {/* Expanded Content - Logs and Details */}
+      {/* Expanded Content */}
       {isExpanded && (
         <div
-          className="border-t p-4 space-y-4"
-          style={{ borderColor: 'var(--color-border-primary)' }}
+          style={{
+            borderTop: '1px solid var(--color-border-primary)',
+            padding: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+          }}
         >
-          {/* Full Instruction */}
+          {/* Instruction */}
           <div>
             <h4
-              className="text-xs font-semibold uppercase mb-2"
-              style={{ color: 'var(--color-text-tertiary)' }}
+              style={{
+                fontSize: 11,
+                textTransform: 'uppercase',
+                color: 'var(--color-text-tertiary)',
+                marginBottom: 6,
+              }}
             >
               Instruction
             </h4>
-            <p
-              className="text-sm whitespace-pre-wrap font-mono p-3 rounded"
+            <pre
               style={{
+                background: 'var(--color-bg-tertiary)',
+                padding: 12,
+                borderRadius: 6,
+                fontFamily: 'monospace',
+                fontSize: 13,
+                whiteSpace: 'pre-wrap',
                 color: 'var(--color-text-secondary)',
-                backgroundColor: 'var(--color-bg-tertiary)',
               }}
             >
               {item.instruction}
-            </p>
+            </pre>
           </div>
 
-          {/* Error Message (if failed) */}
+          {/* Error */}
           {item.status === 'failure' && item.error && (
             <div>
               <h4
-                className="text-xs font-semibold uppercase mb-2"
-                style={{ color: 'var(--color-status-error)' }}
+                style={{
+                  fontSize: 11,
+                  textTransform: 'uppercase',
+                  color: 'var(--color-status-error)',
+                  marginBottom: 6,
+                }}
               >
                 Error
               </h4>
-              <p
-                className="text-sm whitespace-pre-wrap font-mono p-3 rounded"
+              <pre
                 style={{
+                  background: 'var(--color-bg-tertiary)',
+                  padding: 12,
+                  borderRadius: 6,
+                  fontFamily: 'monospace',
+                  fontSize: 13,
                   color: 'var(--color-status-error)',
-                  backgroundColor: 'var(--color-bg-tertiary)',
+                  whiteSpace: 'pre-wrap',
                 }}
               >
                 {item.error}
-              </p>
+              </pre>
             </div>
           )}
 
-          {/* Files Modified */}
-          {item.filesModified && item.filesModified.length > 0 && (
+          {/* Modified Files */}
+          {item.filesModified?.length ? (
             <div>
               <h4
-                className="text-xs font-semibold uppercase mb-2"
-                style={{ color: 'var(--color-text-tertiary)' }}
+                style={{
+                  fontSize: 11,
+                  textTransform: 'uppercase',
+                  color: 'var(--color-text-tertiary)',
+                  marginBottom: 6,
+                }}
               >
                 Files Modified ({item.filesModified.length})
               </h4>
-              <ul className="space-y-1">
-                {item.filesModified.map((file, index) => (
-                  <li
-                    key={index}
-                    className="text-sm font-mono p-2 rounded"
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {item.filesModified.map((f, i) => (
+                  <div
+                    key={i}
                     style={{
+                      background: 'var(--color-bg-tertiary)',
+                      padding: 8,
+                      borderRadius: 6,
+                      fontFamily: 'monospace',
+                      fontSize: 13,
                       color: 'var(--color-text-secondary)',
-                      backgroundColor: 'var(--color-bg-tertiary)',
                     }}
                   >
-                    {file}
-                  </li>
+                    {f}
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
-          )}
+          ) : null}
 
-          {/* Execution Logs */}
+          {/* Logs */}
           <div>
             <h4
-              className="text-xs font-semibold uppercase mb-2"
-              style={{ color: 'var(--color-text-tertiary)' }}
+              style={{
+                fontSize: 11,
+                textTransform: 'uppercase',
+                color: 'var(--color-text-tertiary)',
+                marginBottom: 6,
+              }}
             >
               Execution Logs
             </h4>
+
             <div
-              className="text-sm font-mono p-3 rounded overflow-x-auto max-h-96 overflow-y-auto"
               style={{
-                backgroundColor: 'var(--color-bg-tertiary)',
+                maxHeight: 350,
+                overflowY: 'auto',
+                background: 'var(--color-bg-tertiary)',
+                padding: 12,
+                borderRadius: 6,
+                fontFamily: 'monospace',
+                fontSize: 13,
               }}
             >
-              {formattedLogs.length > 0 ? (
-                formattedLogs.map((logLine, lineIndex) => (
-                  <div key={lineIndex} className="whitespace-pre-wrap break-words">
-                    {logLine.segments.map((segment, segmentIndex) => (
+              {formattedLogs.length ? (
+                formattedLogs.map((line, i) => (
+                  <div key={i} style={{ whiteSpace: 'pre-wrap' }}>
+                    {line.segments.map((seg, j) => (
                       <span
-                        key={segmentIndex}
+                        key={j}
                         style={{
-                          color: segment.color || 'var(--color-text-secondary)',
-                          fontWeight: segment.bold ? 'bold' : 'normal',
+                          color: seg.color || 'var(--color-text-secondary)',
+                          fontWeight: seg.bold ? 'bold' : 'normal',
                         }}
                       >
-                        {segment.text}
+                        {seg.text}
                       </span>
                     ))}
                   </div>
                 ))
               ) : (
-                <p style={{ color: 'var(--color-text-tertiary)' }}>No logs available</p>
+                <div style={{ color: 'var(--color-text-tertiary)' }}>
+                  No logs available
+                </div>
               )}
             </div>
           </div>
@@ -292,65 +302,52 @@ function HistoryItem({ item, onRerun }: HistoryItemProps) {
   );
 }
 
-/**
- * AdhocTaskHistory component
- * Displays a list of executed adhoc tasks with expandable details
- * 
- * Requirement 2.5.1: Display list of executed adhoc tasks
- * Requirement 2.5.2: List tasks with timestamp and status
- * Requirement 2.5.5: Display message when no tasks executed
- */
 export function AdhocTaskHistory({ history, onRerun, className = '' }: AdhocTaskHistoryProps) {
   return (
     <div className={className}>
       {/* Header */}
-      <div className="mb-4">
+      <div style={{ marginBottom: 16 }}>
         <h3
-          className="text-lg font-semibold"
-          style={{ color: 'var(--color-text-primary)' }}
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: 'var(--color-text-primary)',
+          }}
         >
           Adhoc Task History
         </h3>
-        <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-          View and rerun previously executed custom instructions
+        <p style={{ fontSize: 13, marginTop: 4, color: 'var(--color-text-secondary)' }}>
+          View and rerun previously executed tasks.
         </p>
       </div>
 
       {/* History List */}
-      {history.length > 0 ? (
-        <div className="space-y-3">
+      {history.length ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {history.map((item) => (
             <HistoryItem key={item.id} item={item} onRerun={onRerun} />
           ))}
         </div>
       ) : (
-        /* Empty State - Requirement 2.5.5 */
         <div
-          className="text-center py-12 rounded-lg border-2 border-dashed"
           style={{
-            borderColor: 'var(--color-border-secondary)',
-            backgroundColor: 'var(--color-bg-secondary)',
+            border: '2px dashed var(--color-border-secondary)',
+            padding: 40,
+            borderRadius: 8,
+            textAlign: 'center',
+            background: 'var(--color-bg-secondary)',
           }}
         >
-          <div className="flex flex-col items-center gap-3">
-            <Clock
-              className="w-12 h-12 opacity-50"
-              style={{ color: 'var(--color-text-tertiary)' }}
-            />
-            <p
-              className="text-sm font-medium"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              No adhoc tasks executed yet
-            </p>
-            <p
-              className="text-xs max-w-md"
-              style={{ color: 'var(--color-text-tertiary)' }}
-            >
-              Execute custom instructions using the "Execute Adhoc Task" button above.
-              Your task history will appear here.
-            </p>
-          </div>
+          <Clock
+            size={40}
+            style={{ opacity: 0.5, marginBottom: 16, color: 'var(--color-text-tertiary)' }}
+          />
+          <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+            No adhoc tasks executed yet
+          </p>
+          <p style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>
+            Execute an adhoc instruction to see its history here.
+          </p>
         </div>
       )}
     </div>

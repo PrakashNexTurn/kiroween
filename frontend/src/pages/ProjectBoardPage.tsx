@@ -228,12 +228,23 @@ export function ProjectBoardPage() {
         />
       ) : (
         <Row gutter={[16, 16]}>
-          {filteredProjects.map((project) => (
-            <Col key={project.projectId} xs={24} sm={12} md={8} lg={6} xl={6}>
-              <ProjectCard project={project} />
-            </Col>
-          ))}
-        </Row>
+  {filteredProjects.map((project) => (
+    <Col
+      key={project.projectId}
+      xs={24}
+      sm={12}
+      md={8}
+      lg={6}
+      xl={6}
+      style={{ display: "flex" }} // ⭐ allows children to stretch
+    >
+      <div style={{ width: "100%", height: "100%" }}> 
+        <ProjectCard project={project} />
+      </div>
+    </Col>
+  ))}
+</Row>
+
       )}
 
       {/* Create Project Modal */}

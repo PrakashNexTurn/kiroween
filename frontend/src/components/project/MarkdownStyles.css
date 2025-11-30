@@ -11,6 +11,8 @@
   text-align: left; /* Ensure left alignment */
 }
 
+
+
 /* Override any center alignment from parent */
 .markdown-content * {
   text-align: left;

@@ -105,7 +105,7 @@ export function TaskItem({ task, onClick, isNested = false, allTasks = [] }: Tas
     <List.Item
       style={{
         padding: '8px 12px',
-        marginLeft: isNested ? '16px' : '0',
+        marginLeft: isNested ? '0' : '0',
         cursor: isClickable ? 'pointer' : 'default',
         opacity: task.isOptional ? 0.7 : 1,
         transition: 'all 0.2s',

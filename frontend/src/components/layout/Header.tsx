@@ -137,6 +137,7 @@ export function Header() {
                   padding: '4px 8px',
                   borderRadius: '4px',
                   marginLeft: '8px',
+                  marginRight: '8px',
                 }}
               >
                 The Phantom IDE

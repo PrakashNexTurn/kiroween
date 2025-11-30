@@ -400,6 +400,7 @@ export function SpecViewer({ projectId, fileName, onGenerateClick, startInEditMo
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           border: '1px solid var(--color-border)',
+          borderRadius: '8px'
         }}
         role="region"
         aria-label={`${fileName} content`}
@@ -428,6 +429,7 @@ export function SpecViewer({ projectId, fileName, onGenerateClick, startInEditMo
           // View Mode: Markdown Rendering with Ant Design Typography
           <div
             className="p-6 markdown-content"
+            style={{margin: "10px", borderRadius: "8px" }}
             role="article"
             aria-label={`${fileName} preview`}
           >
