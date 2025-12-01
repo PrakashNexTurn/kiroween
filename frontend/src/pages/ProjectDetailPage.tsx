@@ -208,11 +208,8 @@ export function ProjectDetailPage() {
         size="small"
         tabBarStyle={{
           marginBottom: '16px',
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          whiteSpace: 'nowrap',
-          WebkitOverflowScrolling: 'touch',
         }}
+        className="project-detail-tabs"
         items={[
           {
             key: 'overview',

@@ -313,6 +313,40 @@ html {
   }
 }
 
+/* Project detail tabs - mobile scrolling */
+.project-detail-tabs .ant-tabs-nav {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.project-detail-tabs .ant-tabs-nav::-webkit-scrollbar {
+  height: 4px;
+}
+
+.project-detail-tabs .ant-tabs-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-detail-tabs .ant-tabs-nav::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+.project-detail-tabs .ant-tabs-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+.project-detail-tabs .ant-tabs-nav-wrap {
+  overflow: visible;
+}
+
+.project-detail-tabs .ant-tabs-nav-list {
+  white-space: nowrap;
+}
+
 /* Mobile-specific optimizations */
 @media (max-width: 768px) {
   /* Ensure touch-friendly tap targets (minimum 44x44px) */
@@ -371,6 +405,30 @@ html {
   .ant-modal-body {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+  }
+  
+  /* Tabs optimization for mobile */
+  .project-detail-tabs .ant-tabs-tab {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-width: auto;
+  }
+  
+  .project-detail-tabs .ant-tabs-nav {
+    margin-bottom: 12px;
+  }
+  
+  /* Show scroll indicator on mobile */
+  .project-detail-tabs .ant-tabs-nav::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(to right, transparent, var(--color-bg-primary));
+    pointer-events: none;
+    opacity: 0.8;
   }
 }
 
