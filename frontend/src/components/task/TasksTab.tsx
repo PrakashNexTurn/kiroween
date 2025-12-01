@@ -593,7 +593,7 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
               style={{ minWidth: '44px' }}
             >
               <Edit style={{ width: '16px', height: '16px' }} />
-              <span className="hidden sm:inline" style={{ marginLeft: '4px' }}>Edit</span>
+              <span className="button-text-sm" style={{ marginLeft: '4px' }}>Edit</span>
             </Button>
           )}
 
@@ -607,12 +607,12 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
             {executing ? (
               <>
                 <Spin size="small" />
-                <span className="hidden sm:inline" style={{ marginLeft: '8px' }}>Executing...</span>
+                <span className="button-text-sm" style={{ marginLeft: '8px' }}>Executing...</span>
               </>
             ) : (
               <>
                 <Play style={{ width: '16px', height: '16px' }} />
-                <span className="hidden sm:inline" style={{ marginLeft: '4px' }}>Next</span>
+                <span className="button-text-sm" style={{ marginLeft: '4px' }}>Next</span>
               </>
             )}
           </Button>
@@ -625,7 +625,7 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
             style={{ minWidth: '44px' }}
           >
             <PlayCircle style={{ width: '16px', height: '16px' }} />
-            <span className="hidden sm:inline" style={{ marginLeft: '4px' }}>All</span>
+            <span className="button-text-sm" style={{ marginLeft: '4px' }}>All</span>
           </Button>
 
           {/* Execute Adhoc Task Button - Mobile Optimized */}
@@ -638,9 +638,9 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
             style={{ minWidth: '44px' }}
           >
             <Zap style={{ width: '16px', height: '16px' }} />
-            <span className="hidden md:inline" style={{ marginLeft: '4px' }}>Adhoc</span>
+            <span className="button-text-md" style={{ marginLeft: '4px' }}>Adhoc</span>
             <kbd 
-              className="hidden lg:inline-block"
+              className="button-kbd-lg"
               style={{
                 marginLeft: '8px',
                 padding: '2px 6px',

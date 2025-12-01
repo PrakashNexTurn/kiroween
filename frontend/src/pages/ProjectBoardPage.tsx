@@ -227,8 +227,8 @@ export function ProjectBoardPage() {
               block
               style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
-              <span className="hidden sm:inline">Create Project</span>
-              <span className="sm:hidden">Create</span>
+              <span className="button-text-full">Create Project</span>
+              <span className="button-text-short">Create</span>
             </AntButton>
           </Col>
         </Row>

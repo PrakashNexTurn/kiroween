@@ -129,11 +129,11 @@ export function Header() {
                   textOverflow: 'ellipsis',
                 }}
               >
-                <span className="hidden sm:inline">👻 Kiro's Ghost</span>
-                <span className="sm:hidden">👻 Kiro</span>
+                <span className="header-title-full">👻 Kiro's Ghost</span>
+                <span className="header-title-short">👻 Kiro</span>
               </h1>
               <span
-                className="hidden lg:inline-block"
+                className="header-tagline"
                 style={{
                   fontSize: '11px',
                   color: 'var(--color-text-tertiary)',
@@ -150,7 +150,7 @@ export function Header() {
           </div>
 
           {/* Breadcrumbs - Hidden on mobile */}
-          <nav className="hidden md:flex" style={{ flex: 1, justifyContent: 'center' }}>
+          <nav className="header-breadcrumbs" style={{ flex: 1, justifyContent: 'center' }}>
             <Breadcrumb
               items={breadcrumbs}
               style={{

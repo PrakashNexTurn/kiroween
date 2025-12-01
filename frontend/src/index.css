@@ -209,6 +209,110 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Responsive visibility classes */
+
+/* Header responsive classes */
+.header-title-full {
+  display: inline;
+}
+
+.header-title-short {
+  display: none;
+}
+
+.header-tagline {
+  display: none;
+}
+
+.header-breadcrumbs {
+  display: none;
+}
+
+/* Button text responsive classes */
+.button-text-full {
+  display: inline;
+}
+
+.button-text-short {
+  display: none;
+}
+
+.button-text-sm {
+  display: none;
+}
+
+.button-text-md {
+  display: none;
+}
+
+.button-kbd-lg {
+  display: none;
+}
+
+/* Small screens and up (≥576px) */
+@media (min-width: 576px) {
+  .header-title-full {
+    display: inline;
+  }
+  
+  .header-title-short {
+    display: none;
+  }
+  
+  .button-text-full {
+    display: inline;
+  }
+  
+  .button-text-short {
+    display: none;
+  }
+  
+  .button-text-sm {
+    display: inline;
+  }
+}
+
+/* Medium screens and up (≥768px) */
+@media (min-width: 768px) {
+  .header-breadcrumbs {
+    display: flex;
+  }
+  
+  .button-text-md {
+    display: inline;
+  }
+}
+
+/* Large screens and up (≥992px) */
+@media (min-width: 992px) {
+  .header-tagline {
+    display: inline-block;
+  }
+  
+  .button-kbd-lg {
+    display: inline-block;
+  }
+}
+
+/* Extra small screens only (<576px) */
+@media (max-width: 575px) {
+  .header-title-full {
+    display: none;
+  }
+  
+  .header-title-short {
+    display: inline;
+  }
+  
+  .button-text-full {
+    display: none;
+  }
+  
+  .button-text-short {
+    display: inline;
+  }
+}
+
 /* Mobile-specific optimizations */
 @media (max-width: 768px) {
   /* Ensure touch-friendly tap targets (minimum 44x44px) */
