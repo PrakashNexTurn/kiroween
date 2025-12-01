@@ -203,27 +203,6 @@ export function SteeringFileViewer({
         }}
       >
         <div className="flex items-center gap-3">
-          <FileText
-            size={20}
-            style={{ color: 'var(--color-brand-primary)' }}
-          />
-          <div>
-            <p
-              className="text-sm font-medium"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              {fileName}
-            </p>
-            <p
-              className="text-xs"
-              style={{ color: 'var(--color-text-tertiary)' }}
-            >
-              {(fileData.metadata.size / 1024).toFixed(2)} KB
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
           {hasChanges && (
             <span
               className="text-xs"

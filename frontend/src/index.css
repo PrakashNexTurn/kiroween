@@ -19,6 +19,17 @@ body {
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
+/* Resizing cursor for panel resize */
+body.resizing-panel {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+body.resizing-panel * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -319,26 +330,27 @@ html {
   max-width: 180px;
 }
 
+/* Only apply width constraints when NOT collapsed */
 @media (max-width: 768px) {
-  .files-tab-sider,
-  .steering-tab-sider {
+  .files-tab-sider:not(.ant-layout-sider-collapsed),
+  .steering-tab-sider:not(.ant-layout-sider-collapsed) {
     max-width: 150px !important;
   }
   
-  .files-tab-sider .ant-layout-sider-children,
-  .steering-tab-sider .ant-layout-sider-children {
+  .files-tab-sider:not(.ant-layout-sider-collapsed) .ant-layout-sider-children,
+  .steering-tab-sider:not(.ant-layout-sider-collapsed) .ant-layout-sider-children {
     width: 150px !important;
   }
 }
 
 @media (max-width: 576px) {
-  .files-tab-sider,
-  .steering-tab-sider {
+  .files-tab-sider:not(.ant-layout-sider-collapsed),
+  .steering-tab-sider:not(.ant-layout-sider-collapsed) {
     max-width: 120px !important;
   }
   
-  .files-tab-sider .ant-layout-sider-children,
-  .steering-tab-sider .ant-layout-sider-children {
+  .files-tab-sider:not(.ant-layout-sider-collapsed) .ant-layout-sider-children,
+  .steering-tab-sider:not(.ant-layout-sider-collapsed) .ant-layout-sider-children {
     width: 120px !important;
   }
 }

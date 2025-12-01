@@ -51,7 +51,7 @@ export function Layout() {
           backgroundColor: 'var(--color-bg-primary)',
         }}
       >
-        <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '32px 16px' }}>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '5px 5px' }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -71,7 +71,7 @@ export function Layout() {
           marginTop: 'auto',
         }}
       >
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '16px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '8px' }}>
           <div
             style={{
               display: 'flex',

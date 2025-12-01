@@ -168,7 +168,19 @@ User Request → Frontend → Backend API → kiro-cli → Kiro AI
 
 ---
 
-## 🆕 New Features
+## 🆕 Latest Features & Improvements
+
+### 📱 Mobile Optimization (November 30, 2025)
+
+Comprehensive mobile-first optimization while maintaining desktop layout:
+
+- **Touch Targets**: 44x44px minimum for all interactive elements
+- **Responsive Typography**: Fluid scaling using `clamp()` for all text
+- **Optimized Layouts**: Mobile-specific layouts for all components
+- **Better Spacing**: Improved padding and gaps throughout
+- **Icon-Only Buttons**: Compact mode on small screens
+- **Resizable Panels**: Desktop users can adjust file tree and steering panel widths
+- **Mobile Toggle**: Show/hide panels works perfectly on mobile devices
 
 ### 📁 File Explorer
 

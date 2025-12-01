@@ -5,7 +5,7 @@
  * Requirements: 1.4.1, 1.4.2, 1.4.5
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Plus, AlertCircle, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Layout, List, Typography, Space, Spin, Alert, Tooltip } from 'antd';
 import { Button, showError } from '../common';
@@ -45,6 +45,9 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [siderWidth, setSiderWidth] = useState(180);
+  const [isResizing, setIsResizing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   /**
    * Load steering files on mount
@@ -52,6 +55,67 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
   useEffect(() => {
     loadSteeringFiles();
   }, [projectId]);
+
+  // Detect mobile/tablet on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      
+      // Set appropriate width based on screen size
+      if (mobile) {
+        if (window.innerWidth <= 576) {
+          setSiderWidth(120);
+        } else {
+          setSiderWidth(150);
+        }
+      } else if (siderWidth < 180) {
+        // Reset to default desktop width if coming from mobile
+        setSiderWidth(180);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle resize start (desktop only)
+  const handleResizeStart = (e: React.MouseEvent) => {
+    if (isMobile) return;
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  // Handle resize
+  useEffect(() => {
+    if (!isResizing) {
+      document.body.classList.remove('resizing-panel');
+      return;
+    }
+
+    document.body.classList.add('resizing-panel');
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = Math.min(Math.max(e.clientX, 120), 400);
+      setSiderWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.body.classList.remove('resizing-panel');
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.classList.remove('resizing-panel');
+    };
+  }, [isResizing]);
 
   /**
    * Load steering files from API
@@ -71,7 +135,7 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
       // Show error toast with retry functionality (Requirement 3.3.5)
       showError(errorMessage, {
         onRetry: loadSteeringFiles,
-        duration: 7000
+        duration: 70000
       });
     } finally {
       setIsLoading(false);
@@ -174,7 +238,7 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        width={180}
+        width={siderWidth}
         collapsedWidth={0}
         theme="light"
         trigger={null}
@@ -182,6 +246,7 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           borderRight: '1px solid var(--color-border)',
+          position: 'relative',
         }}
       >
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -256,6 +321,34 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
             />
           </div>
         </div>
+
+        {/* Resize Handle - Desktop Only */}
+        {!collapsed && !isMobile && (
+          <div
+            onMouseDown={handleResizeStart}
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '4px',
+              cursor: 'col-resize',
+              backgroundColor: isResizing ? 'var(--color-brand-primary)' : 'transparent',
+              transition: 'background-color 0.2s',
+              zIndex: 10,
+            }}
+            onMouseEnter={(e) => {
+              if (!isResizing) {
+                e.currentTarget.style.backgroundColor = 'var(--color-border)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isResizing) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
+          />
+        )}
       </Sider>
 
       {/* File Content Area */}
