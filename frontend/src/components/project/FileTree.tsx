@@ -663,7 +663,6 @@ export const FileTree: React.FC<FileTreeProps> = ({
     <>
       <div
         ref={treeRef}
-        className="overflow-auto"
         tabIndex={0}
         style={{ outline: 'none' }}
       >

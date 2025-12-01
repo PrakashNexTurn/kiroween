@@ -1,0 +1,566 @@
+/* ============================================
+   HALLOWEEN ADVANCED ANIMATIONS & EFFECTS
+   Cursor movement, click effects, haunted bg
+   ============================================ */
+
+/* ============================================
+   CURSOR MOVEMENT & TRAIL EFFECT
+   ============================================ */
+
+@keyframes cursorGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7),
+                0 0 0 0 rgba(157, 78, 221, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 10px 5px rgba(255, 107, 53, 0.4),
+                0 0 15px 10px rgba(157, 78, 221, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0),
+                0 0 0 0 rgba(157, 78, 221, 0);
+  }
+}
+
+/* Cursor click ripple effect */
+@keyframes clickRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+  }
+}
+
+/* Cursor click sparkle */
+@keyframes clickSparkle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0);
+  }
+}
+
+/* ============================================
+   HAUNTED BACKGROUND ANIMATIONS
+   ============================================ */
+
+/* Fog drift effect */
+@keyframes fogDrift {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.08;
+  }
+  80% {
+    opacity: 0.08;
+  }
+  100% {
+    transform: translateX(100vw);
+    opacity: 0;
+  }
+}
+
+/* Haunted mist pulse */
+@keyframes mistPulse {
+  0%, 100% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.12;
+  }
+}
+
+/* Dark shadow flicker */
+@keyframes shadowFlicker {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  25% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.08;
+  }
+  75% {
+    opacity: 0.12;
+  }
+}
+
+/* Subtle glow pulse in background */
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.02;
+  }
+  50% {
+    opacity: 0.06;
+  }
+}
+
+/* ============================================
+   COMPONENT ENTRANCE ANIMATIONS
+   ============================================ */
+
+/* Card spooky entrance */
+@keyframes spookyCardEntry {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) rotateX(-10deg);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+/* Modal spooky pop */
+@keyframes spookyPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) rotateZ(-5deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05) rotateZ(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateZ(0);
+  }
+}
+
+/* Button pulse glow */
+@keyframes buttonPulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 53, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0);
+  }
+}
+
+/* Icon spooky bounce */
+@keyframes spookyBounce {
+  0%, 100% {
+    transform: translateY(0) rotateZ(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotateZ(-2deg);
+  }
+  50% {
+    transform: translateY(-8px) rotateZ(2deg);
+  }
+  75% {
+    transform: translateY(-3px) rotateZ(-1deg);
+  }
+}
+
+/* Icon flicker effect */
+@keyframes iconFlicker {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(255, 107, 53, 0.5));
+  }
+  10% {
+    opacity: 0.8;
+  }
+  20% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  40% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.8));
+  }
+  60% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.95;
+  }
+}
+
+/* ============================================
+   HAUNTED BACKGROUND IMPLEMENTATION
+   ============================================ */
+
+body[data-halloween-theme="true"] {
+  position: relative;
+}
+
+/* Primary fog layer - slow drift */
+body[data-halloween-theme="true"]::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 107, 53, 0.03) 25%,
+      rgba(255, 107, 53, 0.03) 75%,
+      transparent 100%);
+  animation: fogDrift 20s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Secondary fog layer - faster drift */
+body[data-halloween-theme="true"]::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(157, 78, 221, 0.02) 25%,
+      rgba(157, 78, 221, 0.02) 75%,
+      transparent 100%);
+  animation: fogDrift 30s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+  animation-delay: -5s;
+}
+
+/* Mist layer - pulsing effect */
+body[data-halloween-theme="true"] {
+  overflow-x: hidden;
+}
+
+body[data-halloween-theme="true"]::backdrop {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(255, 107, 53, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(157, 78, 221, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 40% 20%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+  animation: mistPulse 8s ease-in-out infinite;
+}
+
+/* ============================================
+   ANT DESIGN MODAL ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-modal-wrap {
+  animation: spookyPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+body[data-halloween-theme="true"] .ant-modal-content {
+  animation: spookyPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================
+   ANT DESIGN BUTTON ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+body[data-halloween-theme="true"] .ant-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+body[data-halloween-theme="true"] .ant-btn-primary:active::before {
+  width: 100px;
+  height: 100px;
+  animation: clickRipple 0.6s ease-out;
+}
+
+/* Button hover glow */
+body[data-halloween-theme="true"] .ant-btn-primary {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+body[data-halloween-theme="true"] .ant-btn-primary:hover {
+  animation: buttonPulseGlow 1.5s infinite;
+  transform: scale(1.08);
+}
+
+/* ============================================
+   ANT DESIGN CARD ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-card {
+  animation: spookyCardEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Card shadow glow on hover */
+body[data-halloween-theme="true"] .ant-card:hover {
+  box-shadow: 0 0 30px rgba(255, 107, 53, 0.5),
+              0 0 50px rgba(157, 78, 221, 0.3),
+              inset 0 0 20px rgba(255, 107, 53, 0.1);
+  transform: translateY(-5px);
+}
+
+/* ============================================
+   ICON ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] svg,
+body[data-halloween-theme="true"] [class*="icon"] {
+  animation: iconFlicker 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] svg:hover,
+body[data-halloween-theme="true"] [class*="icon"]:hover {
+  animation: spookyBounce 0.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.8))
+          drop-shadow(0 0 5px rgba(157, 78, 221, 0.5));
+}
+
+/* ============================================
+   LOADING ANIMATION
+   ============================================ */
+
+@keyframes hauntedSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+body[data-halloween-theme="true"] .ant-spin-spin {
+  animation: hauntedSpin 2s linear infinite;
+}
+
+/* ============================================
+   TABLE ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-table-tbody > tr {
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-table-tbody > tr:hover {
+  box-shadow: inset 0 0 15px rgba(255, 107, 53, 0.2);
+  background-color: rgba(255, 107, 53, 0.05) !important;
+  animation: mistPulse 0.8s ease-in-out;
+}
+
+/* ============================================
+   INPUT FOCUS ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-input:focus,
+body[data-halloween-theme="true"] input[type="text"]:focus,
+body[data-halloween-theme="true"] textarea:focus {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   BADGE & TAG ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-badge-count,
+body[data-halloween-theme="true"] .ant-tag {
+  animation: spookyBounce 2s ease-in-out infinite;
+}
+
+/* ============================================
+   TOOLTIP ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-tooltip-inner {
+  animation: spookyPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================
+   CURSOR CLICK EFFECT (JAVASCRIPT DRIVEN)
+   ============================================ */
+
+.cursor-click-effect {
+  position: fixed;
+  pointer-events: none;
+  border: 2px solid rgba(255, 107, 53, 0.8);
+  border-radius: 50%;
+  z-index: 9999;
+  animation: clickRipple 0.6s ease-out forwards;
+}
+
+.cursor-sparkle {
+  position: fixed;
+  pointer-events: none;
+  font-size: 20px;
+  animation: clickSparkle 0.8s ease-out forwards;
+  z-index: 9999;
+}
+
+/* ============================================
+   HAMBURGER MENU ANIMATION
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-layout-sider-trigger {
+  animation: buttonPulseGlow 2s infinite;
+}
+
+body[data-halloween-theme="true"] .ant-layout-sider-trigger:hover {
+  animation: spookyBounce 0.6s ease-in-out infinite;
+}
+
+/* ============================================
+   DROPDOWN ANIMATION
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-dropdown-menu {
+  animation: spookyPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================
+   TRANSITIONS - SMOOTH & SPOOKY
+   ============================================ */
+
+body[data-halloween-theme="true"] * {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   SKELETON ANIMATION
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-skeleton-content {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 107, 53, 0.05) 0%,
+    rgba(157, 78, 221, 0.1) 50%,
+    rgba(255, 107, 53, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================================
+   PROGRESS BAR ANIMATION
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-progress-inner {
+  background-color: rgba(157, 78, 221, 0.2);
+}
+
+body[data-halloween-theme="true"] .ant-progress-bar {
+  background: linear-gradient(90deg,
+    #FF6B35 0%,
+    #FFB366 50%,
+    #FF6B35 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.6),
+              0 0 20px rgba(157, 78, 221, 0.3);
+}
+
+/* ============================================
+   DIVIDER ANIMATION
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-divider {
+  position: relative;
+  overflow: hidden;
+}
+
+body[data-halloween-theme="true"] .ant-divider::before,
+body[data-halloween-theme="true"] .ant-divider::after {
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 107, 53, 0.5),
+    transparent);
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* ============================================
+   SCROLL ANIMATION
+   ============================================ */
+
+body[data-halloween-theme="true"] ::-webkit-scrollbar-thumb {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+/* ============================================
+   RESPONSIVE - REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-halloween-theme="true"] *,
+  body[data-halloween-theme="true"] *::before,
+  body[data-halloween-theme="true"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Reduce animation complexity on mobile */
+  body[data-halloween-theme="true"]::before,
+  body[data-halloween-theme="true"]::after {
+    opacity: 0.02;
+  }
+
+  body[data-halloween-theme="true"] .ant-card {
+    animation: none;
+  }
+
+  body[data-halloween-theme="true"] svg {
+    animation: none;
+  }
+}

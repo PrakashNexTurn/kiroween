@@ -12,6 +12,13 @@
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
+body[data-halloween-theme="true"] .ant-input, body[data-halloween-theme="true"] input[type="text"], body[data-halloween-theme="true"] input[type="password"], body[data-halloween-theme="true"] input[type="email"], body[data-halloween-theme="true"] textarea {
+    border: 0px !important;
+}
+
+body[data-halloween-theme="true"] .ant-input, body[data-halloween-theme="true"] input[type="text"]{
+  border: 0px !important;
+}
 body {
   margin: 0;
   min-width: 320px;

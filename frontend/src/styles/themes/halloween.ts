@@ -1,6 +1,6 @@
 /**
  * Halloween theme configuration
- * Provides a spooky, festive Halloween color scheme with orange, purple, and dark tones
+ * Provides a spooky, festive Halloween color scheme with haunted fonts, animations, and glowing effects
  */
 
 import type { Theme } from '../../types/theme.types';
@@ -9,15 +9,15 @@ export const halloweenTheme: Theme = {
   name: 'halloween',
   colors: {
     background: {
-      primary: '#1A0F1F', // Deep purple-black
-      secondary: '#2D1B3D', // Dark purple
-      tertiary: '#3D2550', // Medium purple
+      primary: '#0A0508', // Deep black-purple
+      secondary: '#1A0F1F', // Deep purple-black
+      tertiary: '#2D1B3D', // Dark purple
     },
     text: {
       primary: '#FFE5B4', // Warm cream/peach
       secondary: '#D4A574', // Muted gold
       tertiary: '#A67C52', // Bronze
-      inverse: '#1A0F1F',
+      inverse: '#0A0508',
     },
     brand: {
       primary: '#FF6B35', // Vibrant Halloween orange
@@ -40,7 +40,7 @@ export const halloweenTheme: Theme = {
     },
     border: '#4A2F5C',
     hover: '#3D2550',
-    active: '#4A2F5C',
+    active: '#5A3F6C',
     disabled: '#2D1B3D',
   },
   spacing: {
@@ -55,8 +55,8 @@ export const halloweenTheme: Theme = {
   },
   typography: {
     fontFamily: {
-      primary: "'Inter', system-ui, sans-serif",
-      monospace: "'Fira Code', 'Courier New', monospace",
+      primary: "'Creepster', 'Griffy', 'Creepy', 'Spooky', 'Inter', system-ui, sans-serif",
+      monospace: "'Courier Prime', 'Fira Code', 'Courier New', monospace",
     },
     fontSize: {
       xs: '0.75rem',
@@ -81,11 +81,11 @@ export const halloweenTheme: Theme = {
     },
   },
   shadows: {
-    sm: '0 1px 2px 0 rgba(255, 107, 53, 0.2)',
-    base: '0 1px 3px 0 rgba(255, 107, 53, 0.3), 0 1px 2px 0 rgba(157, 78, 221, 0.2)',
-    md: '0 4px 6px -1px rgba(255, 107, 53, 0.3), 0 2px 4px -1px rgba(157, 78, 221, 0.2)',
-    lg: '0 10px 15px -3px rgba(255, 107, 53, 0.3), 0 4px 6px -2px rgba(157, 78, 221, 0.2)',
-    xl: '0 20px 25px -5px rgba(255, 107, 53, 0.3), 0 10px 10px -5px rgba(157, 78, 221, 0.2)',
+    sm: '0 0 8px 0 rgba(255, 107, 53, 0.3)',
+    base: '0 0 15px 0 rgba(255, 107, 53, 0.4), 0 0 8px 0 rgba(157, 78, 221, 0.3)',
+    md: '0 0 20px -2px rgba(255, 107, 53, 0.5), 0 0 15px -4px rgba(157, 78, 221, 0.4)',
+    lg: '0 0 30px -3px rgba(255, 107, 53, 0.5), 0 0 20px -2px rgba(157, 78, 221, 0.4)',
+    xl: '0 0 40px -5px rgba(255, 107, 53, 0.6), 0 0 30px -5px rgba(157, 78, 221, 0.5)',
   },
   borderRadius: {
     sm: '0.25rem',
@@ -125,8 +125,8 @@ export const halloweenTheme: Theme = {
         exit: { opacity: 0, scale: 0.95 },
       },
       cardHover: {
-        rest: { scale: 1, boxShadow: '0 1px 3px rgba(255, 107, 53, 0.3)' },
-        hover: { scale: 1.02, boxShadow: '0 10px 15px rgba(255, 107, 53, 0.4)' },
+        rest: { scale: 1, boxShadow: '0 0 15px rgba(255, 107, 53, 0.3)' },
+        hover: { scale: 1.02, boxShadow: '0 0 30px rgba(255, 107, 53, 0.5)' },
       },
     },
   },

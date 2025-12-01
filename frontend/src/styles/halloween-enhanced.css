@@ -1,0 +1,567 @@
+/* ============================================
+   HALLOWEEN ENHANCED EFFECTS
+   Advanced animations for links, nav, and UI
+   ============================================ */
+
+/* ============================================
+   LINK HOVER EFFECTS
+   ============================================ */
+
+body[data-halloween-theme="true"] a {
+  position: relative;
+  text-decoration: none;
+  color: #FFE5B4;
+  transition: color 0.3s ease;
+}
+
+body[data-halloween-theme="true"] a::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #FF6B35, #9D4EDD, #FF6B35);
+  background-size: 200% 100%;
+  animation: glowLine 1s ease infinite;
+  transition: width 0.3s ease;
+}
+
+body[data-halloween-theme="true"] a:hover::before {
+  width: 100%;
+}
+
+@keyframes glowLine {
+  0%, 100% {
+    background-position: 0% 0%;
+    box-shadow: 0 0 5px rgba(255, 107, 53, 0.5);
+  }
+  50% {
+    background-position: 100% 0%;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+  }
+}
+
+/* ============================================
+   NAVIGATION ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-menu {
+  background-color: transparent !important;
+}
+
+body[data-halloween-theme="true"] .ant-menu-item {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body[data-halloween-theme="true"] .ant-menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 107, 53, 0.2),
+    transparent);
+  transition: left 0.5s ease;
+}
+
+body[data-halloween-theme="true"] .ant-menu-item:hover::before {
+  left: 100%;
+}
+
+body[data-halloween-theme="true"] .ant-menu-item:hover {
+  transform: translateX(5px);
+  box-shadow: inset -5px 0 15px rgba(255, 107, 53, 0.2);
+}
+
+body[data-halloween-theme="true"] .ant-menu-item-selected {
+  background: linear-gradient(90deg,
+    rgba(255, 107, 53, 0.15),
+    rgba(157, 78, 221, 0.1)) !important;
+  box-shadow: inset -5px 0 15px rgba(255, 107, 53, 0.3);
+}
+
+/* ============================================
+   HEADER ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-layout-header {
+  background: linear-gradient(135deg,
+    rgba(26, 15, 31, 0.95),
+    rgba(45, 27, 61, 0.95)) !important;
+  box-shadow: 0 5px 20px rgba(255, 107, 53, 0.2),
+              0 0 30px rgba(157, 78, 221, 0.1);
+  border-bottom: 2px solid #FF6B35;
+  animation: headerPulse 4s ease-in-out infinite;
+}
+
+@keyframes headerPulse {
+  0%, 100% {
+    box-shadow: 0 5px 20px rgba(255, 107, 53, 0.2),
+                0 0 30px rgba(157, 78, 221, 0.1);
+  }
+  50% {
+    box-shadow: 0 5px 25px rgba(255, 107, 53, 0.4),
+                0 0 40px rgba(157, 78, 221, 0.2);
+  }
+}
+
+/* ============================================
+   BREADCRUMB ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-breadcrumb-link {
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-breadcrumb-link:hover {
+  color: #FF8C42 !important;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.7);
+  transform: scale(1.1);
+}
+
+body[data-halloween-theme="true"] .ant-breadcrumb-separator {
+  color: #4A2F5C !important;
+  animation: separatorPulse 2s ease-in-out infinite;
+}
+
+@keyframes separatorPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   TABS ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-tabs-tab {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body[data-halloween-theme="true"] .ant-tabs-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #FF6B35, #9D4EDD);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-tabs-tab:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+body[data-halloween-theme="true"] .ant-tabs-tab-active {
+  color: #FFB366 !important;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+}
+
+body[data-halloween-theme="true"] .ant-tabs-ink-bar {
+  background: linear-gradient(90deg, #FF6B35, #9D4EDD) !important;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+  animation: inkBarGlow 2s ease-in-out infinite;
+}
+
+@keyframes inkBarGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 107, 53, 0.8),
+                0 0 10px rgba(157, 78, 221, 0.4);
+  }
+}
+
+/* ============================================
+   COLLAPSE/ACCORDION ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-collapse {
+  background-color: transparent !important;
+  border: 1px solid #4A2F5C !important;
+}
+
+body[data-halloween-theme="true"] .ant-collapse-header {
+  background-color: #2D1B3D !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-collapse-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 107, 53, 0.15),
+    transparent);
+  transition: left 0.6s ease;
+}
+
+body[data-halloween-theme="true"] .ant-collapse-header:hover {
+  background-color: #3D2550 !important;
+}
+
+body[data-halloween-theme="true"] .ant-collapse-header:hover::before {
+  left: 100%;
+}
+
+body[data-halloween-theme="true"] .ant-collapse-header-text {
+  color: #FFE5B4 !important;
+  font-family: 'Creepster', system-ui, sans-serif;
+}
+
+/* ============================================
+   LIST ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-list-item {
+  background-color: transparent;
+  border-bottom: 1px solid rgba(74, 47, 92, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+body[data-halloween-theme="true"] .ant-list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, #FF6B35, #9D4EDD);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-list-item:hover {
+  background-color: rgba(255, 107, 53, 0.08);
+  transform: translateX(5px);
+}
+
+body[data-halloween-theme="true"] .ant-list-item:hover::before {
+  transform: scaleY(1);
+}
+
+/* ============================================
+   EMPTY STATE ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-empty {
+  animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body[data-halloween-theme="true"] .ant-empty-image {
+  font-size: 48px;
+  animation: floatBounce 3s ease-in-out infinite;
+}
+
+@keyframes floatBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+body[data-halloween-theme="true"] .ant-empty-description {
+  color: #D4A574 !important;
+  font-family: 'Creepster', system-ui, sans-serif;
+  animation: glowText 2s ease-in-out infinite;
+}
+
+/* ============================================
+   FORM GROUP ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-form-item {
+  animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body[data-halloween-theme="true"] .ant-form-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+body[data-halloween-theme="true"] .ant-form-item:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+body[data-halloween-theme="true"] .ant-form-item:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+body[data-halloween-theme="true"] .ant-form-item-control-input-content {
+  position: relative;
+}
+
+/* ============================================
+   CHECKBOX & RADIO ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-checkbox-inner,
+body[data-halloween-theme="true"] .ant-radio-inner {
+  border-color: #4A2F5C !important;
+  background-color: transparent !important;
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+body[data-halloween-theme="true"] .ant-radio-wrapper:hover .ant-radio-inner {
+  border-color: #FF6B35 !important;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+}
+
+body[data-halloween-theme="true"] .ant-checkbox-checked .ant-checkbox-inner,
+body[data-halloween-theme="true"] .ant-radio-checked .ant-radio-inner {
+  background-color: #FF6B35 !important;
+  border-color: #FF8C42 !important;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+}
+
+/* ============================================
+   SWITCH ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-switch {
+  background-color: #4A2F5C !important;
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-switch:hover {
+  background-color: #5A3F6C !important;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+}
+
+body[data-halloween-theme="true"] .ant-switch-checked {
+  background-color: #FF6B35 !important;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+}
+
+/* ============================================
+   RATE ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-rate-star {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: scale(1);
+}
+
+body[data-halloween-theme="true"] .ant-rate-star:hover {
+  transform: scale(1.2) rotate(15deg);
+}
+
+body[data-halloween-theme="true"] .ant-rate-star-full {
+  color: #FF6B35 !important;
+}
+
+/* ============================================
+   ALERT ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-alert {
+  animation: slideDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background-color: rgba(255, 107, 53, 0.1) !important;
+  border: 1px solid #FF6B35 !important;
+  border-radius: 8px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body[data-halloween-theme="true"] .ant-alert-close-icon {
+  color: #FF6B35;
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-alert-close-icon:hover {
+  color: #FF8C42;
+  transform: rotate(90deg) scale(1.2);
+}
+
+/* ============================================
+   PAGINATION ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-pagination-item {
+  border-color: #4A2F5C !important;
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-pagination-item:hover {
+  border-color: #FF6B35 !important;
+  transform: scale(1.1);
+}
+
+body[data-halloween-theme="true"] .ant-pagination-item-active {
+  background-color: #FF6B35 !important;
+  border-color: #FF8C42 !important;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+}
+
+/* ============================================
+   SLIDER ANIMATIONS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-slider-rail {
+  background-color: rgba(74, 47, 92, 0.5) !important;
+}
+
+body[data-halloween-theme="true"] .ant-slider-track {
+  background: linear-gradient(90deg, #FF6B35, #FF8C42) !important;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+}
+
+body[data-halloween-theme="true"] .ant-slider-handle {
+  background-color: #FF6B35 !important;
+  border-color: #FFB366 !important;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-slider-handle:hover,
+body[data-halloween-theme="true"] .ant-slider-handle-dragging {
+  box-shadow: 0 0 25px rgba(255, 107, 53, 1);
+  transform: scale(1.2);
+}
+
+/* ============================================
+   SPIN/LOADING ICON ANIMATION
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-spin-nested-loading {
+  animation: fadeIn 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-spin-dot {
+  animation: hauntedSpin 1.5s linear infinite;
+}
+
+body[data-halloween-theme="true"] .ant-spin-dot-item {
+  background-color: #FF6B35 !important;
+  box-shadow: 0 0 5px rgba(255, 107, 53, 0.8);
+}
+
+/* ============================================
+   TOOLTIP & POPOVER HOVER TEXT
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-tooltip-placement-top > .ant-tooltip-arrow::after,
+body[data-halloween-theme="true"] .ant-tooltip-placement-bottom > .ant-tooltip-arrow::after,
+body[data-halloween-theme="true"] .ant-tooltip-placement-left > .ant-tooltip-arrow::after,
+body[data-halloween-theme="true"] .ant-tooltip-placement-right > .ant-tooltip-arrow::after {
+  background-color: #2D1B3D !important;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  body[data-halloween-theme="true"] a::before {
+    display: none;
+  }
+
+  body[data-halloween-theme="true"] .ant-collapse-header::before {
+    display: none;
+  }
+
+  body[data-halloween-theme="true"] .ant-list-item::before {
+    display: none;
+  }
+
+  body[data-halloween-theme="true"] svg:hover {
+    animation: none;
+  }
+}
+
+/* ============================================
+   UTILITY ANIMATIONS
+   ============================================ */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hauntedSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glowText {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(255, 107, 53, 0.5),
+                 0 0 10px rgba(157, 78, 221, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(255, 107, 53, 0.8),
+                 0 0 20px rgba(157, 78, 221, 0.5),
+                 0 0 30px rgba(255, 107, 53, 0.4);
+  }
+}
+
+/* ============================================
+   FILETREE ANIMATION DISABLED
+   No animations for file tree for smooth scrolling
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-tree-treenode {
+  animation: none !important;
+}
+
+body[data-halloween-theme="true"] .custom-file-tree .ant-tree-node-content-wrapper {
+  animation: none !important;
+}
+
+body[data-halloween-theme="true"] .custom-file-tree {
+  animation: none !important;
+}

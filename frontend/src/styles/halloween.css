@@ -1,0 +1,558 @@
+/* ============================================
+   HALLOWEEN THEME STYLES
+   Spooky fonts, glowing effects, and animations
+   ============================================ */
+
+/* Import haunted fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Griffy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+
+/* ============================================
+   PUMPKIN CURSOR STYLES WITH ORANGE SHADOW
+   ============================================ */
+
+/* Base cursor - pumpkin emoji with orange shadow */
+body[data-halloween-theme="true"] {
+  cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><defs><filter id="orangeShadow"><feGaussianBlur in="SourceAlpha" stdDeviation="2"/><feOffset dx="1" dy="1.5" result="offsetblur"/><feFlood flood-color="%23FF6B35" flood-opacity="0.7"/><feComposite in2="offsetblur" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><text x="2" y="24" font-size="24" text-anchor="start" filter="url(%23orangeShadow)">🎃</text></svg>') 2 0, auto;
+}
+
+/* Interactive elements - brighter pumpkin with enhanced glow and shadow */
+body[data-halloween-theme="true"] a,
+body[data-halloween-theme="true"] button,
+body[data-halloween-theme="true"] [role="button"],
+body[data-halloween-theme="true"] input,
+body[data-halloween-theme="true"] textarea,
+body[data-halloween-theme="true"] select {
+  cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><defs><filter id="glowingShadow"><feGaussianBlur in="SourceAlpha" stdDeviation="2.2"/><feOffset dx="1.2" dy="1.8" result="offsetblur"/><feFlood flood-color="%23FF8C42" flood-opacity="0.8"/><feComposite in2="offsetblur" operator="in" result="offsetColor"/><feFlood flood-color="%23FF6B35" flood-opacity="0.4" result="offsetColor2"/><feComposite in="offsetColor2" in2="offsetblur" operator="in" result="offsetColor2"/><feMerge><feMergeNode in="offsetColor"/><feMergeNode in="offsetColor2"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><text x="2" y="24" font-size="24" text-anchor="start" filter="url(%23glowingShadow)" style="font-weight: bold;">🎃</text></svg>') 2 0, auto;
+}
+
+/* Cursor enhancement - add subtle glow box-shadow to interactive elements when hovered */
+body[data-halloween-theme="true"] a:hover,
+body[data-halloween-theme="true"] button:hover,
+body[data-halloween-theme="true"] input:hover,
+body[data-halloween-theme="true"] textarea:hover,
+body[data-halloween-theme="true"] select:hover {
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.4), 0 0 30px rgba(255, 107, 53, 0.2);
+}
+
+/* ============================================
+   BACKGROUND ANIMATIONS
+   ============================================ */
+
+/* Floating ghosts animation */
+@keyframes floatGhost {
+  0% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.03;
+  }
+  50% {
+    transform: translateY(-30px) translateX(10px);
+    opacity: 0.05;
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.03;
+  }
+}
+
+@keyframes floatGhost2 {
+  0% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.02;
+  }
+  50% {
+    transform: translateY(-40px) translateX(-15px);
+    opacity: 0.04;
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.02;
+  }
+}
+
+@keyframes floatGhost3 {
+  0% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.025;
+  }
+  50% {
+    transform: translateY(-35px) translateX(20px);
+    opacity: 0.045;
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.025;
+  }
+}
+
+/* Pulsing glow effect */
+@keyframes pulsingGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 107, 53, 0.3), inset 0 0 10px rgba(255, 107, 53, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.5), inset 0 0 15px rgba(255, 107, 53, 0.2);
+  }
+}
+
+/* Purple flickering effect */
+@keyframes purpleFlicker {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(157, 78, 221, 0.8), 0 0 30px rgba(255, 107, 53, 0.4);
+  }
+}
+
+/* Orange glow pulse */
+@keyframes orangePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(255, 107, 53, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 107, 53, 0.7));
+  }
+}
+
+/* Haunted text wobble */
+@keyframes hauntedWobble {
+  0%, 100% {
+    transform: skewX(-0.75deg) skewY(-0.75deg);
+  }
+  50% {
+    transform: skewX(0.75deg) skewY(0.75deg);
+  }
+}
+
+/* Background flicker */
+@keyframes backgroundFlicker {
+  0%, 100% {
+    background-color: #0A0508;
+  }
+  50% {
+    background-color: #150A1A;
+  }
+}
+
+/* Glow text effect */
+@keyframes glowText {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(255, 107, 53, 0.5),
+                 0 0 10px rgba(157, 78, 221, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(255, 107, 53, 0.8),
+                 0 0 20px rgba(157, 78, 221, 0.5),
+                 0 0 30px rgba(255, 107, 53, 0.4);
+  }
+}
+
+/* ============================================
+   HALLOWEEN THEME BODY STYLES
+   ============================================ */
+
+body[data-halloween-theme="true"] {
+  font-family: 'Creepster', 'Griffy', 'Courier Prime', system-ui, sans-serif;
+  background-color: #0A0508;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(157, 78, 221, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 107, 53, 0.02) 0%, transparent 50%);
+  animation: backgroundFlicker 4s ease-in-out infinite;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Ghost background elements */
+body[data-halloween-theme="true"]::before,
+body[data-halloween-theme="true"]::after {
+  content: '👻';
+  position: fixed;
+  font-size: 80px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body[data-halloween-theme="true"]::before {
+  top: 10%;
+  left: 5%;
+  animation: floatGhost 8s ease-in-out infinite;
+}
+
+body[data-halloween-theme="true"]::after {
+  bottom: 20%;
+  right: 10%;
+  animation: floatGhost2 10s ease-in-out infinite;
+}
+
+/* ============================================
+   HAUNTED FONT AND TEXT EFFECTS
+   ============================================ */
+
+body[data-halloween-theme="true"] h1,
+body[data-halloween-theme="true"] h2,
+body[data-halloween-theme="true"] h3,
+body[data-halloween-theme="true"] h4,
+body[data-halloween-theme="true"] h5,
+body[data-halloween-theme="true"] h6 {
+  font-family: 'Creepster', 'Griffy', serif;
+  animation: glowText 3s ease-in-out infinite;
+  letter-spacing: 0.05em;
+}
+
+body[data-halloween-theme="true"] .prose h1,
+body[data-halloween-theme="true"] .prose h2,
+body[data-halloween-theme="true"] .prose h3 {
+  animation: glowText 3s ease-in-out infinite;
+}
+
+/* Pulsing headers */
+body[data-halloween-theme="true"] button,
+body[data-halloween-theme="true"] .ant-btn {
+  font-family: 'Creepster', 'Griffy', system-ui, sans-serif;
+  animation: orangePulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   ANT DESIGN MODAL HALLOWEEN STYLES
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-modal {
+  animation: slideUp 0.4s ease-out;
+}
+
+body[data-halloween-theme="true"] .ant-modal-content {
+  background-color: #1A0F1F !important;
+  border: 2px solid #FF6B35;
+  box-shadow: 0 0 30px rgba(255, 107, 53, 0.4),
+              0 0 50px rgba(157, 78, 221, 0.3),
+              inset 0 0 20px rgba(255, 107, 53, 0.1);
+  border-radius: 8px;
+  animation: pulsingGlow 3s ease-in-out infinite;
+}
+
+body[data-halloween-theme="true"] .ant-modal-header {
+  background-color: #2D1B3D !important;
+  border-bottom: 2px solid #FF6B35;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+body[data-halloween-theme="true"] .ant-modal-title {
+  color: #FFE5B4 !important;
+  font-family: 'Creepster', 'Griffy', serif;
+  font-size: 1.3em;
+  animation: glowText 2.5s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+}
+
+body[data-halloween-theme="true"] .ant-modal-close {
+  color: #FFE5B4 !important;
+}
+
+body[data-halloween-theme="true"] .ant-modal-close:hover {
+  color: #FF6B35 !important;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.7);
+}
+
+/* Modal body */
+body[data-halloween-theme="true"] .ant-modal-body {
+  background-color: #1A0F1F !important;
+  color: #FFE5B4 !important;
+  font-family: 'Courier Prime', monospace;
+}
+
+/* Modal footer */
+body[data-halloween-theme="true"] .ant-modal-footer {
+  background-color: #2D1B3D !important;
+  border-top: 2px solid #FF6B35;
+  box-shadow: inset 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+/* ============================================
+   ANT DESIGN TOOLTIP HALLOWEEN STYLES
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-tooltip-inner {
+  background-color: #2D1B3D !important;
+  color: #FFE5B4 !important;
+  border: 1px solid #FF6B35;
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.4),
+              0 0 15px rgba(157, 78, 221, 0.2);
+  font-family: 'Creepster', system-ui, sans-serif;
+  animation: purpleFlicker 1.5s ease-in-out infinite;
+}
+
+body[data-halloween-theme="true"] .ant-tooltip-arrow-content {
+  background-color: #2D1B3D !important;
+  border-color: #FF6B35 !important;
+}
+
+body[data-halloween-theme="true"] .ant-tooltip-arrow::before {
+  border: 1px solid #FF6B35 !important;
+  background-color: #2D1B3D !important;
+}
+
+/* ============================================
+   ANT DESIGN INPUT HALLOWEEN STYLES
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-input,
+body[data-halloween-theme="true"] input[type="text"],
+body[data-halloween-theme="true"] input[type="password"],
+body[data-halloween-theme="true"] input[type="email"],
+body[data-halloween-theme="true"] textarea {
+  background-color: #150A1A !important;
+  color: #FFE5B4 !important;
+  border: 0px !important;
+  font-family: 'Courier Prime', monospace;
+  box-shadow: inset 0 0 10px rgba(255, 107, 53, 0.1);
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-input:hover,
+body[data-halloween-theme="true"] input[type="text"]:hover,
+body[data-halloween-theme="true"] input[type="password"]:hover,
+body[data-halloween-theme="true"] input[type="email"]:hover,
+body[data-halloween-theme="true"] textarea:hover {
+  border-color: #FF6B35 !important;
+  box-shadow: inset 0 0 15px rgba(255, 107, 53, 0.2),
+              0 0 10px rgba(255, 107, 53, 0.3) !important;
+}
+
+body[data-halloween-theme="true"] .ant-input:focus,
+body[data-halloween-theme="true"] input[type="text"]:focus,
+body[data-halloween-theme="true"] input[type="password"]:focus,
+body[data-halloween-theme="true"] input[type="email"]:focus,
+body[data-halloween-theme="true"] textarea:focus {
+  border-color: #FF8C42 !important;
+  box-shadow: inset 0 0 20px rgba(255, 107, 53, 0.3),
+              0 0 20px rgba(255, 107, 53, 0.5),
+              0 0 10px rgba(157, 78, 221, 0.3) !important;
+  background-color: #1A0F1F !important;
+  animation: glowText 1.5s ease-in-out infinite;
+}
+
+/* Input placeholder */
+body[data-halloween-theme="true"] .ant-input::placeholder,
+body[data-halloween-theme="true"] textarea::placeholder {
+  color: #A67C52 !important;
+  opacity: 0.6;
+}
+
+/* Input label */
+body[data-halloween-theme="true"] .ant-form-item-label > label {
+  color: #FFE5B4 !important;
+  font-family: 'Creepster', system-ui, sans-serif;
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(255, 107, 53, 0.3);
+}
+
+body[data-halloween-theme="true"] .ant-form-item-label > label.ant-form-item-required::before {
+  color: #D32F2F !important;
+}
+
+/* ============================================
+   ANT DESIGN BUTTON HALLOWEEN STYLES
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-btn-primary {
+  background-color: #FF6B35 !important;
+  border-color: #FF8C42 !important;
+  color: #0A0508 !important;
+  font-family: 'Creepster', system-ui, sans-serif;
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+  animation: orangePulse 2s ease-in-out infinite;
+}
+
+body[data-halloween-theme="true"] .ant-btn-primary:hover {
+  background-color: #FF8C42 !important;
+  border-color: #FFB366 !important;
+  box-shadow: 0 0 25px rgba(255, 107, 53, 0.8);
+  transform: scale(1.05);
+}
+
+body[data-halloween-theme="true"] .ant-btn-primary:active {
+  background-color: #E55A24 !important;
+  transform: scale(0.98);
+}
+
+body[data-halloween-theme="true"] .ant-btn-default {
+  background-color: #2D1B3D !important;
+  border-color: #4A2F5C !important;
+  color: #FFE5B4 !important;
+  font-family: 'Creepster', system-ui, sans-serif;
+}
+
+body[data-halloween-theme="true"] .ant-btn-default:hover {
+  background-color: #3D2550 !important;
+  border-color: #FF6B35 !important;
+  color: #FFE5B4 !important;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+}
+
+/* ============================================
+   ANT DESIGN SELECT AND DROPDOWN STYLES
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-select-selector {
+  background-color: #150A1A !important;
+  border: 1px solid #4A2F5C !important;
+  color: #FFE5B4 !important;
+}
+
+body[data-halloween-theme="true"] .ant-select-selector:hover {
+  border-color: #FF6B35 !important;
+}
+
+body[data-halloween-theme="true"] .ant-select-focused .ant-select-selector {
+  border-color: #FF8C42 !important;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.4) !important;
+}
+
+body[data-halloween-theme="true"] .ant-select-selection-item {
+  color: #FFE5B4 !important;
+}
+
+body[data-halloween-theme="true"] .ant-dropdown-menu {
+  background-color: #1A0F1F !important;
+  border: 1px solid #4A2F5C !important;
+}
+
+body[data-halloween-theme="true"] .ant-dropdown-menu-item {
+  color: #FFE5B4 !important;
+}
+
+body[data-halloween-theme="true"] .ant-dropdown-menu-item:hover {
+  background-color: #2D1B3D !important;
+  color: #FF8C42 !important;
+}
+
+/* ============================================
+   ADDITIONAL ANT DESIGN COMPONENTS
+   ============================================ */
+
+body[data-halloween-theme="true"] .ant-card {
+  background-color: #1A0F1F !important;
+  border: 1px solid #4A2F5C !important;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.2),
+              0 0 10px rgba(157, 78, 221, 0.1);
+  transition: all 0.3s ease;
+}
+
+body[data-halloween-theme="true"] .ant-card:hover {
+  box-shadow: 0 0 25px rgba(255, 107, 53, 0.3),
+              0 0 15px rgba(157, 78, 221, 0.2);
+  border-color: #FF6B35;
+}
+
+body[data-halloween-theme="true"] .ant-divider {
+  background-color: #4A2F5C !important;
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, #4A2F5C, #FF6B35, #4A2F5C);
+}
+
+body[data-halloween-theme="true"] .ant-table {
+  background-color: #1A0F1F !important;
+  color: #FFE5B4 !important;
+}
+
+body[data-halloween-theme="true"] .ant-table-thead > tr > th {
+  background-color: #2D1B3D !important;
+  color: #FFE5B4 !important;
+  border-color: #4A2F5C !important;
+  border-bottom: 2px solid #FF6B35;
+}
+
+body[data-halloween-theme="true"] .ant-table-tbody > tr > td {
+  border-color: #4A2F5C !important;
+  color: #FFE5B4 !important;
+}
+
+body[data-halloween-theme="true"] .ant-table-tbody > tr:hover > td {
+  background-color: #2D1B3D !important;
+}
+
+/* ============================================
+   SCROLLBAR HALLOWEEN STYLES
+   ============================================ */
+
+body[data-halloween-theme="true"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body[data-halloween-theme="true"] ::-webkit-scrollbar-track {
+  background: #150A1A;
+}
+
+body[data-halloween-theme="true"] ::-webkit-scrollbar-thumb {
+  background: #FF6B35;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+}
+
+body[data-halloween-theme="true"] ::-webkit-scrollbar-thumb:hover {
+  background: #FF8C42;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+}
+
+/* ============================================
+   ANIMATIONS FOR HALLOWEEN THEME
+   ============================================ */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Smooth transitions */
+body[data-halloween-theme="true"] * {
+  transition: background-color 0.3s ease,
+              color 0.3s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* Reduce animation on smaller devices */
+@media (max-width: 768px) {
+  body[data-halloween-theme="true"]::before,
+  body[data-halloween-theme="true"]::after {
+    opacity: 0.01;
+    font-size: 60px;
+  }
+
+  body[data-halloween-theme="true"] h1,
+  body[data-halloween-theme="true"] h2,
+  body[data-halloween-theme="true"] h3 {
+    animation: glowText 3s ease-in-out infinite;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  body[data-halloween-theme="true"],
+  body[data-halloween-theme="true"] * {
+    animation: none !important;
+    background-image: none !important;
+  }
+}

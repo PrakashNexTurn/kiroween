@@ -1,0 +1,476 @@
+/* ============================================
+   HALLOWEEN SCREENSAVER & FLYING ICONS
+   Inactivity mode with melting UI and blood
+   ============================================ */
+
+/* ============================================
+   FLYING ICONS ANIMATIONS
+   ============================================ */
+
+@keyframes flyAcross1 {
+  0% {
+    transform: translateX(-50px) translateY(-50px) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(calc(100vw + 100px)) translateY(calc(100vh + 100px)) rotate(360deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes flyAcross2 {
+  0% {
+    transform: translateX(calc(100vw + 50px)) translateY(-50px) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-100px) translateY(calc(100vh + 100px)) rotate(-360deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes flyAcross3 {
+  0% {
+    transform: translateX(50%) translateY(-50px) rotate(45deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(50%) translateY(calc(100vh + 100px)) rotate(405deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes flyAcross4 {
+  0% {
+    transform: translateX(-50px) translateY(50%) rotate(-45deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(calc(100vw + 100px)) translateY(50%) rotate(-405deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes flyAcross5 {
+  0% {
+    transform: translateX(0) translateY(-50px) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(100vw) translateY(100vh) rotate(720deg) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes bobbing {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(-20px);
+  }
+  75% {
+    transform: translateY(20px);
+  }
+}
+
+/* Flying icons container */
+.flying-icons-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* Individual flying icon */
+.flying-icon {
+  position: fixed;
+  font-size: 40px;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 101;
+  filter: drop-shadow(0 0 5px rgba(255, 107, 53, 0.5));
+  animation: flyAcross1 8s linear forwards infinite;
+}
+
+.flying-icon:nth-child(1) {
+  animation: flyAcross1 8s linear forwards infinite;
+}
+
+.flying-icon:nth-child(2) {
+  animation: flyAcross2 10s linear forwards infinite;
+}
+
+.flying-icon:nth-child(3) {
+  animation: flyAcross3 12s linear forwards infinite;
+}
+
+.flying-icon:nth-child(4) {
+  animation: flyAcross4 9s linear forwards infinite;
+}
+
+.flying-icon:nth-child(5) {
+  animation: flyAcross1 11s linear forwards infinite;
+  animation-delay: 1s;
+}
+
+.flying-icon:nth-child(6) {
+  animation: flyAcross2 13s linear forwards infinite;
+  animation-delay: 2s;
+}
+
+.flying-icon:nth-child(7) {
+  animation: flyAcross5 15s linear forwards infinite;
+  animation-delay: 1.5s;
+}
+
+.flying-icon:nth-child(8) {
+  animation: flyAcross3 10s linear forwards infinite;
+  animation-delay: 2.5s;
+}
+
+/* ============================================
+   SCREENSAVER EFFECT - MELTING UI
+   ============================================ */
+
+.halloween-screensaver {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+.halloween-screensaver.active {
+  opacity: 1;
+}
+
+/* ============================================
+   UI MELT EFFECT
+   ============================================ */
+
+.ui-melt-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 107, 53, 0) 0%,
+    rgba(211, 47, 47, 0.15) 50%,
+    rgba(211, 47, 47, 0.3) 100%
+  );
+  animation: meltIntensity 3s ease-in-out forwards;
+}
+
+@keyframes meltIntensity {
+  0% {
+    opacity: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 107, 53, 0) 0%,
+      rgba(211, 47, 47, 0) 50%,
+      rgba(211, 47, 47, 0) 100%
+    );
+  }
+  50% {
+    opacity: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 107, 53, 0.1) 0%,
+      rgba(211, 47, 47, 0.3) 50%,
+      rgba(211, 47, 47, 0.5) 100%
+    );
+  }
+  100% {
+    opacity: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 107, 53, 0.2) 0%,
+      rgba(211, 47, 47, 0.4) 50%,
+      rgba(211, 47, 47, 0.6) 100%
+    );
+  }
+}
+
+/* ============================================
+   BLOOD DRIPS
+   ============================================ */
+
+@keyframes bloodDrip {
+  0% {
+    top: -20px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100vh;
+    opacity: 0;
+  }
+}
+
+@keyframes bloodSpread {
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+
+.blood-drip {
+  position: absolute;
+  top: -20px;
+  width: 8px;
+  height: 60px;
+  background: linear-gradient(
+    180deg,
+    #D32F2F 0%,
+    #8B0000 50%,
+    #660000 100%
+  );
+  border-radius: 10px 10px 0 0;
+  filter: drop-shadow(0 0 4px rgba(211, 47, 47, 0.8));
+  animation: bloodDrip 5s linear forwards;
+}
+
+.blood-drip::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: -20px;
+  width: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #8B0000, transparent);
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 4px rgba(211, 47, 47, 0.6));
+}
+
+.blood-drip::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, #D32F2F, #660000);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 3px rgba(211, 47, 47, 0.7));
+}
+
+/* ============================================
+   MELT WAVE DISTORTION
+   ============================================ */
+
+@keyframes meltWave {
+  0% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) scaleY(0.8);
+    opacity: 0;
+  }
+}
+
+.melt-wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: url('data:image/svg+xml,<svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,40 Q 300,0 600,40 T 1200,40 L 1200,80 L 0,80 Z" fill="rgba(211,47,47,0.3)" stroke="rgba(211,47,47,0.5)" stroke-width="2"/></svg>');
+  background-size: 600px 80px;
+  background-position: 0 0;
+  background-repeat: repeat-x;
+  animation: meltWave 6s ease-in forwards;
+  filter: drop-shadow(0 4px 8px rgba(211, 47, 47, 0.4));
+}
+
+.melt-wave::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(211, 47, 47, 0.3),
+    transparent
+  );
+  filter: blur(5px);
+}
+
+/* ============================================
+   DISTORTION EFFECT ON UI
+   ============================================ */
+
+body[data-halloween-theme="true"].screensaver-active {
+  filter: blur(0px) sepia(0.2) brightness(0.8);
+  animation: screenDistortion 0.3s ease-in-out infinite;
+}
+
+@keyframes screenDistortion {
+  0%, 100% {
+    filter: blur(0px) sepia(0.2) brightness(0.8);
+  }
+  25% {
+    filter: blur(1px) sepia(0.25) brightness(0.75);
+  }
+  50% {
+    filter: blur(0.5px) sepia(0.2) brightness(0.85);
+  }
+  75% {
+    filter: blur(1.5px) sepia(0.3) brightness(0.7);
+  }
+}
+
+/* ============================================
+   BLOOD SPLATTER PARTICLE
+   ============================================ */
+
+@keyframes bloodSplat {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0);
+  }
+}
+
+.blood-splatter {
+  position: fixed;
+  pointer-events: none;
+  font-size: 20px;
+  animation: bloodSplat 1.5s ease-out forwards;
+  z-index: 1001;
+  filter: drop-shadow(0 0 2px rgba(211, 47, 47, 0.8));
+}
+
+/* ============================================
+   TEXT GLITCH EFFECT (OPTIONAL)
+   ============================================ */
+
+@keyframes textGlitch {
+  0% {
+    text-shadow: 2px 0 #D32F2F, -2px 0 #8B0000;
+  }
+  25% {
+    text-shadow: -2px 0 #D32F2F, 2px 0 #8B0000;
+  }
+  50% {
+    text-shadow: 3px 0 #D32F2F, -3px 0 #8B0000;
+  }
+  75% {
+    text-shadow: -3px 0 #D32F2F, 3px 0 #8B0000;
+  }
+  100% {
+    text-shadow: 2px 0 #D32F2F, -2px 0 #8B0000;
+  }
+}
+
+body[data-halloween-theme="true"].screensaver-active .ant-modal-title,
+body[data-halloween-theme="true"].screensaver-active .ant-page-header-heading-title {
+  animation: textGlitch 0.3s ease-in-out infinite;
+  color: #FF6B35;
+}
+
+/* ============================================
+   CONTINUOUS FLYING EFFECT
+   ============================================ */
+
+body[data-halloween-theme="true"] .flying-icons-container {
+  animation: fadeInFlyingIcons 0.5s ease-in;
+}
+
+@keyframes fadeInFlyingIcons {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   MOBILE OPTIMIZATION
+   ============================================ */
+
+@media (max-width: 768px) {
+  .flying-icon {
+    font-size: 30px;
+  }
+
+  .blood-drip {
+    width: 6px;
+    height: 40px;
+  }
+
+  .melt-wave {
+    height: 60px;
+  }
+
+  body[data-halloween-theme="true"].screensaver-active {
+    filter: blur(0px) brightness(0.8);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .flying-icon,
+  .blood-drip,
+  .melt-wave,
+  .ui-melt-effect {
+    animation: none !important;
+  }
+
+  body[data-halloween-theme="true"].screensaver-active {
+    animation: none !important;
+  }
+}

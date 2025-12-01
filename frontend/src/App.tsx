@@ -12,6 +12,8 @@ import { ToastContainer, ErrorBoundary } from './components/common';
 import { ProjectBoardPage, ProjectDetailPage, NotFoundPage } from './pages';
 import { FileTreeProvider } from './contexts/FileTreeContext';
 import { useTheme } from './hooks/useTheme';
+import { useCursorEffect } from './hooks/useCursorEffect';
+import { useScreensaverMode } from './hooks/useScreensaverMode';
 import { setupKeyboardUserDetection } from './utils/accessibility';
 import './App.css';
 
@@ -38,6 +40,12 @@ function AnimatedRoutes() {
 function App() {
   // Get Ant Design theme configuration from theme context
   const { antdTheme } = useTheme();
+
+  // Initialize cursor effects for Halloween theme
+  useCursorEffect();
+
+  // Initialize screensaver mode with flying icons
+  useScreensaverMode();
 
   // Initialize accessibility features
   useEffect(() => {

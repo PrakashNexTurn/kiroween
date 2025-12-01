@@ -112,6 +112,7 @@ export function FilesTab({ projectId }: FilesTabProps) {
           backgroundColor: 'var(--color-bg-secondary)',
           borderRight: '1px solid var(--color-border)',
           position: 'relative',
+          width:'500px'
         }}
       >
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -127,7 +128,7 @@ export function FilesTab({ projectId }: FilesTabProps) {
           </div>
 
           {/* File Tree */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '0 8px 8px 8px' }}>
+          <div style={{ flex: 1, overflowX:'hidden', cursor: 'pointer', padding: '8px 8px 8px' }}>
             <FileTree
               projectId={projectId}
               onFileSelect={setSelectedFile}

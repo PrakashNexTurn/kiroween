@@ -32,6 +32,7 @@ const DEFAULT_THEME = 'light';
  */
 function applyTheme(theme: Theme): void {
   const root = document.documentElement;
+  const body = document.body;
 
   // Apply background colors
   root.style.setProperty(
@@ -92,6 +93,13 @@ function applyTheme(theme: Theme): void {
   root.style.setProperty('--color-hover', theme.colors.hover);
   root.style.setProperty('--color-active', theme.colors.active);
   root.style.setProperty('--color-disabled', theme.colors.disabled);
+
+  // Set Halloween theme attribute for special Halloween CSS styling
+  if (theme.name === 'halloween') {
+    body.setAttribute('data-halloween-theme', 'true');
+  } else {
+    body.removeAttribute('data-halloween-theme');
+  }
 
   // Add smooth transition for theme switching
   // This ensures all color changes animate smoothly
