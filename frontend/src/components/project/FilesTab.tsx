@@ -39,10 +39,11 @@ export function FilesTab({ projectId }: FilesTabProps) {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        width={200}
+        width={180}
         collapsedWidth={0}
         theme="light"
         trigger={null}
+        className="files-tab-sider"
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           borderRight: '1px solid var(--color-border)',

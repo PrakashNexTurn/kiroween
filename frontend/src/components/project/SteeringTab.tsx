@@ -174,10 +174,11 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        width={200}
+        width={180}
         collapsedWidth={0}
         theme="light"
         trigger={null}
+        className="steering-tab-sider"
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           borderRight: '1px solid var(--color-border)',

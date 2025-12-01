@@ -313,6 +313,36 @@ html {
   }
 }
 
+/* Files and Steering tab sidebars - responsive width */
+.files-tab-sider,
+.steering-tab-sider {
+  max-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .files-tab-sider,
+  .steering-tab-sider {
+    max-width: 150px !important;
+  }
+  
+  .files-tab-sider .ant-layout-sider-children,
+  .steering-tab-sider .ant-layout-sider-children {
+    width: 150px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .files-tab-sider,
+  .steering-tab-sider {
+    max-width: 120px !important;
+  }
+  
+  .files-tab-sider .ant-layout-sider-children,
+  .steering-tab-sider .ant-layout-sider-children {
+    width: 120px !important;
+  }
+}
+
 /* Project detail tabs - mobile scrolling */
 .project-detail-tabs .ant-tabs-nav {
   overflow-x: auto;
@@ -429,6 +459,34 @@ html {
     background: linear-gradient(to right, transparent, var(--color-bg-primary));
     pointer-events: none;
     opacity: 0.8;
+  }
+  
+  /* Compact sidebar styling on mobile */
+  .files-tab-sider .ant-input,
+  .steering-tab-sider .ant-input {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+  
+  .files-tab-sider .ant-list-item,
+  .steering-tab-sider .ant-list-item {
+    padding: 6px 8px !important;
+  }
+  
+  .files-tab-sider .ant-list-item-meta-title,
+  .steering-tab-sider .ant-list-item-meta-title {
+    font-size: 11px !important;
+  }
+  
+  .files-tab-sider .ant-list-item-meta-description,
+  .steering-tab-sider .ant-list-item-meta-description {
+    font-size: 9px !important;
+  }
+  
+  .files-tab-sider .ant-btn,
+  .steering-tab-sider .ant-btn {
+    font-size: 12px;
+    padding: 4px 8px;
   }
 }
 
