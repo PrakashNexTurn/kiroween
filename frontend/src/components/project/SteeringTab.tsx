@@ -6,8 +6,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { FileText, Plus, AlertCircle } from 'lucide-react';
-import { Layout, List, Typography, Space, Spin, Alert } from 'antd';
+import { FileText, Plus, AlertCircle, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Layout, List, Typography, Space, Spin, Alert, Tooltip } from 'antd';
 import { Button, showError } from '../common';
 import { SteeringFileViewer } from './SteeringFileViewer';
 import { steeringService } from '../../services';
@@ -44,6 +44,7 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
 
   /**
    * Load steering files on mount
@@ -170,8 +171,13 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
     <Layout style={{ height: 'calc(100vh - 250px)', minHeight: '500px', backgroundColor: 'var(--color-bg-primary)' }}>
       {/* File List Sidebar */}
       <Sider
-        width={250}
+        collapsible
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        width={200}
+        collapsedWidth={0}
         theme="light"
+        trigger={null}
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           borderRight: '1px solid var(--color-border)',
@@ -263,15 +269,28 @@ export function SteeringTab({ projectId, onGenerateClick }: SteeringTabProps) {
       >
         {selectedFile ? (
           <>
-            {/* File Header */}
+            {/* File Header with Toggle */}
             <div
               style={{
                 padding: '12px 16px',
                 borderBottom: '1px solid var(--color-border)',
                 backgroundColor: 'var(--color-bg-secondary)',
                 flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
               }}
             >
+              <Tooltip title={collapsed ? 'Show file list' : 'Hide file list'}>
+                <Button
+                  onClick={() => setCollapsed(!collapsed)}
+                  variant="ghost"
+                  size="sm"
+                  style={{ padding: '4px 8px', minWidth: 'auto' }}
+                >
+                  {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+                </Button>
+              </Tooltip>
               <Text
                 style={{
                   fontSize: '14px',

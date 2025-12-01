@@ -7,8 +7,10 @@
  */
 
 import { useState } from 'react';
-import { Layout, Input } from 'antd';
+import { Layout, Input, Tooltip } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Button } from '../common';
 import { FileTree } from './FileTree';
 import { FileContentViewer } from './FileContentViewer';
 
@@ -37,9 +39,10 @@ export function FilesTab({ projectId }: FilesTabProps) {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        width={250}
+        width={200}
         collapsedWidth={0}
         theme="light"
+        trigger={null}
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           borderRight: '1px solid var(--color-border)',
@@ -81,15 +84,28 @@ export function FilesTab({ projectId }: FilesTabProps) {
       >
         {selectedFile ? (
           <>
-            {/* File Header */}
+            {/* File Header with Toggle */}
             <div
               style={{
                 padding: '12px 16px',
                 borderBottom: '1px solid var(--color-border)',
                 backgroundColor: 'var(--color-bg-secondary)',
                 flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
               }}
             >
+              <Tooltip title={collapsed ? 'Show file tree' : 'Hide file tree'}>
+                <Button
+                  onClick={() => setCollapsed(!collapsed)}
+                  variant="ghost"
+                  size="sm"
+                  style={{ padding: '4px 8px', minWidth: 'auto' }}
+                >
+                  {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+                </Button>
+              </Tooltip>
               <div
                 style={{
                   fontSize: '14px',
@@ -98,6 +114,7 @@ export function FilesTab({ projectId }: FilesTabProps) {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
+                  flex: 1,
                 }}
                 title={selectedFile}
               >
