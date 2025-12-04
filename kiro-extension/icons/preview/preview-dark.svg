@@ -1,0 +1,119 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Editor background -->
+  <rect width="800" height="600" fill="#0d0a0f"/>
+  
+  <!-- Title bar -->
+  <rect width="800" height="35" fill="#1a1420"/>
+  <text x="20" y="23" font-family="monospace" font-size="14" fill="#e8dfd8">Halloween Dark Theme - example.ts</text>
+  
+  <!-- Line numbers background -->
+  <rect x="0" y="35" width="60" height="565" fill="#1a1420"/>
+  
+  <!-- Line numbers -->
+  <text x="15" y="65" font-family="monospace" font-size="13" fill="#7c6f7d">1</text>
+  <text x="15" y="85" font-family="monospace" font-size="13" fill="#7c6f7d">2</text>
+  <text x="15" y="105" font-family="monospace" font-size="13" fill="#7c6f7d">3</text>
+  <text x="15" y="125" font-family="monospace" font-size="13" fill="#7c6f7d">4</text>
+  <text x="15" y="145" font-family="monospace" font-size="13" fill="#7c6f7d">5</text>
+  <text x="15" y="165" font-family="monospace" font-size="13" fill="#7c6f7d">6</text>
+  <text x="15" y="185" font-family="monospace" font-size="13" fill="#7c6f7d">7</text>
+  <text x="15" y="205" font-family="monospace" font-size="13" fill="#7c6f7d">8</text>
+  <text x="15" y="225" font-family="monospace" font-size="13" fill="#7c6f7d">9</text>
+  <text x="8" y="245" font-family="monospace" font-size="13" fill="#7c6f7d">10</text>
+  <text x="8" y="265" font-family="monospace" font-size="13" fill="#7c6f7d">11</text>
+  <text x="8" y="285" font-family="monospace" font-size="13" fill="#7c6f7d">12</text>
+  <text x="8" y="305" font-family="monospace" font-size="13" fill="#7c6f7d">13</text>
+  <text x="8" y="325" font-family="monospace" font-size="13" fill="#7c6f7d">14</text>
+  <text x="8" y="345" font-family="monospace" font-size="13" fill="#7c6f7d">15</text>
+  
+  <!-- Code content -->
+  <!-- Line 1: import -->
+  <text x="75" y="65" font-family="monospace" font-size="13" fill="#ff8c1a">import</text>
+  <text x="135" y="65" font-family="monospace" font-size="13" fill="#e8dfd8"> { </text>
+  <text x="165" y="65" font-family="monospace" font-size="13" fill="#a855f7">User</text>
+  <text x="205" y="65" font-family="monospace" font-size="13" fill="#e8dfd8"> } </text>
+  <text x="235" y="65" font-family="monospace" font-size="13" fill="#ff8c1a">from</text>
+  <text x="280" y="65" font-family="monospace" font-size="13" fill="#10b981"> './types'</text>
+  <text x="360" y="65" font-family="monospace" font-size="13" fill="#e8dfd8">;</text>
+  
+  <!-- Line 2: blank -->
+  
+  <!-- Line 3: comment -->
+  <text x="75" y="105" font-family="monospace" font-size="13" fill="#7c6f7d">// Halloween-themed user greeting</text>
+  
+  <!-- Line 4: function declaration -->
+  <text x="75" y="125" font-family="monospace" font-size="13" fill="#ff8c1a">function</text>
+  <text x="155" y="125" font-family="monospace" font-size="13" fill="#60a5fa"> greetUser</text>
+  <text x="245" y="125" font-family="monospace" font-size="13" fill="#e8dfd8">(</text>
+  <text x="255" y="125" font-family="monospace" font-size="13" fill="#e8dfd8">user</text>
+  <text x="295" y="125" font-family="monospace" font-size="13" fill="#b8a89d">:</text>
+  <text x="310" y="125" font-family="monospace" font-size="13" fill="#a855f7"> User</text>
+  <text x="355" y="125" font-family="monospace" font-size="13" fill="#e8dfd8">)</text>
+  <text x="365" y="125" font-family="monospace" font-size="13" fill="#b8a89d">:</text>
+  <text x="380" y="125" font-family="monospace" font-size="13" fill="#a855f7"> string</text>
+  <text x="440" y="125" font-family="monospace" font-size="13" fill="#e8dfd8"> {</text>
+  
+  <!-- Line 5: const -->
+  <text x="95" y="145" font-family="monospace" font-size="13" fill="#ff8c1a">const</text>
+  <text x="145" y="145" font-family="monospace" font-size="13" fill="#e8dfd8"> emoji </text>
+  <text x="205" y="145" font-family="monospace" font-size="13" fill="#b8a89d">=</text>
+  <text x="220" y="145" font-family="monospace" font-size="13" fill="#10b981"> '🎃'</text>
+  <text x="265" y="145" font-family="monospace" font-size="13" fill="#e8dfd8">;</text>
+  
+  <!-- Line 6: const -->
+  <text x="95" y="165" font-family="monospace" font-size="13" fill="#ff8c1a">const</text>
+  <text x="145" y="165" font-family="monospace" font-size="13" fill="#e8dfd8"> greeting </text>
+  <text x="225" y="165" font-family="monospace" font-size="13" fill="#b8a89d">=</text>
+  <text x="240" y="165" font-family="monospace" font-size="13" fill="#10b981"> 'Happy Halloween'</text>
+  <text x="390" y="165" font-family="monospace" font-size="13" fill="#e8dfd8">;</text>
+  
+  <!-- Line 7: blank -->
+  
+  <!-- Line 8: if statement -->
+  <text x="95" y="205" font-family="monospace" font-size="13" fill="#ff8c1a">if</text>
+  <text x="120" y="205" font-family="monospace" font-size="13" fill="#e8dfd8"> (</text>
+  <text x="135" y="205" font-family="monospace" font-size="13" fill="#e8dfd8">user</text>
+  <text x="175" y="205" font-family="monospace" font-size="13" fill="#b8a89d">.</text>
+  <text x="185" y="205" font-family="monospace" font-size="13" fill="#e8dfd8">isSpooky</text>
+  <text x="265" y="205" font-family="monospace" font-size="13" fill="#e8dfd8">) {</text>
+  
+  <!-- Line 9: return -->
+  <text x="115" y="225" font-family="monospace" font-size="13" fill="#ff8c1a">return</text>
+  <text x="175" y="225" font-family="monospace" font-size="13" fill="#e8dfd8"> `</text>
+  <text x="190" y="225" font-family="monospace" font-size="13" fill="#10b981">${emoji} ${greeting}, ${</text>
+  <text x="410" y="225" font-family="monospace" font-size="13" fill="#e8dfd8">user</text>
+  <text x="450" y="225" font-family="monospace" font-size="13" fill="#b8a89d">.</text>
+  <text x="460" y="225" font-family="monospace" font-size="13" fill="#e8dfd8">name</text>
+  <text x="500" y="225" font-family="monospace" font-size="13" fill="#10b981">}!</text>
+  <text x="520" y="225" font-family="monospace" font-size="13" fill="#e8dfd8">`;</text>
+  
+  <!-- Line 10: } -->
+  <text x="95" y="245" font-family="monospace" font-size="13" fill="#e8dfd8">}</text>
+  
+  <!-- Line 11: blank -->
+  
+  <!-- Line 12: return -->
+  <text x="95" y="285" font-family="monospace" font-size="13" fill="#ff8c1a">return</text>
+  <text x="155" y="285" font-family="monospace" font-size="13" fill="#10b981"> 'Boo!'</text>
+  <text x="215" y="285" font-family="monospace" font-size="13" fill="#e8dfd8">;</text>
+  
+  <!-- Line 13: } -->
+  <text x="75" y="305" font-family="monospace" font-size="13" fill="#e8dfd8">}</text>
+  
+  <!-- Line 14: blank -->
+  
+  <!-- Line 15: export -->
+  <text x="75" y="345" font-family="monospace" font-size="13" fill="#ff8c1a">export</text>
+  <text x="135" y="345" font-family="monospace" font-size="13" fill="#ff8c1a"> default</text>
+  <text x="205" y="345" font-family="monospace" font-size="13" fill="#e8dfd8"> greetUser;</text>
+  
+  <!-- Status bar -->
+  <rect x="0" y="565" width="800" height="35" fill="#2a1f35"/>
+  <text x="20" y="587" font-family="monospace" font-size="12" fill="#ff8c1a">● TypeScript</text>
+  <text x="150" y="587" font-family="monospace" font-size="12" fill="#e8dfd8">UTF-8</text>
+  <text x="220" y="587" font-family="monospace" font-size="12" fill="#e8dfd8">LF</text>
+  <text x="270" y="587" font-family="monospace" font-size="12" fill="#e8dfd8">Ln 8, Col 15</text>
+  
+  <!-- Decorative pumpkin in corner -->
+  <text x="750" y="590" font-size="20">🎃</text>
+</svg>

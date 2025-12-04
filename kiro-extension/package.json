@@ -1,0 +1,162 @@
+{
+  "👻": "════════════════════════════════════════════════════════════",
+  "🎃": "─────────────────── CONTRIBUTIONS ───────────────────────",
+  "🕸️": "─────────────────── HAUNTED ASSETS ──────────────────────",
+  "name": "halloween-kiro-extension",
+  "displayName": "🎃 Halloween Kiro Extension 👻",
+  "description": "⚰️ Complete Halloween experience: Theme + Animations + Icons + Effects - Everything you need for a haunted IDE! 🦇",
+  "version": "1.0.0",
+  "publisher": "kiro-extensions",
+  "🕷️": "════════════════════════════════════════════════════════════",
+  "author": "🧙 Kiro Extensions 🧙",
+  "license": "MIT",
+  "💀": "   END OF HAUNTED MANIFEST - ALL-IN-ONE HALLOWEEN! 🎃👻   ",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiro-extensions/halloween-complete.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kiro-extensions/halloween-complete/issues"
+  },
+  "homepage": "https://github.com/kiro-extensions/halloween-complete#readme",
+  "🦇": "════════════════════════════════════════════════════════════",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "keywords": [
+    "halloween",
+    "theme",
+    "icons",
+    "animations",
+    "effects",
+    "dark",
+    "light",
+    "orange",
+    "purple",
+    "spooky",
+    "haunted",
+    "complete",
+    "all-in-one"
+  ],
+  "icon": "icons/theme-icon.png",
+  "galleryBanner": {
+    "color": "#0d0a0f",
+    "theme": "dark"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "themes": [
+      {
+        "label": "🎃 Halloween Dark 👻",
+        "uiTheme": "vs-dark",
+        "path": "./themes/halloween-dark.json"
+      },
+      {
+        "label": "🎃 Halloween Light 🦇",
+        "uiTheme": "vs",
+        "path": "./themes/halloween-light.json"
+      }
+    ],
+    "iconThemes": [
+      {
+        "id": "halloween-icons",
+        "label": "🎃 Halloween Icons ⚰️",
+        "path": "./icons/halloween-icon-theme.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "halloween.enableEffects",
+        "title": "🎃 Halloween: Enable Haunted Effects"
+      },
+      {
+        "command": "halloween.disableEffects",
+        "title": "👻 Halloween: Disable Haunted Effects"
+      },
+      {
+        "command": "halloween.toggleEffects",
+        "title": "🦇 Halloween: Toggle Haunted Effects"
+      },
+      {
+        "command": "halloween.openDemo",
+        "title": "🕸️ Halloween: Open Effects Demo"
+      }
+    ],
+    "configuration": {
+      "title": "🎃 Halloween Complete Settings",
+      "properties": {
+        "halloween.effects.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "🎃 Enable or disable Halloween haunted effects"
+        },
+        "halloween.effects.ghosts": {
+          "type": "boolean",
+          "default": true,
+          "description": "👻 Show floating ghosts"
+        },
+        "halloween.effects.spiderWebs": {
+          "type": "boolean",
+          "default": true,
+          "description": "🕸️ Show spider webs in corners"
+        },
+        "halloween.effects.particles": {
+          "type": "boolean",
+          "default": true,
+          "description": "🦇 Show falling particles (bats, leaves)"
+        },
+        "halloween.effects.pumpkins": {
+          "type": "boolean",
+          "default": true,
+          "description": "🎃 Show animated pumpkins"
+        },
+        "halloween.effects.fog": {
+          "type": "boolean",
+          "default": true,
+          "description": "🌫️ Show atmospheric fog effect"
+        },
+        "halloween.effects.intensity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "medium",
+          "description": "💀 Animation intensity level"
+        },
+        "halloween.effects.mouseTrail": {
+          "type": "boolean",
+          "default": true,
+          "description": "✨ Show mouse trail effects"
+        },
+        "halloween.effects.clickExplosions": {
+          "type": "boolean",
+          "default": true,
+          "description": "💥 Show click explosion effects"
+        }
+      }
+    }
+  },
+  "⚰️": "─────────────────── CURSED SCRIPTS ──────────────────────",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "vitest --run"
+  },
+  "🧪": "─────────────────── WITCH'S CAULDRON ────────────────────",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.60.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

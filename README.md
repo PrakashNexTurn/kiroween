@@ -2,11 +2,11 @@
 
 > *"The spirit of Kiro IDE, unleashed from its desktop chains..."*
 
-**Kiro's Ghost** is a possessed orchestrator that channels the power of Kiro AI without requiring the IDE installation. Built for the Kiroween Hackathon, this haunting application brings AI-powered development to any device, anywhere - even your mobile phone.
+**Kiro's Ghost** is a complete Halloween-themed development ecosystem built for the Kiroween Hackathon. It includes a web-based orchestrator that channels Kiro AI's power without requiring IDE installation, plus a spooky VS Code extension for those who prefer desktop development. Work from any device, anywhere - even your mobile phone.
 
 ## 🎃 The Haunting Story
 
-Legend has it that during a dark and stormy hackathon night, the spirit of Kiro IDE escaped its desktop confines and possessed a web application. Now, **Kiro's Ghost** roams the internet, bringing AI-powered development to developers (and non-developers!) wherever they may be.
+Legend has it that during a dark and stormy hackathon night, the spirit of Kiro IDE escaped its desktop confines. It split into three supernatural forms: a web orchestrator for universal access, a haunted VS Code extension for desktop power users, and the mystical kiro-cli that binds them all. Now, **Kiro's Ghost** roams the internet and haunts your IDE, bringing AI-powered development to developers (and non-developers!) wherever they may be.
 
 ---
 
@@ -59,39 +59,50 @@ From idea to production, all in browser:
 
 ## 🎭 Architecture Overview
 
+### The Three Spirits
+
 ```
-┌─────────────────────────────────────┐
-│   Any Device (Desktop/Tablet/Mobile) │
-│            Browser                   │
-└──────────────┬──────────────────────┘
-               │ HTTPS
-               ▼
-┌─────────────────────────────────────┐
-│      Kiro's Ghost Frontend          │
-│   (React + TypeScript + Tailwind)   │
-└──────────────┬──────────────────────┘
-               │ REST API
-               ▼
-┌─────────────────────────────────────┐
-│      Kiro's Ghost Backend           │
-│        (FastAPI + Python)           │
-└──────────────┬──────────────────────┘
-               │ CLI Execution
-               ▼
-┌─────────────────────────────────────┐
-│           kiro-cli                  │
-│      (Kiro AI Integration)          │
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    🌐 Web Access Path                        │
+│   Any Device (Desktop/Tablet/Mobile) → Browser              │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ HTTPS
+                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│              👻 Kiro's Ghost Frontend                        │
+│           (React + TypeScript + Tailwind)                    │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ REST API
+                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│              🎃 Kiro's Ghost Backend                         │
+│                (FastAPI + Python)                            │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ CLI Execution
+                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    🔮 kiro-cli                               │
+│              (Kiro AI Integration)                           │
+└─────────────────────────────────────────────────────────────┘
+                       ▲
+                       │ Direct CLI
+                       │
+┌─────────────────────────────────────────────────────────────┐
+│                    🦇 VS Code Extension                      │
+│         (Halloween Themes + Icons + Effects)                 │
+│                  Desktop IDE Path                            │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### How It Works Without Official API
 
 ```
-User Request → Frontend → Backend API → kiro-cli → Kiro AI
-                                    ↓
-                            File System Storage
-                                    ↓
-                            Real-time Updates
+Web Path:     Browser → Frontend → Backend → kiro-cli → Kiro AI
+Desktop Path: VS Code → kiro-cli → Kiro AI
+                           ↓
+                   File System Storage
+                           ↓
+                   Real-time Updates
 ```
 
 ---
@@ -130,40 +141,80 @@ User Request → Frontend → Backend API → kiro-cli → Kiro AI
 
 ## 🎭 Supernatural Features
 
-### The Ghost's Powers (Backend)
-- **👻 Phantom Project Management**: Organize multiple haunted projects with separate base paths
-- **🔮 Spec-Driven Sorcery**: Automated requirements, design, and task generation through AI channeling
-- **🧙 AI-Powered Manifestation**: Integration with kiro-cli for automated code generation - no Kiro IDE required!
-- **📡 Spectral API**: Complete RESTful API for project lifecycle management
-- **🧪 Property-Based Testing**: Built-in support for correctness properties and PBT
-- **🌐 Universal Access**: Works from any device with a browser - desktop, tablet, or mobile
+### 👻 Web Orchestrator (Backend + Frontend)
 
-### The Haunted Interface (Frontend)
-- **🎃 Project Séance Dashboard**: Summon and manage all your possessed projects in one place
-- **✨ Spec Conjuring**: Generate requirements, design, and tasks through an intuitive, haunted UI
-- **⚡ Task Possession**: Execute and track implementation tasks with real-time spectral progress
-- **📝 Monaco Spirit Editor**: Integrated code editor for viewing and editing spec files
-- **🌙 Theme Transformation**: Light, dark, and Halloween themes (naturally!)
-- **📱 Mobile Haunting**: Fully responsive - the ghost follows you on any device, anywhere
-- **🚫 No Installation Curse**: Break free from desktop-only development - work from coffee shops, trains, or your couch
+**The Spirit Engine (Backend):**
+- **Multi-Project Management**: Organize multiple projects with separate base paths
+- **Spec-Driven Development**: AI-generated requirements, design, and task documents
+- **AI Integration**: Direct kiro-cli integration - no API keys needed
+- **RESTful API**: Complete project lifecycle management
+- **Property-Based Testing**: Built-in PBT support for correctness
+- **File System Service**: Secure file browsing with binary detection
+- **Steering Generation**: Auto-create AI context files
 
-## Repository Structure
+**The Haunted Interface (Frontend):**
+- **📱 Mobile-First**: Works perfectly on phones, tablets, and desktops
+- **Project Dashboard**: Manage all projects in one place
+- **Spec Generation**: AI-powered requirements, design, and tasks
+- **Task Execution**: Real-time progress tracking and log streaming
+- **File Explorer**: Browse files with syntax highlighting and search
+- **Monaco Editor**: In-browser code editing
+- **Adhoc Tasks**: Execute custom instructions (Ctrl+K)
+- **Theme System**: Light, dark, and Halloween themes
+- **🚫 No Installation**: Access from any browser, anywhere
+
+### 🦇 VS Code Extension (Desktop Phantom)
+
+**Halloween Themes:**
+- **Dark Theme**: Deep black with purple tints and orange accents
+- **Light Theme**: Warm cream backgrounds with spooky colors
+- **WCAG AA Compliant**: Accessible color contrast ratios
+- **Glowing Borders**: Animated tab highlights
+
+**Spooky Icons:**
+- Coffin file icons ⚰️
+- Pumpkin folder icons 🎃
+- Ghost icons for JS/TS 👻
+- Bat icons for HTML 🦇
+- Spider icons for Python 🕷️
+- And more haunted icons!
+
+**Interactive Effects:**
+- Floating ghosts that run from cursor
+- Spider webs in corners
+- Falling bats and leaves
+- Mouse trails with Halloween emojis
+- Click explosions
+- Bouncing pumpkins
+- Atmospheric fog
+- Pumpkin cursor
+
+**Customization:**
+- Toggle effects on/off
+- Adjust intensity levels
+- Enable/disable individual effects
+- Keyboard shortcuts for quick access
+
+## 🏗️ Repository Structure
+
+This is a monorepo containing three haunted components:
 
 ```
 .
-├── backend/              # Python FastAPI backend service
+├── backend/              # 👻 Python FastAPI backend (The Spirit Engine)
 │   ├── src/             # Application source code
 │   ├── tests/           # Test suite (unit, property, integration)
-│   ├── main.py          # Application entry point
-│   └── README.md        # Backend documentation
-├── frontend/            # React TypeScript frontend
+│   └── main.py          # Application entry point
+├── frontend/            # 🎃 React TypeScript frontend (The Haunted Interface)
 │   ├── src/             # React source code
-│   ├── public/          # Static assets
-│   └── README.md        # Frontend documentation
-├── .kiro/               # Kiro specs and steering rules
-│   ├── specs/           # Feature specifications
-│   └── steering/        # AI context files
-└── README.md            # This file
+│   └── public/          # Static assets
+├── kiro-extension/      # 🦇 VS Code Extension (The Desktop Phantom)
+│   ├── themes/          # Halloween themes (dark & light)
+│   ├── icons/           # Spooky file icons
+│   └── src/             # Extension source code
+└── .kiro/               # Kiro specs and steering rules
+    ├── specs/           # Feature specifications
+    └── steering/        # AI context files
 ```
 
 ---
@@ -278,98 +329,89 @@ Execute custom instructions that aren't part of your predefined task list:
 
 ---
 
-## 🕯️ Summoning the Ghost (Quick Start)
+## 🕯️ Summoning the Spirits (Quick Start)
 
-Ready to be possessed by Kiro's spirit? Follow these incantations...
+> **TL;DR**: See [QUICK_START.md](QUICK_START.md) for a 5-minute setup guide!
 
-### Backend Setup
+Ready to be possessed by Kiro's spirits? Choose your path...
 
-1. Navigate to the backend directory:
+### 🌐 Web Orchestrator (Universal Access)
+
+**For mobile, tablet, or browser-based development:**
+
+1. **Start the Backend Spirit:**
    ```bash
    cd backend
-   ```
-
-2. Install dependencies:
-   ```bash
    pip install -r requirements.txt
-   ```
-
-3. Start the server:
-   ```bash
    python main.py
    ```
+   Backend API: `http://localhost:8000`
 
-The backend API will be available at `http://localhost:8000`
-
-See [backend/README.md](backend/README.md) for complete backend documentation.
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
+2. **Awaken the Frontend Phantom:**
    ```bash
    cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
    npm install
-   ```
-
-3. Configure environment:
-   ```bash
-   cp .env.example .env
-   # Edit .env to set VITE_API_BASE_URL (default: http://localhost:8000)
-   ```
-
-4. Start the development server:
-   ```bash
+   cp .env.example .env  # Configure if needed
    npm run dev
    ```
+   Frontend App: `http://localhost:5173`
 
-The frontend will be available at `http://localhost:5173`
+3. **Access from any device** - desktop, tablet, or mobile phone!
 
-See [frontend/README.md](frontend/README.md) for complete frontend documentation.
+See [backend/README.md](backend/README.md) and [frontend/README.md](frontend/README.md) for details.
 
-## 🎭 Supernatural Features
+### 🦇 VS Code Extension (Desktop Power)
 
-### The Ghost's Powers (Backend)
-- **👻 Phantom Project Management**: Organize multiple haunted projects with separate base paths
-- **🔮 Spec-Driven Sorcery**: Automated requirements, design, and task generation through AI channeling
-- **🧙 AI-Powered Manifestation**: Integration with kiro-cli for automated code generation - no Kiro IDE required!
-- **📡 Spectral API**: Complete RESTful API for project lifecycle management
-- **🧪 Property-Based Testing**: Built-in support for correctness properties and PBT
-- **🌐 Universal Access**: Works from any device with a browser - desktop, tablet, or mobile
+**For traditional IDE experience with Halloween flair:**
 
-### The Haunted Interface (Frontend)
-- **🎃 Project Séance Dashboard**: Summon and manage all your possessed projects in one place
-- **✨ Spec Conjuring**: Generate requirements, design, and tasks through an intuitive, haunted UI
-- **⚡ Task Possession**: Execute and track implementation tasks with real-time spectral progress
-- **📝 Monaco Spirit Editor**: Integrated code editor for viewing and editing spec files
-- **🌙 Theme Transformation**: Light, dark, and Halloween themes (naturally!)
-- **📱 Mobile Haunting**: Fully responsive - the ghost follows you on any device, anywhere
-- **🚫 No Installation Curse**: Break free from desktop-only development - work from coffee shops, trains, or your couch
+1. **Install the Extension:**
+   - Open VS Code
+   - Go to Extensions (Ctrl+Shift+X)
+   - Install from `kiro-extension/` folder
+   - Or package and install: `vsce package` then install the .vsix
 
-## Documentation
+2. **Activate the Haunting:**
+   ```
+   Ctrl+Shift+P → "Color Theme" → "🎃 Halloween Dark 👻"
+   Ctrl+Shift+P → "File Icon Theme" → "🎃 Halloween Icons ⚰️"
+   Ctrl+Shift+P → "🎃 Halloween: Enable Haunted Effects"
+   ```
+
+3. **Enjoy spooky coding** with themes, icons, and interactive effects!
+
+See [kiro-extension/README.md](kiro-extension/README.md) for complete extension documentation.
+
+### 🎯 Choose Your Path
+
+- **Mobile/Tablet Users**: Use the web orchestrator
+- **Desktop Users**: Use both! Extension for coding, web for project management
+- **Teams**: Web orchestrator for collaboration, extension for individual work
+- **Non-Developers**: Web orchestrator for accessible AI-powered development
+
+---
+
+## 📚 Documentation
 
 ### Getting Started
 - **[USER_GUIDE.md](USER_GUIDE.md)** - Comprehensive user guide with tutorials and best practices
 - **[KEYBOARD_SHORTCUTS.md](KEYBOARD_SHORTCUTS.md)** - Complete keyboard shortcuts reference
 
-### Backend
+### Web Orchestrator
 - **[backend/README.md](backend/README.md)** - Backend setup and overview
 - **[backend/USAGE.md](backend/USAGE.md)** - Detailed usage guide
 - **[backend/API_REFERENCE.md](backend/API_REFERENCE.md)** - Complete API reference
-
-### Frontend
 - **[frontend/README.md](frontend/README.md)** - Frontend setup and overview
 - **[frontend/ACCESSIBILITY.md](frontend/ACCESSIBILITY.md)** - Accessibility compliance
 
-## Quick Links
+### VS Code Extension
+- **[kiro-extension/README.md](kiro-extension/README.md)** - Extension setup and features
 
-- **Frontend Application**: http://localhost:5173
+### Quick Links
+
+- **Web Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **API ReDoc**: http://localhost:8000/redoc
+- **API Docs (Swagger)**: http://localhost:8000/docs
+- **API Docs (ReDoc)**: http://localhost:8000/redoc
 
 ---
 
@@ -422,23 +464,25 @@ npm run dev
 
 ## 🚀 Technology Stack
 
-### Backend (The Spirit Engine)
-- **Python 3.11+** - Primary language
-- **FastAPI** - Web framework for RESTful API
-- **Uvicorn** - ASGI server
-- **Pydantic** - Data validation and settings
-- **pytest** - Testing framework
-- **hypothesis** - Property-based testing
+### 👻 Web Orchestrator
 
-### Frontend (The Haunted Interface)
-- **React 19** - UI framework
-- **TypeScript 5.9** - Type safety
-- **Vite 7** - Build tool and dev server
-- **Tailwind CSS 4** - Utility-first CSS
-- **React Router 7** - Client-side routing
-- **Axios** - HTTP client
-- **Monaco Editor** - In-browser code editor
-- **Framer Motion** - Smooth animations
+**Backend (The Spirit Engine):**
+- Python 3.11+, FastAPI, Uvicorn
+- Pydantic for data validation
+- pytest + hypothesis for testing
+
+**Frontend (The Haunted Interface):**
+- React 19, TypeScript 5.9, Vite 7
+- Tailwind CSS 4, React Router 7
+- Monaco Editor, Framer Motion, Axios
+
+### 🦇 VS Code Extension
+
+**Extension (The Desktop Phantom):**
+- TypeScript 5.3
+- VS Code Extension API
+- Custom themes and icon themes
+- Interactive HTML/CSS/JS effects
 
 ## 🎃 Kiroween Hackathon Demo
 

@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Coffin shape -->
+  <path d="M 12 4 L 8 10 L 8 26 L 12 28 L 20 28 L 24 26 L 24 10 L 20 4 Z" 
+        fill="#8b4513" stroke="#5a2d0c" stroke-width="1"/>
+  <!-- Cross -->
+  <rect x="14" y="10" width="4" height="10" fill="#d4a574"/>
+  <rect x="11" y="13" width="10" height="4" fill="#d4a574"/>
+  <!-- Shadow -->
+  <path d="M 12 4 L 8 10 L 8 26 L 12 28 L 20 28 L 24 26 L 24 10 L 20 4 Z" 
+        fill="rgba(0,0,0,0.2)"/>
+</svg>

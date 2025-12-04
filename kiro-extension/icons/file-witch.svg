@@ -1,0 +1,8 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- File background -->
+  <path d="M 6 2 L 6 30 L 26 30 L 26 8 L 20 2 Z" fill="#e8dfd8" stroke="#b8a89d" stroke-width="1"/>
+  <path d="M 20 2 L 20 8 L 26 8" fill="#d4c5ba" stroke="#b8a89d" stroke-width="1"/>
+  <!-- Witch hat -->
+  <path d="M 16 12 L 12 18 L 20 18 Z" fill="#2a1f35"/>
+  <ellipse cx="16" cy="18" rx="5" ry="1.5" fill="#a855f7"/>
+</svg>

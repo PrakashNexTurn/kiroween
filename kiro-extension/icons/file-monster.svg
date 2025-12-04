@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- File background -->
+  <path d="M 6 2 L 6 30 L 26 30 L 26 8 L 20 2 Z" fill="#e8dfd8" stroke="#b8a89d" stroke-width="1"/>
+  <path d="M 20 2 L 20 8 L 26 8" fill="#d4c5ba" stroke="#b8a89d" stroke-width="1"/>
+  <!-- Monster -->
+  <rect x="12" y="12" width="8" height="8" rx="2" fill="#10b981"/>
+  <circle cx="14" cy="15" r="1" fill="#fff"/>
+  <circle cx="18" cy="15" r="1" fill="#fff"/>
+  <circle cx="14" cy="15" r="0.5" fill="#000"/>
+  <circle cx="18" cy="15" r="0.5" fill="#000"/>
+  <path d="M 14 18 L 16 19 L 18 18" stroke="#000" stroke-width="1" fill="none"/>
+  <!-- Horns -->
+  <path d="M 13 12 L 12 10 M 19 12 L 20 10" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

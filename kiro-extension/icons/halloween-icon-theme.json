@@ -1,0 +1,71 @@
+{
+  "iconDefinitions": {
+    "_file": {
+      "iconPath": "./file-coffin.svg"
+    },
+    "_folder": {
+      "iconPath": "./folder-pumpkin.svg"
+    },
+    "_folder_open": {
+      "iconPath": "./folder-pumpkin-open.svg"
+    },
+    "_root_folder": {
+      "iconPath": "./folder-haunted.svg"
+    },
+    "_root_folder_open": {
+      "iconPath": "./folder-haunted-open.svg"
+    },
+    "_file_js": {
+      "iconPath": "./file-ghost.svg"
+    },
+    "_file_ts": {
+      "iconPath": "./file-ghost.svg"
+    },
+    "_file_json": {
+      "iconPath": "./file-web.svg"
+    },
+    "_file_html": {
+      "iconPath": "./file-bat.svg"
+    },
+    "_file_css": {
+      "iconPath": "./file-witch.svg"
+    },
+    "_file_md": {
+      "iconPath": "./file-skull.svg"
+    },
+    "_file_py": {
+      "iconPath": "./file-spider.svg"
+    },
+    "_file_java": {
+      "iconPath": "./file-monster.svg"
+    },
+    "_file_git": {
+      "iconPath": "./file-cauldron.svg"
+    }
+  },
+  "file": "_file",
+  "folder": "_folder",
+  "folderExpanded": "_folder_open",
+  "rootFolder": "_root_folder",
+  "rootFolderExpanded": "_root_folder_open",
+  "fileExtensions": {
+    "js": "_file_js",
+    "jsx": "_file_js",
+    "ts": "_file_ts",
+    "tsx": "_file_ts",
+    "json": "_file_json",
+    "html": "_file_html",
+    "htm": "_file_html",
+    "css": "_file_css",
+    "scss": "_file_css",
+    "md": "_file_md",
+    "py": "_file_py",
+    "java": "_file_java"
+  },
+  "fileNames": {
+    ".gitignore": "_file_git",
+    ".gitattributes": "_file_git",
+    "package.json": "_file_json",
+    "tsconfig.json": "_file_json"
+  }
+}

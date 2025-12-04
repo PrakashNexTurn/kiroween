@@ -2,17 +2,20 @@
 
 ## Repository Organization
 
-This is a monorepo with separate backend and frontend applications:
+This is a monorepo with three main components:
 
 ```
 .
-├── backend/              # Python FastAPI backend
-├── frontend/             # React TypeScript frontend
+├── backend/              # Python FastAPI backend (Web Orchestrator)
+├── frontend/             # React TypeScript frontend (Web Orchestrator)
+├── kiro-extension/       # VS Code Extension (Desktop Phantom)
 ├── .kiro/               # Kiro specs and steering rules
 └── README.md            # Main documentation
 ```
 
-## Backend Structure
+## Web Orchestrator Structure
+
+### Backend
 
 ```
 backend/
@@ -23,6 +26,8 @@ backend/
 │   ├── instruction_generator.py # Instruction generation for kiro-cli
 │   ├── cli_executor.py          # CLI command execution
 │   ├── file_ops.py              # File system operations
+│   ├── file_system_service.py   # File explorer service
+│   ├── steering_generator.py    # Steering file generation
 │   ├── models.py                # Pydantic data models
 │   ├── response_formatter.py    # API response formatting
 │   └── logger.py                # Logging utilities
@@ -47,7 +52,7 @@ backend/
 - **File Operations**: Use `file_ops.py` abstraction, never direct file I/O
 - **Async**: FastAPI endpoints are async where appropriate
 
-## Frontend Structure
+### Frontend
 
 ```
 frontend/
@@ -63,7 +68,9 @@ frontend/
 │   ├── pages/                   # Page components
 │   ├── services/                # API service layer
 │   │   ├── api.ts              # Axios configuration
-│   │   └── projectService.ts   # Project API calls
+│   │   ├── projectService.ts   # Project API calls
+│   │   ├── fileSystemService.ts # File explorer API
+│   │   └── steeringService.ts  # Steering file API
 │   ├── styles/
 │   │   └── themes/             # Theme definitions
 │   ├── types/                   # TypeScript type definitions
@@ -77,6 +84,25 @@ frontend/
 ├── tsconfig.json                # TypeScript configuration
 ├── eslint.config.js             # ESLint configuration
 └── package.json                 # Dependencies and scripts
+```
+
+## VS Code Extension Structure
+
+```
+kiro-extension/
+├── src/
+│   └── extension.ts             # Extension entry point
+├── themes/
+│   ├── halloween-dark.json      # Dark theme definition
+│   └── halloween-light.json     # Light theme definition
+├── icons/
+│   ├── halloween-icon-theme.json # Icon theme definition
+│   ├── file-*.svg               # File icons (coffin, ghost, bat, etc.)
+│   ├── folder-*.svg             # Folder icons (pumpkin, haunted)
+│   └── preview/                 # Preview images
+├── package.json                 # Extension manifest
+├── tsconfig.json                # TypeScript configuration
+└── README.md                    # Extension documentation
 ```
 
 ### Frontend Conventions
@@ -160,3 +186,12 @@ Projects are stored in a configurable base path with the following structure:
 - **Endpoints**: `/kebab-case`
 - **JSON Keys**: `camelCase` (frontend) ↔ `snake_case` (backend) with Pydantic conversion
 - **Project IDs**: `kebab-case` (sanitized from project names)
+
+
+### Extension Conventions
+
+- **Themes**: JSON files defining colors for syntax highlighting and UI
+- **Icons**: SVG files for file and folder icons
+- **Commands**: Registered in package.json contributions
+- **Settings**: Configurable through VS Code settings UI
+- **Effects**: HTML/CSS/JS injected into webview panels

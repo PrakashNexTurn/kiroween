@@ -1,0 +1,12 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- File background -->
+  <path d="M 6 2 L 6 30 L 26 30 L 26 8 L 20 2 Z" fill="#e8dfd8" stroke="#b8a89d" stroke-width="1"/>
+  <path d="M 20 2 L 20 8 L 26 8" fill="#d4c5ba" stroke="#b8a89d" stroke-width="1"/>
+  <!-- Spider web -->
+  <path d="M 16 10 L 16 22 M 10 16 L 22 16 M 12 12 L 20 20 M 20 12 L 12 20" 
+        stroke="#666" stroke-width="0.8" opacity="0.6"/>
+  <circle cx="16" cy="16" r="6" fill="none" stroke="#666" stroke-width="0.8" opacity="0.4"/>
+  <circle cx="16" cy="16" r="3" fill="none" stroke="#666" stroke-width="0.8" opacity="0.4"/>
+  <!-- Spider -->
+  <circle cx="18" cy="14" r="1.5" fill="#000"/>
+</svg>

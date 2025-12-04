@@ -4,21 +4,25 @@
 
 **Project Name**: Kiro's Ghost - The Phantom IDE  
 **Team**: Solo Developer  
-**Submission Date**: November 30, 2025  
+**Submission Date**: December 4, 2025  
 **Repository**: https://github.com/PrakashNexTurn/kiroween
 
 ---
 
 ## 🌟 Project Overview
 
-**Kiro's Ghost** is a possessed orchestrator that channels the power of Kiro AI without requiring IDE installation. It's a full-stack web application that brings AI-powered development to any device, anywhere - even your mobile phone.
+**Kiro's Ghost** is a complete Halloween-themed development ecosystem that channels the power of Kiro AI. It includes:
+1. **Web Orchestrator**: Full-stack app for universal access (mobile, tablet, desktop)
+2. **VS Code Extension**: Halloween themes, icons, and interactive effects for desktop users
+3. **kiro-cli Integration**: Direct AI integration without official API
 
 ### The Core Innovation
 
 > *"Why install an IDE when the IDE can haunt you instead?"*
 
-Kiro's Ghost breaks free from desktop constraints by:
-- **No Installation Required**: Just open a browser and start building
+Kiro's Ghost breaks free from desktop constraints by offering **two supernatural paths**:
+- **Web Path**: No installation required - just open a browser and start building
+- **Desktop Path**: Haunted VS Code extension with spooky themes and effects
 - **No Official API Needed**: Uses kiro-cli for direct AI integration
 - **True Mobile Development**: Works perfectly on phones and tablets
 - **Universal Access**: Accessible to developers and non-developers alike
@@ -109,48 +113,72 @@ Kiro's Ghost breaks free from desktop constraints by:
 
 ## 🚀 Key Features
 
-### 1. Spec-Driven Development
-- **Requirements Generation**: AI creates detailed requirements
-- **Design Documents**: Technical design with architecture
-- **Task Breakdown**: Actionable implementation steps
-- **Property-Based Testing**: Correctness properties and PBT support
+### 👻 Web Orchestrator Features
 
-### 2. File Explorer
-- **Interactive File Tree**: Browse project structure
-- **Monaco Editor**: Syntax highlighting and code editing
-- **Search & Filter**: Quick file finding
-- **Keyboard Navigation**: Efficient file browsing
+**1. Spec-Driven Development**
+- AI-generated requirements, design, and task documents
+- Property-based testing support
+- Complete project lifecycle management
 
-### 3. Steering File Management
-- **Auto-Generation**: Create AI context files
-- **Three Default Files**: product.md, tech.md, structure.md
-- **In-Browser Editing**: Edit with Monaco editor
-- **Regeneration**: Update as project evolves
+**2. File Explorer**
+- Interactive file tree with syntax highlighting
+- Monaco editor integration
+- Search, filter, and keyboard navigation
 
-### 4. Adhoc Task Execution
-- **Quick Access**: Ctrl+K keyboard shortcut
-- **Large Text Input**: Up to 50,000 characters
-- **Instruction Templates**: 5 built-in templates
-- **Task History**: View and rerun previous tasks
+**3. Steering File Management**
+- Auto-generate AI context files (product.md, tech.md, structure.md)
+- In-browser editing with Monaco
+- Regenerate as project evolves
 
-### 5. Resizable Panels (NEW!)
-- **Desktop Power**: Drag to resize file tree and steering panels
-- **Size Constraints**: 120px-400px range
-- **Visual Feedback**: Hover and drag indicators
-- **Mobile Optimized**: Fixed widths on mobile devices
+**4. Adhoc Task Execution**
+- Quick access with Ctrl+K
+- 50,000 character limit
+- 5 built-in templates
+- Task history with rerun capability
 
-### 6. Mobile Optimization (NEW!)
-- **Touch Targets**: 44px minimum for all interactive elements
-- **Responsive Typography**: Fluid scaling with clamp()
-- **Optimized Layouts**: Mobile-specific component layouts
-- **Better Spacing**: Improved padding and gaps
-- **Panel Toggle**: Show/hide works perfectly on mobile
+**5. Mobile Optimization**
+- 44px minimum touch targets
+- Responsive typography with clamp()
+- Resizable panels on desktop
+- Fixed widths on mobile
+
+### 🦇 VS Code Extension Features
+
+**1. Halloween Themes**
+- Dark theme with purple tints and orange accents
+- Light theme with warm cream backgrounds
+- WCAG AA compliant color contrast
+- Glowing animated tab borders
+
+**2. Spooky File Icons**
+- Coffin file icons ⚰️
+- Pumpkin folder icons 🎃
+- Ghost icons for JS/TS 👻
+- Bat icons for HTML 🦇
+- Spider icons for Python 🕷️
+
+**3. Interactive Effects**
+- Floating ghosts that run from cursor
+- Spider webs in corners
+- Falling bats and leaves
+- Mouse trails with Halloween emojis
+- Click explosions
+- Bouncing pumpkins
+- Atmospheric fog
+
+**4. Customization**
+- Toggle effects on/off
+- Adjust intensity levels
+- Enable/disable individual effects
+- Keyboard shortcuts
 
 ---
 
 ## 📊 Technical Achievements
 
-### Backend
+### 👻 Web Orchestrator
+
+**Backend:**
 - ✅ RESTful API with 20+ endpoints
 - ✅ Async operations for performance
 - ✅ File-based project storage
@@ -158,7 +186,7 @@ Kiro's Ghost breaks free from desktop constraints by:
 - ✅ Error handling and validation
 - ✅ Comprehensive logging
 
-### Frontend
+**Frontend:**
 - ✅ React 19 with TypeScript
 - ✅ Tailwind CSS 4 for styling
 - ✅ Monaco editor integration
@@ -169,15 +197,35 @@ Kiro's Ghost breaks free from desktop constraints by:
 - ✅ Toast notifications
 - ✅ Real-time updates
 
-### Mobile Optimization
+**Mobile Optimization:**
 - ✅ 44px minimum touch targets
 - ✅ Fluid typography with clamp()
 - ✅ Responsive layouts
 - ✅ Touch-friendly interactions
 - ✅ Optimized spacing
-- ✅ Icon-only buttons on small screens
-- ✅ Resizable panels (desktop only)
-- ✅ Fixed widths on mobile
+- ✅ Resizable panels (desktop)
+
+### 🦇 VS Code Extension
+
+**Themes:**
+- ✅ Two complete Halloween themes (dark & light)
+- ✅ WCAG AA compliant colors
+- ✅ Glowing animated borders
+- ✅ Syntax highlighting for 20+ languages
+
+**Icons:**
+- ✅ Custom icon theme with 15+ spooky icons
+- ✅ File type associations
+- ✅ Folder icons (open/closed states)
+- ✅ SVG-based for crisp rendering
+
+**Interactive Effects:**
+- ✅ HTML/CSS/JS animations
+- ✅ Mouse event tracking
+- ✅ Click explosions with particles
+- ✅ Floating ghost AI
+- ✅ Configurable settings
+- ✅ Performance optimized
 
 ---
 
@@ -200,17 +248,20 @@ Kiro's Ghost breaks free from desktop constraints by:
 5. ⚡ Execute a task and watch AI work
 6. 📊 Show real-time logs streaming
 7. 🎯 Resize panels to customize workspace
+8. 🦇 Open VS Code with Halloween extension
+9. 👻 Show spooky themes, icons, and effects
 
-**Key Message**: *"Start on mobile, finish on desktop - the ghost follows you!"*
+**Key Message**: *"Start on mobile, finish on desktop - the ghost follows you everywhere!"*
 
 ### Act 3: The Kicker (1 min)
-1. 🎯 Highlight: No installation needed
-2. 🚫 Highlight: No API required
-3. 📱 Highlight: Works on any device
-4. 🌍 Highlight: Accessible to everyone
-5. 🎃 Closing: "The future of development is haunted!"
+1. 🎯 Highlight: No installation needed (web)
+2. 🦇 Highlight: Optional desktop extension for power users
+3. 🚫 Highlight: No API required
+4. 📱 Highlight: Works on any device
+5. 🌍 Highlight: Accessible to everyone
+6. 🎃 Closing: "The future of development is haunted!"
 
-**Key Message**: *"Why install an IDE when the IDE can haunt you instead?"*
+**Key Message**: *"Why install an IDE when the IDE can haunt you instead? And if you do install, make it spooky!"*
 
 ---
 
@@ -309,6 +360,7 @@ Kiro's Ghost breaks free from desktop constraints by:
 
 ### Code Repository
 - ✅ Full source code on GitHub
+- ✅ Three complete components (backend, frontend, extension)
 - ✅ Comprehensive README
 - ✅ User guide and documentation
 - ✅ API reference
@@ -316,6 +368,7 @@ Kiro's Ghost breaks free from desktop constraints by:
 
 ### Documentation
 - ✅ README.md - Main project documentation
+- ✅ HACKATHON_SUBMISSION.md - This submission document
 - ✅ USER_GUIDE.md - Comprehensive user guide
 - ✅ KEYBOARD_SHORTCUTS.md - Shortcuts reference
 - ✅ backend/README.md - Backend documentation
@@ -323,6 +376,7 @@ Kiro's Ghost breaks free from desktop constraints by:
 - ✅ backend/API_REFERENCE.md - API documentation
 - ✅ frontend/README.md - Frontend documentation
 - ✅ frontend/ACCESSIBILITY.md - Accessibility compliance
+- ✅ kiro-extension/README.md - Extension documentation
 
 ### Demo Materials
 - ✅ 4-minute demo script
@@ -334,17 +388,18 @@ Kiro's Ghost breaks free from desktop constraints by:
 
 ## 🎃 Final Words
 
-**Kiro's Ghost** represents a fundamental shift in how we think about development tools. By breaking free from desktop constraints and embracing the web, we've created a truly accessible, mobile-first, universal development environment.
+**Kiro's Ghost** represents a fundamental shift in how we think about development tools. By offering **two supernatural paths** - a web orchestrator for universal access and a haunted VS Code extension for desktop power - we've created the most flexible, accessible, and fun development environment possible.
 
 The ghost is out of the bottle - and it's here to haunt your development workflow in the best way possible! 👻✨
 
 ### Why Kiro's Ghost Should Win
 
-1. **Innovation**: First truly mobile-friendly AI IDE
-2. **Technical Excellence**: Full-stack implementation with real-time AI
-3. **User Experience**: Intuitive, accessible, and delightful
-4. **Impact**: Democratizes AI development for everyone
-5. **Kiroween Spirit**: Spooky, fun, and creative throughout
+1. **Innovation**: First truly mobile-friendly AI IDE + haunted desktop extension
+2. **Technical Excellence**: Full-stack web app + VS Code extension with real-time AI
+3. **User Experience**: Intuitive, accessible, delightful, and spooky
+4. **Impact**: Democratizes AI development for everyone, everywhere
+5. **Kiroween Spirit**: Maximum spookiness - themes, icons, effects, and Halloween vibes throughout
+6. **Completeness**: Three integrated components working together seamlessly
 
 ---
 

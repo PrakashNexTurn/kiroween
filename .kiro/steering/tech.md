@@ -119,3 +119,64 @@ KIRO_LOG_LEVEL=INFO               # Logging level
 ```bash
 VITE_API_BASE_URL=http://localhost:8000  # Backend API URL
 ```
+
+
+## VS Code Extension
+
+### Core Technologies
+- **TypeScript 5.3** - Primary language
+- **VS Code Extension API** - Extension framework
+- **Node.js** - Runtime environment
+
+### Extension Components
+- **Themes** - JSON-based color themes
+- **Icons** - SVG-based icon theme
+- **Commands** - Extension commands and keybindings
+- **Settings** - Configurable extension settings
+- **Webviews** - HTML/CSS/JS for interactive effects
+
+### Development Tools
+- **vsce** - VS Code Extension packaging tool
+- **vitest** - Testing framework
+
+### Common Commands
+
+```bash
+# Extension setup and development
+cd kiro-extension
+npm install
+npm run compile                   # Compile TypeScript
+npm run watch                     # Watch mode for development
+npm test                          # Run tests
+
+# Packaging
+vsce package                      # Create .vsix package
+code --install-extension *.vsix   # Install extension locally
+```
+
+## Development Workflow
+
+### Full-Stack Development
+
+Run both web services in separate terminals:
+
+```bash
+# Terminal 1 - Backend
+cd backend
+python main.py
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+
+# Terminal 3 (Optional) - Extension Development
+cd kiro-extension
+npm run watch
+```
+
+### Extension Development
+
+1. Open `kiro-extension/` in VS Code
+2. Press F5 to launch Extension Development Host
+3. Test themes, icons, and effects in the new window
+4. Make changes and reload (Ctrl+R) to see updates
