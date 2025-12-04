@@ -121,6 +121,7 @@ export function SpecsTab({ projectId, onGenerationStateChange, onTaskComplete, o
           }}
           onExecutionStateChange={onExecutionStateChange}
           onEditClick={handleEditTasksClick}
+          onGenerateClick={handleGenerateClick}
         />
       ),
     },

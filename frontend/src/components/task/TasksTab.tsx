@@ -34,6 +34,7 @@ export interface TasksTabProps {
   onTaskComplete?: () => void;
   onExecutionStateChange?: (isExecuting: boolean) => void;
   onEditClick?: () => void;
+  onGenerateClick?: () => void;
 }
 
 /**
@@ -52,7 +53,7 @@ export interface TasksTabProps {
  * - 2.1.5: Disable button when adhoc task is executing
  * - 2.3.5: Refresh project status after adhoc task completion
  */
-export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, onEditClick }: TasksTabProps) {
+export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, onEditClick, onGenerateClick }: TasksTabProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [executing, setExecuting] = useState(false);
@@ -502,14 +503,34 @@ export function TasksTab({ projectId, onTaskComplete, onExecutionStateChange, on
 
   if (tasks.length === 0) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', gap: '16px' }}>
-        <Alert
-          message="No Tasks Found"
-          description="No tasks found in tasks.md"
-          type="info"
-          showIcon
-        />
-        <Button onClick={fetchTasks}>Refresh</Button>
+      <div
+        className="rounded-lg p-12 text-center"
+        style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+      >
+        <p
+          className="text-lg font-medium mb-2"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          No tasks yet
+        </p>
+        <p
+          className="mb-6"
+          style={{ color: 'var(--color-text-secondary)' }}
+        >
+          This tasks file hasn't been created yet. Generate it or create it manually.
+        </p>
+        <div className="flex gap-4 justify-center">
+          {onGenerateClick && (
+            <Button onClick={onGenerateClick} variant="primary">
+              Generate Tasks
+            </Button>
+          )}
+          {onEditClick && (
+            <Button onClick={onEditClick} variant="secondary">
+              Create Manually
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
